@@ -1,108 +1,108 @@
-# Claude Code: Usage, Rate Limits & Extra Usage
+# Claude Code: 사용량, 속도 제한 & 추가 사용량
 
-Understanding how usage limits work in Claude Code and how to keep working when you hit them.
+Claude Code에서 사용량 제한이 작동하는 방식과 제한에 도달했을 때 계속 작업하는 방법.
 
 <table width="100%">
 <tr>
-<td><a href="../">← Back to Claude Code Best Practice</a></td>
+<td><a href="../">← Claude Code 모범 사례로 돌아가기</a></td>
 <td align="right"><img src="../!/claude-jumping.svg" alt="Claude" width="60" /></td>
 </tr>
 </table>
 
 ---
 
-## Overview
+## 개요
 
-Claude Code on subscription plans (Pro, Max 5x, Max 20x) has usage limits that reset on a rolling window. Three built-in slash commands help you monitor and manage usage:
+구독 플랜(Pro, Max 5x, Max 20x)의 Claude Code는 롤링 창에서 리셋되는 사용량 제한이 있습니다. 세 가지 내장 슬래시 명령어가 사용량을 모니터링하고 관리하는 데 도움을 줍니다:
 
-| Command | Description | Available To |
-|---------|-------------|--------------|
-| `/usage` | Check plan limits and rate limit status | Pro, Max 5x, Max 20x |
-| `/extra-usage` | Configure pay-as-you-go overflow when limits are hit | Pro, Max 5x, Max 20x |
-| `/cost` | Show token usage and spending for the current session | API key users |
-
----
-
-## `/usage` — Check Your Limits
-
-Shows your current plan's usage limits and rate limit status. Useful for checking how much capacity you have left before hitting a limit.
+| 명령어 | 설명 | 사용 가능 대상 |
+|--------|------|-------------|
+| `/usage` | 플랜 제한 및 속도 제한 상태 확인 | Pro, Max 5x, Max 20x |
+| `/extra-usage` | 제한 도달 시 종량제 초과 설정 | Pro, Max 5x, Max 20x |
+| `/cost` | 현재 세션의 토큰 사용량 및 지출 표시 | API 키 사용자 |
 
 ---
 
-## `/extra-usage` — Keep Working Past Limits
+## `/usage` — 제한 확인
 
-The `/extra-usage` command configures **pay-as-you-go overflow billing** so Claude Code continues working seamlessly when you hit your plan's rate limits, instead of blocking you.
-
-### How It Works
-
-1. You hit your plan's rate limit (limits reset every 5 hours)
-2. If extra usage is enabled with available funds, Claude Code continues without interruption
-3. Overflow tokens are billed at **standard API rates**, separate from your subscription fee
-
-### Setting It Up
-
-The `/extra-usage` command in the CLI will guide you through configuration. You can also configure it on the web at **Settings > Usage** on claude.ai:
-
-1. Enable extra usage
-2. Add a payment method
-3. Set a **monthly spending cap** (or choose unlimited)
-4. Optionally add **prepaid funds** with auto-reload when balance drops below a threshold
-
-### Key Details
-
-| Detail | Value |
-|--------|-------|
-| Daily redemption limit | $2,000/day |
-| Billing | Separate from subscription, at standard API rates |
-| Limit reset window | Every 5 hours |
-
-### Known Issue
-
-As of February 2026, the `/extra-usage` CLI command is [undocumented](https://github.com/anthropics/claude-code/issues/12396) and may open a sign-in window without clear configuration options. Configuring through the **claude.ai web interface** is the more reliable path for now.
+현재 플랜의 사용량 제한 및 속도 제한 상태를 표시합니다. 제한에 도달하기 전에 얼마나 많은 용량이 남았는지 확인하는 데 유용합니다.
 
 ---
 
-## `/cost` — Session Spending (API Users)
+## `/extra-usage` — 제한 이후에도 계속 작업
 
-For users authenticating with an API key (not a subscription plan), `/cost` shows:
+`/extra-usage` 명령어는 플랜의 속도 제한에 도달했을 때 차단되는 대신 Claude Code가 원활하게 계속 작동하도록 **종량제 초과 청구**를 설정합니다.
 
-- Total cost for the current session
-- API duration and wall time
-- Token usage breakdown
-- Code changes made
+### 작동 방식
 
-This command is not relevant for Pro/Max subscription users.
+1. 플랜의 속도 제한에 도달합니다 (제한은 5시간마다 리셋)
+2. 추가 사용량이 활성화되어 있고 사용 가능한 자금이 있다면 Claude Code는 중단 없이 계속됩니다
+3. 초과 토큰은 구독료와 별도로 **표준 API 요금**으로 청구됩니다
 
----
+### 설정 방법
 
-## Fast Mode and Extra Usage
+CLI의 `/extra-usage` 명령어가 설정을 안내합니다. claude.ai의 **설정 > 사용량**에서 웹으로도 설정할 수 있습니다:
 
-Fast mode (`/fast`) uses Claude Opus 4.6 with faster output. It has a special billing relationship with extra usage:
+1. 추가 사용량 활성화
+2. 결제 수단 추가
+3. **월별 지출 한도** 설정 (또는 무제한 선택)
+4. 선택적으로 잔액이 임계값 아래로 떨어지면 자동 재충전되는 **선불 자금** 추가
 
-- Fast mode usage is **always billed to extra usage** from the first token
-- This applies even if you have remaining usage on your subscription plan
-- Fast mode does not consume your plan's included rate limits
+### 주요 세부사항
 
-This means you need extra usage enabled and funded to use `/fast`.
+| 세부사항 | 값 |
+|---------|-----|
+| 일일 상환 한도 | $2,000/일 |
+| 청구 | 구독과 별도, 표준 API 요금 |
+| 제한 리셋 창 | 5시간마다 |
 
----
+### 알려진 문제
 
-## CLI Startup Flags
-
-Two startup flags relate to usage budgets (API key users only, print mode):
-
-| Flag | Description |
-|------|-------------|
-| `--max-budget-usd <AMOUNT>` | Maximum dollar amount for API calls before stopping |
-| `--max-turns <NUMBER>` | Limit number of agentic turns |
-
-See [CLI Startup Flags Reference](claude-cli-startup-flags.md) for the full list.
+2026년 2월 기준으로 `/extra-usage` CLI 명령어는 [미문서화](https://github.com/anthropics/claude-code/issues/12396)이며 명확한 설정 옵션 없이 로그인 창이 열릴 수 있습니다. 지금은 **claude.ai 웹 인터페이스**를 통한 설정이 더 신뢰할 수 있는 방법입니다.
 
 ---
 
-## Sources
+## `/cost` — 세션 지출 (API 사용자)
 
-- [Extra usage for paid Claude plans — Claude Help Center](https://support.claude.com/en/articles/12429409-extra-usage-for-paid-claude-plans)
-- [Using Claude Code with your Pro or Max plan — Claude Help Center](https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan)
-- [/extra-usage slash command is undocumented — GitHub Issue #12396](https://github.com/anthropics/claude-code/issues/12396)
-- [Claude Code CLI Reference](https://code.claude.com/docs/en/cli-reference)
+API 키로 인증하는 사용자(구독 플랜 아님)의 경우 `/cost`는 다음을 표시합니다:
+
+- 현재 세션의 총 비용
+- API 지속 시간 및 실제 소요 시간
+- 토큰 사용량 분류
+- 변경된 코드
+
+이 명령어는 Pro/Max 구독 사용자에게는 해당되지 않습니다.
+
+---
+
+## 빠른 모드와 추가 사용량
+
+빠른 모드(`/fast`)는 더 빠른 출력으로 Claude Opus 4.6을 사용합니다. 추가 사용량과 특별한 청구 관계가 있습니다:
+
+- 빠른 모드 사용은 **첫 번째 토큰부터 항상 추가 사용량에 청구됩니다**
+- 구독 플랜에 남은 사용량이 있더라도 적용됩니다
+- 빠른 모드는 플랜의 포함된 속도 제한을 소모하지 않습니다
+
+즉, `/fast`를 사용하려면 추가 사용량이 활성화되고 자금이 있어야 합니다.
+
+---
+
+## CLI 시작 플래그
+
+사용량 예산과 관련된 두 가지 시작 플래그 (API 키 사용자 전용, 프린트 모드):
+
+| 플래그 | 설명 |
+|-------|------|
+| `--max-budget-usd <AMOUNT>` | 중지하기 전 API 호출의 최대 달러 금액 |
+| `--max-turns <NUMBER>` | 에이전트 턴 수 제한 |
+
+전체 목록은 [CLI 시작 플래그 참조](claude-cli-startup-flags.md)를 참고하세요.
+
+---
+
+## 출처
+
+- [유료 Claude 플랜을 위한 추가 사용량 — Claude 도움말 센터](https://support.claude.com/en/articles/12429409-extra-usage-for-paid-claude-plans)
+- [Pro 또는 Max 플랜으로 Claude Code 사용 — Claude 도움말 센터](https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan)
+- [/extra-usage 슬래시 명령어 미문서화 — GitHub 이슈 #12396](https://github.com/anthropics/claude-code/issues/12396)
+- [Claude Code CLI 참조](https://code.claude.com/docs/en/cli-reference)

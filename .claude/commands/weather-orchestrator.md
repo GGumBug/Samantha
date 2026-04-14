@@ -1,46 +1,46 @@
 ---
-description: Fetch weather data for Dubai and create an SVG weather card
+description: 두바이 날씨 데이터를 가져와 SVG 날씨 카드를 생성합니다
 model: haiku
 ---
 
-# Weather Orchestrator Command
+# 날씨 오케스트레이터 명령어
 
-Fetch the current temperature for Dubai, UAE and create a visual SVG weather card.
+두바이(UAE)의 현재 온도를 가져와 시각적인 SVG 날씨 카드를 생성합니다.
 
-## Workflow
+## 워크플로우
 
-### Step 1: Ask User Preference
+### 1단계: 사용자 선호도 확인
 
-Use the AskUserQuestion tool to ask the user whether they want the temperature in Celsius or Fahrenheit.
+AskUserQuestion 도구를 사용하여 사용자에게 섭씨 또는 화씨 중 어느 단위를 원하는지 묻습니다.
 
-### Step 2: Fetch Weather Data
+### 2단계: 날씨 데이터 가져오기
 
-Use the Task tool to invoke the weather agent:
+Task 도구를 사용하여 날씨 에이전트를 호출합니다:
 - subagent_type: weather-agent
-- description: Fetch Dubai weather data
-- prompt: Fetch the current temperature for Dubai, UAE in [unit requested by user]. Return the numeric temperature value and unit. The agent has a preloaded skill (weather-fetcher) that provides the detailed instructions.
+- description: 두바이 날씨 데이터 가져오기
+- prompt: 두바이(UAE)의 현재 온도를 [사용자가 요청한 단위]로 가져오세요. 숫자 온도 값과 단위를 반환하세요. 에이전트에는 상세 지침을 제공하는 스킬(weather-fetcher)이 사전 로드되어 있습니다.
 - model: haiku
 
-Wait for the agent to complete and capture the returned temperature value and unit.
+에이전트가 완료될 때까지 기다리고 반환된 온도 값과 단위를 캡처합니다.
 
-### Step 3: Create SVG Weather Card
+### 3단계: SVG 날씨 카드 생성
 
-Use the Skill tool to invoke the weather-svg-creator skill:
+Skill 도구를 사용하여 weather-svg-creator 스킬을 호출합니다:
 - skill: weather-svg-creator
 
-The skill will use the temperature value and unit from Step 2 (available in the current context) to create the SVG card and write output files.
+스킬은 2단계의 온도 값과 단위(현재 컨텍스트에서 사용 가능)를 사용하여 SVG 카드를 생성하고 출력 파일을 작성합니다.
 
-## Critical Requirements
+## 핵심 요구사항
 
-1. **Use Task Tool for Agent**: DO NOT use bash commands to invoke agents. You must use the Task tool.
-2. **Use Skill Tool for SVG Creator**: Invoke the SVG creator via the Skill tool, not the Task tool.
-3. **Pass User Preference**: Include the user's temperature unit preference when invoking the agent.
-4. **Sequential Flow**: Complete each step before moving to the next.
+1. **에이전트에는 Task 도구 사용**: bash 명령어로 에이전트를 호출하지 마세요. Task 도구를 사용해야 합니다.
+2. **SVG 크리에이터에는 Skill 도구 사용**: Task 도구가 아닌 Skill 도구를 통해 SVG 크리에이터를 호출합니다.
+3. **사용자 선호도 전달**: 에이전트 호출 시 사용자의 온도 단위 선호도를 포함합니다.
+4. **순차적 흐름**: 각 단계를 완료한 후 다음 단계로 진행합니다.
 
-## Output Summary
+## 출력 요약
 
-Provide a clear summary to the user showing:
-- Temperature unit requested
-- Temperature fetched from Dubai
-- SVG card created at `orchestration-workflow/weather.svg`
-- Summary written to `orchestration-workflow/output.md`
+사용자에게 다음을 표시하는 명확한 요약을 제공합니다:
+- 요청한 온도 단위
+- 두바이에서 가져온 온도
+- `orchestration-workflow/weather.svg`에 생성된 SVG 카드
+- `orchestration-workflow/output.md`에 작성된 요약

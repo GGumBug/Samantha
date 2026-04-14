@@ -1,29 +1,29 @@
 ---
 name: weather-svg-creator
-description: Creates an SVG weather card showing the current temperature for Dubai. Writes the SVG to orchestration-workflow/weather.svg and updates orchestration-workflow/output.md.
+description: 두바이의 현재 온도를 보여주는 SVG 날씨 카드를 생성합니다. SVG를 orchestration-workflow/weather.svg에 저장하고 orchestration-workflow/output.md를 업데이트합니다.
 ---
 
-# Weather SVG Creator Skill
+# 날씨 SVG 생성 스킬
 
-Creates a visual SVG weather card for Dubai, UAE and writes the output files.
+두바이(UAE)의 시각적 SVG 날씨 카드를 생성하고 출력 파일을 작성합니다.
 
-## Task
+## 작업
 
-You will receive a temperature value and unit (Celsius or Fahrenheit) from the calling context. Create an SVG weather card and write both the SVG and a markdown summary.
+호출 컨텍스트에서 온도 값과 단위(섭씨 또는 화씨)를 받습니다. SVG 날씨 카드를 생성하고 SVG와 마크다운 요약을 모두 작성합니다.
 
-## Instructions
+## 지침
 
-1. **Create SVG** — Use the SVG template from [reference.md](reference.md), replacing placeholders with actual values
-2. **Write SVG file** — Read then write to `orchestration-workflow/weather.svg`
-3. **Write summary** — Read then write to `orchestration-workflow/output.md` using the markdown template from [reference.md](reference.md)
+1. **SVG 생성** — [reference.md](reference.md)의 SVG 템플릿을 사용하여 플레이스홀더를 실제 값으로 교체합니다
+2. **SVG 파일 작성** — `orchestration-workflow/weather.svg`를 읽은 후 작성합니다
+3. **요약 작성** — [reference.md](reference.md)의 마크다운 템플릿을 사용하여 `orchestration-workflow/output.md`를 읽은 후 작성합니다
 
-## Rules
+## 규칙
 
-- Use the exact temperature value and unit provided — do not re-fetch or modify
-- The SVG must be self-contained and valid
-- Both output files go in the `orchestration-workflow/` directory
+- 제공된 온도 값과 단위를 그대로 사용합니다 — 다시 가져오거나 수정하지 않습니다
+- SVG는 독립적이고 유효해야 합니다
+- 두 출력 파일 모두 `orchestration-workflow/` 디렉토리에 저장합니다
 
-## Additional resources
+## 추가 리소스
 
-- For SVG template, output template, and design specs, see [reference.md](reference.md)
-- For example input/output pairs, see [examples.md](examples.md)
+- SVG 템플릿, 출력 템플릿, 디자인 사양은 [reference.md](reference.md)를 참고합니다
+- 입력/출력 예시는 [examples.md](examples.md)를 참고합니다

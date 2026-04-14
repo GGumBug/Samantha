@@ -1,10 +1,10 @@
-# Skills Implementation
+# 스킬 구현
 
 ![Last Updated](https://img.shields.io/badge/Last_Updated-Mar_02%2C_2026-white?style=flat&labelColor=555)
 
 <table width="100%">
 <tr>
-<td><a href="../">← Back to Claude Code Best Practice</a></td>
+<td><a href="../">← Claude Code 모범 사례로 돌아가기</a></td>
 <td align="right"><img src="../!/claude-jumping.svg" alt="Claude" width="60" /></td>
 </tr>
 </table>
@@ -13,96 +13,94 @@
 
 <a href="#weather-svg-creator"><img src="../!/tags/implemented-hd.svg" alt="Implemented"></a>
 
-Two skills are implemented in this repo as part of the **Command → Agent → Skill** architecture pattern, demonstrating two distinct skill invocation patterns: **agent skills** (preloaded) and **skills** (invoked directly).
+이 저장소에는 **명령어 → 에이전트 → 스킬** 아키텍처 패턴의 일부로 두 가지 스킬이 구현되어 있으며, **에이전트 스킬**(사전 로드됨)과 **스킬**(직접 호출됨)이라는 두 가지 별개의 스킬 호출 패턴을 보여줍니다.
 
 ---
 
-## Weather SVG Creator (Skill)
+## 날씨 SVG 생성기 (스킬)
 
-**File**: [`.claude/skills/weather-svg-creator/SKILL.md`](../.claude/skills/weather-svg-creator/SKILL.md)
+**파일**: [`.claude/skills/weather-svg-creator/SKILL.md`](../.claude/skills/weather-svg-creator/SKILL.md)
 
 ```yaml
 ---
 name: weather-svg-creator
-description: Creates an SVG weather card showing the current temperature for
-  Dubai. Writes the SVG to orchestration-workflow/weather.svg and updates
-  orchestration-workflow/output.md.
+description: 두바이의 현재 온도를 보여주는 SVG 날씨 카드를 생성합니다.
+  SVG를 orchestration-workflow/weather.svg에 저장하고
+  orchestration-workflow/output.md를 업데이트합니다.
 ---
 
-# Weather SVG Creator Skill
+# 날씨 SVG 생성기 스킬
 
-This skill creates a visual SVG weather card and writes the output files.
+이 스킬은 시각적 SVG 날씨 카드를 생성하고 출력 파일을 작성합니다.
 
-## Task
-Create an SVG weather card displaying the temperature for Dubai, UAE,
-and write it along with a summary to output files.
+## 작업
+두바이(UAE)의 온도를 표시하는 SVG 날씨 카드를 생성하고
+요약과 함께 출력 파일에 작성합니다.
 
-## Instructions
-You will receive the temperature value and unit (Celsius or Fahrenheit)
-from the calling context.
+## 지침
+호출 컨텍스트에서 온도 값과 단위(섭씨 또는 화씨)를 받습니다.
 
-### 1. Create SVG Weather Card
-Generate a clean SVG weather card...
+### 1. SVG 날씨 카드 생성
+깔끔한 SVG 날씨 카드를 생성합니다...
 
-### 2. Write SVG File
-Write the SVG content to `orchestration-workflow/weather.svg`.
+### 2. SVG 파일 작성
+SVG 내용을 `orchestration-workflow/weather.svg`에 작성합니다.
 
-### 3. Write Output Summary
-Write to `orchestration-workflow/output.md`...
+### 3. 출력 요약 작성
+`orchestration-workflow/output.md`에 작성합니다...
 
 ...
 ```
 
-This is a **skill** — invoked directly by the command via the Skill tool. It receives the temperature data from the conversation context and creates the SVG weather card and output summary.
+이것은 **스킬** — 명령어가 Skill 도구를 통해 직접 호출합니다. 대화 컨텍스트에서 온도 데이터를 받아 SVG 날씨 카드와 출력 요약을 생성합니다.
 
 ---
 
-## Weather Fetcher (Agent Skill)
+## 날씨 가져오기 (에이전트 스킬)
 
-**File**: [`.claude/skills/weather-fetcher/SKILL.md`](../.claude/skills/weather-fetcher/SKILL.md)
+**파일**: [`.claude/skills/weather-fetcher/SKILL.md`](../.claude/skills/weather-fetcher/SKILL.md)
 
 ```yaml
 ---
 name: weather-fetcher
-description: Instructions for fetching current weather temperature data
-  for Dubai, UAE from Open-Meteo API
+description: 두바이(UAE)의 현재 기상 온도 데이터를
+  Open-Meteo API에서 가져오는 지침
 user-invocable: false
 ---
 
-# Weather Fetcher Skill
+# 날씨 가져오기 스킬
 
-This skill provides instructions for fetching current weather data.
+이 스킬은 현재 날씨 데이터를 가져오는 지침을 제공합니다.
 
-## Task
-Fetch the current temperature for Dubai, UAE in the requested unit
-(Celsius or Fahrenheit).
+## 작업
+두바이(UAE)의 현재 온도를 요청된 단위(섭씨 또는 화씨)로 가져옵니다.
 
-## Instructions
-1. Fetch Weather Data: Use the WebFetch tool to get current weather data
-   - Celsius URL: https://api.open-meteo.com/v1/forecast?latitude=25.2048&longitude=55.2708&current=temperature_2m&temperature_unit=celsius
-   - Fahrenheit URL: https://api.open-meteo.com/v1/forecast?latitude=25.2048&longitude=55.2708&current=temperature_2m&temperature_unit=fahrenheit
-2. Extract Temperature: From the JSON response, extract `current.temperature_2m`
-3. Return Result: Return the temperature value and unit clearly.
+## 지침
+1. 날씨 데이터 가져오기: WebFetch 도구를 사용하여 현재 날씨 데이터를 가져옵니다
+   - 섭씨 URL: https://api.open-meteo.com/v1/forecast?latitude=25.2048&longitude=55.2708&current=temperature_2m&temperature_unit=celsius
+   - 화씨 URL: https://api.open-meteo.com/v1/forecast?latitude=25.2048&longitude=55.2708&current=temperature_2m&temperature_unit=fahrenheit
+2. 온도 추출: JSON 응답에서 `current.temperature_2m` 추출
+3. 결과 반환: 온도 값과 단위를 명확하게 반환합니다.
 
 ...
 ```
 
-This is an **agent skill** — preloaded into the `weather-agent` at startup via the `skills:` frontmatter field. It is not invoked directly; instead, it serves as domain knowledge injected into the agent's context. Note `user-invocable: false` which hides it from the `/` command menu.
+이것은 **에이전트 스킬** — `skills:` 프론트매터 필드를 통해 시작 시 `weather-agent`에 사전 로드됩니다. 직접 호출되지 않고 에이전트 컨텍스트에 주입된 도메인 지식으로 역할합니다. `/` 명령어 메뉴에서 숨기는 `user-invocable: false`를 참고하세요.
 
 ---
 
-## Two Skill Patterns
+## 두 가지 스킬 패턴
 
-| Pattern | Invocation | Example | Key Difference |
-|---------|-----------|---------|----------------|
-| **Skill** | `Skill(skill: "name")` | `weather-svg-creator` | Invoked directly via Skill tool |
-| **Agent Skill** | Preloaded via `skills:` field | `weather-fetcher` | Injected into agent context at startup |
+| 패턴 | 호출 | 예시 | 주요 차이점 |
+|------|------|------|------------|
+| **스킬** | `Skill(skill: "name")` | `weather-svg-creator` | Skill 도구를 통해 직접 호출 |
+| **에이전트 스킬** | `skills:` 필드를 통해 사전 로드 | `weather-fetcher` | 시작 시 에이전트 컨텍스트에 주입 |
 
 ---
 
-## ![How to Use](../!/tags/how-to-use.svg)
+## ![사용 방법](../!/tags/how-to-use.svg)
 
-**Skill** — invoke directly via slash command:
+**스킬** — 슬래시 명령어로 직접 호출:
 ```bash
 $ claude
 > /weather-svg-creator
@@ -110,11 +108,11 @@ $ claude
 
 ---
 
-## ![How to Implement](../!/tags/how-to-implement.svg)
+## ![구현 방법](../!/tags/how-to-implement.svg)
 
-Ask Claude to create one for you — it will generate the markdown file with YAML frontmatter and body in `.claude/skills/my-skill/SKILL.md`
+Claude에게 하나 만들어달라고 요청하세요 — YAML 프론트매터와 본문이 있는 마크다운 파일을 `.claude/skills/my-skill/SKILL.md`에 생성해드립니다
 
-# My Skill
+# 나의 스킬
 
-Instructions for what the skill does.
+스킬의 역할에 대한 지침.
 ```

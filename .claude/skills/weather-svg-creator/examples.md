@@ -1,15 +1,15 @@
-# Weather SVG Creator — Examples
+# 날씨 SVG 생성기 — 예시
 
-## Example 1: Celsius
+## 예시 1: 섭씨
 
-### Input
+### 입력
 
 ```
 Temperature: 26.2°C
 Unit: Celsius
 ```
 
-### SVG Output (`orchestration-workflow/weather.svg`)
+### SVG 출력 (`orchestration-workflow/weather.svg`)
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160" width="300" height="160">
@@ -20,7 +20,7 @@ Unit: Celsius
 </svg>
 ```
 
-### Markdown Output (`orchestration-workflow/output.md`)
+### 마크다운 출력 (`orchestration-workflow/output.md`)
 
 ```markdown
 # Weather Result
@@ -40,16 +40,16 @@ Celsius
 
 ---
 
-## Example 2: Fahrenheit
+## 예시 2: 화씨
 
-### Input
+### 입력
 
 ```
 Temperature: 79.2°F
 Unit: Fahrenheit
 ```
 
-### SVG Output (`orchestration-workflow/weather.svg`)
+### SVG 출력 (`orchestration-workflow/weather.svg`)
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160" width="300" height="160">
@@ -60,7 +60,7 @@ Unit: Fahrenheit
 </svg>
 ```
 
-### Markdown Output (`orchestration-workflow/output.md`)
+### 마크다운 출력 (`orchestration-workflow/output.md`)
 
 ```markdown
 # Weather Result

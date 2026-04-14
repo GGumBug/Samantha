@@ -1,38 +1,38 @@
 ---
 name: vibe-to-agentic-framework
-description: The conceptual framework behind the presentation — what "Vibe Coding to Agentic Engineering" means, why the journey is structured the way it is, and how every slide fits the narrative arc
+description: 프레젠테이션의 개념적 프레임워크 — "Vibe Coding에서 Agentic Engineering으로"의 의미, 여정이 그렇게 구성된 이유, 모든 슬라이드가 내러티브 호에 어떻게 맞는지
 ---
 
-# The "Vibe Coding to Agentic Engineering" Framework
+# "Vibe Coding에서 Agentic Engineering으로" 프레임워크
 
-This skill teaches the **conceptual model** behind the presentation. Every slide and section exists to tell a single story: how a developer incrementally moves from unstructured "vibe coding" (Low level) to high-level agentic engineering (High level).
+이 스킬은 프레젠테이션 뒤에 있는 **개념적 모델**을 가르칩니다. 모든 슬라이드와 섹션은 하나의 이야기를 전달하기 위해 존재합니다: 개발자가 어떻게 비구조적인 "Vibe Coding"(Low 레벨)에서 고수준 에이전트 엔지니어링(High 레벨)으로 점진적으로 이동하는지입니다.
 
-## Core Concept
+## 핵심 개념
 
-**Vibe Coding (Low level)** is when a developer uses Claude Code with no structure — no project context, no conventions, no reusable knowledge. Every prompt is a coin flip. Claude might create random endpoints, ignore existing patterns, skip tests, and produce inconsistent code. The codebase drifts toward entropy with every interaction.
+**Vibe Coding (Low 레벨)** 은 개발자가 구조 없이 Claude Code를 사용할 때입니다 — 프로젝트 컨텍스트 없음, 관례 없음, 재사용 가능한 지식 없음. 모든 프롬프트는 도박입니다. Claude가 무작위 엔드포인트를 만들고, 기존 패턴을 무시하고, 테스트를 건너뛰고, 일관성 없는 코드를 생성할 수 있습니다. 코드베이스는 모든 상호작용과 함께 엔트로피를 향해 드리프트합니다.
 
-**Agentic Engineering (High level)** is when Claude Code operates as a fully configured engineering system. It knows the project architecture (CLAUDE.md), follows scoped conventions (Rules), loads domain expertise on demand (Skills), delegates to specialized workers (Agents), orchestrates multi-step workflows (Commands), automates lifecycle events (Hooks), and connects to external tools (MCP Servers). Every prompt produces consistent, tested, production-quality code.
+**Agentic Engineering (High 레벨)** 은 Claude Code가 완전히 구성된 엔지니어링 시스템으로 작동할 때입니다. 프로젝트 아키텍처를 알고(CLAUDE.md), 범위가 지정된 관례를 따르고(Rules), 수요에 따라 도메인 전문 지식을 로드하고(Skills), 전문화된 작업자에게 위임하고(Agents), 다단계 워크플로우를 오케스트레이션하고(Commands), 라이프사이클 이벤트를 자동화하고(Hooks), 외부 도구에 연결합니다(MCP Servers). 모든 프롬프트는 일관성 있고, 테스트되고, 프로덕션 품질의 코드를 생성합니다.
 
-The journey between these two extremes is **incremental and cumulative**. Each best practice builds on the previous ones, and the presentation teaches them in the order a developer should adopt them.
+이 두 극단 사이의 여정은 **점진적이고 누적적**입니다. 각 모범 사례는 이전 것 위에 구축되고, 프레젠테이션은 개발자가 채택해야 하는 순서대로 가르칩니다.
 
-## The 4-Level Journey System
+## 4단계 여정 시스템
 
-The presentation uses a 4-level scoring system instead of a percentage bar:
+프레젠테이션은 퍼센트 바 대신 4단계 점수 시스템을 사용합니다:
 
-| Level | Order | Color | Journey Bar Height | Description |
-|-------|-------|-------|--------------------|-------------|
-| Low | 1 | Red/orange (`hsl(0, 70%, 45%)`) | 25% | Vibe coding territory — no structure |
-| Medium | 2 | Yellow (`hsl(40, 70%, 45%)`) | 50% | Structured workflows, some automation |
-| High | 3 | Light green (`hsl(80, 70%, 45%)`) | 75% | Domain knowledge, skills, custom agents |
-| Pro | 4 | Deep green (`hsl(120, 70%, 45%)`) | 100% | Full agentic engineering, multi-agent teams |
+| 레벨 | 순서 | 색상 | 여정 바 높이 | 설명 |
+|------|------|------|------------|------|
+| Low | 1 | 빨간색/주황색 (`hsl(0, 70%, 45%)`) | 25% | Vibe coding 영역 — 구조 없음 |
+| Medium | 2 | 노란색 (`hsl(40, 70%, 45%)`) | 50% | 구조화된 워크플로우, 일부 자동화 |
+| High | 3 | 연한 녹색 (`hsl(80, 70%, 45%)`) | 75% | 도메인 지식, 스킬, 커스텀 에이전트 |
+| Pro | 4 | 진한 녹색 (`hsl(120, 70%, 45%)`) | 100% | 완전한 에이전트 엔지니어링, 다중 에이전트 팀 |
 
-The journey bar is hidden on slide 1 (title slide) and appears from slide 2 onward. Levels are set via `data-level` attributes on key transition slides and inherited by subsequent slides until the next level change. A `.level-badge` is JS-injected on the slide's `h1` when the level changes (do not hardcode these in HTML).
+여정 바는 슬라이드 1(제목 슬라이드)에서 숨겨지고 슬라이드 2부터 나타납니다. 레벨은 주요 전환 슬라이드의 `data-level` 속성으로 설정되고 다음 레벨 변경까지 후속 슬라이드에 상속됩니다. 레벨이 변경될 때 슬라이드의 `h1`에 JS가 `.level-badge`를 자동 주입합니다 (HTML에 하드코딩하지 마세요).
 
-## The Running Example: TodoApp Monorepo
+## 실행 예시: TodoApp 모노레포
 
-Every technique is demonstrated on a realistic full-stack project. The presentation shows the transformation from a plain project (vibe coding) to one with full Claude Code configuration (agentic engineering):
+모든 기술은 현실적인 풀스택 프로젝트에서 시연됩니다. 프레젠테이션은 일반 프로젝트(Vibe Coding)에서 전체 Claude Code 설정이 있는 프로젝트(Agentic Engineering)로의 변환을 보여줍니다:
 
-**Before (Vibe Coding):**
+**이전 (Vibe Coding):**
 ```
 todoapp/
 ├── backend/          # FastAPI (Python)
@@ -46,125 +46,125 @@ todoapp/
     └── lib/
 ```
 
-**After (Agentic Engineering):**
+**이후 (Agentic Engineering):**
 ```
 todoapp/
-├── .claude/                  # Claude Code config
-│   ├── agents/               # Custom subagents
-│   ├── skills/               # Domain knowledge
-│   ├── commands/             # Slash commands
-│   ├── hooks/                # Lifecycle scripts
-│   ├── rules/                # Modular instructions
-│   ├── settings.json         # Team settings
-│   └── settings.local.json   # Personal settings
+├── .claude/                  # Claude Code 설정
+│   ├── agents/               # 커스텀 서브에이전트
+│   ├── skills/               # 도메인 지식
+│   ├── commands/             # 슬래시 명령어
+│   ├── hooks/                # 라이프사이클 스크립트
+│   ├── rules/                # 모듈식 지침
+│   ├── settings.json         # 팀 설정
+│   └── settings.local.json   # 개인 설정
 ├── backend/
-│   └── CLAUDE.md             # Backend instructions
+│   └── CLAUDE.md             # 백엔드 지침
 ├── frontend/
-│   └── CLAUDE.md             # Frontend instructions
-├── .mcp.json                 # Managed MCP servers
-└── CLAUDE.md                 # Project instructions
+│   └── CLAUDE.md             # 프론트엔드 지침
+├── .mcp.json                 # 관리되는 MCP 서버
+└── CLAUDE.md                 # 프로젝트 지침
 ```
 
-**Why TodoApp?** It's small enough to fit on slides but complex enough to demonstrate real problems: a backend with route patterns and test conventions, a frontend with component hierarchy and design tokens, and a monorepo structure where cross-cutting concerns (like adding a new feature) require coordination between both sides.
+**왜 TodoApp인가?** 슬라이드에 맞을 만큼 작지만 실제 문제를 시연할 만큼 복잡합니다: 라우트 패턴과 테스트 관례가 있는 백엔드, 컴포넌트 계층 구조와 디자인 토큰이 있는 프론트엔드, 그리고 새로운 기능 추가와 같은 크로스커팅 관심사가 양쪽 조율을 필요로 하는 모노레포 구조입니다.
 
-The TodoApp makes the vibe-coding problem concrete: without structure, asking Claude to "add a notes feature" produces a random `/api/notes` endpoint that doesn't follow `routes/todos.py` patterns, a standalone page with no sidebar navigation, and zero tests. With full agentic setup, the same request produces a route following existing patterns, a page integrated into the sidebar, and tests matching `test_todos.py` style.
+TodoApp은 Vibe Coding 문제를 구체적으로 만듭니다: 구조 없이 Claude에게 "notes 기능 추가"를 요청하면 `routes/todos.py` 패턴을 따르지 않는 무작위 `/api/notes` 엔드포인트, 사이드바 탐색이 없는 독립형 페이지, 그리고 테스트 없음이 생성됩니다. 완전한 에이전트 설정과 함께 같은 요청은 기존 패턴을 따르는 라우트, 사이드바에 통합된 페이지, `test_todos.py` 스타일에 맞는 테스트를 생성합니다.
 
-## The Journey Arc: Why This Order
+## 여정 호: 이 순서인 이유
 
-The presentation follows a deliberate pedagogical sequence. Each section unlocks a new capability layer:
+프레젠테이션은 의도적인 교육적 순서를 따릅니다. 각 섹션은 새로운 기능 계층을 열어줍니다:
 
-### Part 0: Introduction (Slides 1–4, no weight)
-**Purpose:** Set the stage. Introduce the TodoApp, define vibe coding, and show the destination.
-- Title slide establishes the journey metaphor
-- Example Project shows the transformation: before/after comparison of TodoApp — plain project structure vs one with full Claude Code configuration (.claude/, CLAUDE.md, .mcp.json, etc.)
-- "What is Vibe Coding?" creates the 0% baseline — the pain point
-- Journey Map provides a clickable TOC showing the full path ahead
+### 파트 0: 소개 (슬라이드 1-4, 가중치 없음)
+**목적:** 무대 설정. TodoApp 소개, Vibe Coding 정의, 목적지 제시.
+- 제목 슬라이드는 여정 메타포를 확립
+- 예시 프로젝트는 변환을 보여줌: TodoApp의 전/후 비교 — 일반 프로젝트 구조 vs 전체 Claude Code 설정이 있는 것(.claude/, CLAUDE.md, .mcp.json 등)
+- "Vibe Coding이란?"은 0% 기준선 — 문제점을 형성
+- 여정 맵은 앞에 있는 전체 경로를 보여주는 클릭 가능한 TOC를 제공
 
-### Part 1: Prerequisites (Slides 5–9, no weight)
-**Purpose:** Get Claude Code installed and running. This is purely logistical — no engineering practices yet.
-- Installing, authentication, first session, interface overview
-- No weight because knowing how to install a tool doesn't improve code quality
-- The "first session" IS vibe coding — this is intentional, so the developer experiences the 0% state firsthand
+### 파트 1: 사전 준비 (슬라이드 5-9, 가중치 없음)
+**목적:** Claude Code 설치 및 실행. 순전히 물류적 — 아직 엔지니어링 관행 없음.
+- 설치, 인증, 첫 세션, 인터페이스 개요
+- 도구 설치 방법을 알아도 코드 품질이 향상되지 않으므로 가중치 없음
+- "첫 세션"은 Vibe Coding입니다 — 의도적인 것으로, 개발자가 직접 0% 상태를 경험하게 합니다
 
-### Part 2: Better Prompting (Slides 10–17, Level: Low)
-**Purpose:** The first real improvement. Better inputs produce better outputs, even without any project configuration.
-- **Good vs Bad Prompts:** Specific, scoped prompts vs vague requests. The simplest possible improvement.
-- **Providing Context:** Using `@files` to give Claude the code it needs. Reduces hallucination immediately.
-- **Context Window & /compact:** Understanding the finite context window prevents degraded responses in long sessions.
-- **Plan Mode:** `/plan` forces thinking before coding. Prevents wasted effort on wrong approaches.
+### 파트 2: 더 나은 프롬프팅 (슬라이드 10-17, 레벨: Low)
+**목적:** 첫 번째 실질적 개선. 프로젝트 설정 없이도 더 나은 입력이 더 나은 출력을 생성합니다.
+- **좋은 vs 나쁜 프롬프트:** 구체적이고 범위가 지정된 프롬프트 vs 모호한 요청. 가장 단순한 가능한 개선.
+- **컨텍스트 제공:** `@파일`을 사용하여 Claude에게 필요한 코드 제공. 즉시 환각을 줄입니다.
+- **컨텍스트 창 & /compact:** 유한한 컨텍스트 창을 이해하면 긴 세션에서 저하된 응답을 방지합니다.
+- **계획 모드:** `/plan`은 코딩 전에 생각을 강제합니다. 잘못된 접근법에 대한 낭비된 노력을 방지합니다.
 
-**Why Low level:** Prompting is foundational but limited. It improves individual interactions but doesn't create lasting project knowledge. Each session starts from zero.
+**왜 Low 레벨인가:** 프롬프팅은 기초적이지만 제한적입니다. 개별 상호작용을 개선하지만 지속적인 프로젝트 지식을 만들지 않습니다. 각 세션은 제로에서 시작합니다.
 
-### Part 3: Project Memory (Slides 18–24, Level: Medium)
-**Purpose:** The leap from session-level to project-level knowledge. Claude now remembers across sessions.
-- **CLAUDE.md & /init:** The project's "README for Claude." Establishes architecture, tech stack, and conventions. This is the single most impactful file.
-- **What to Include:** Practical guidance on writing effective CLAUDE.md content (keep under 150 lines, focus on what Claude needs to know).
-- **Rules:** Path-scoped conventions in `.claude/rules/`. Rules are a multiplier — they apply automatically to every matching file, enforcing consistency without developer effort. A single `backend-testing.md` rule ensures every test follows the same pattern forever.
+### 파트 3: 프로젝트 메모리 (슬라이드 18-24, 레벨: Medium)
+**목적:** 세션 레벨에서 프로젝트 레벨 지식으로의 도약. Claude가 이제 세션 간에 기억합니다.
+- **CLAUDE.md & /init:** 프로젝트의 "Claude를 위한 README". 아키텍처, 기술 스택, 관례를 확립합니다. 이것이 단일 가장 영향력 있는 파일입니다.
+- **포함할 내용:** 효과적인 CLAUDE.md 콘텐츠 작성에 대한 실용적 지침 (150줄 이하 유지, Claude가 알아야 하는 것에 집중).
+- **Rules:** `.claude/rules/`의 경로 범위 관례. Rules는 승수입니다 — 일치하는 모든 파일에 자동으로 적용되어 개발자 노력 없이 일관성을 강화합니다. 단일 `backend-testing.md` 규칙은 모든 테스트가 영원히 같은 패턴을 따르게 합니다.
 
-**Why Medium level:** Project memory transforms Claude from a stateless tool into a context-aware collaborator. But knowledge alone doesn't create workflows.
+**왜 Medium 레벨인가:** 프로젝트 메모리는 Claude를 상태 없는 도구에서 컨텍스트 인식 협업자로 변환합니다. 하지만 지식만으로는 워크플로우를 만들지 않습니다.
 
-### Part 4: Structured Workflows (Slides 25–28, Level: Medium)
-**Purpose:** Systematic approaches that prevent wasted effort and improve execution quality.
-- **Task Lists:** Breaking complex work into trackable steps. Prevents scope drift and ensures completeness.
-- **Model Selection:** Choosing the right model (Opus for architecture, Sonnet for implementation, Haiku for quick tasks) optimizes cost and quality.
+### 파트 4: 구조화된 워크플로우 (슬라이드 25-28, 레벨: Medium)
+**목적:** 낭비된 노력을 방지하고 실행 품질을 향상시키는 체계적 접근법.
+- **작업 목록:** 복잡한 작업을 추적 가능한 단계로 분류. 범위 드리프트를 방지하고 완성도를 보장합니다.
+- **모델 선택:** 올바른 모델 선택 (아키텍처에는 Opus, 구현에는 Sonnet, 빠른 작업에는 Haiku)은 비용과 품질을 최적화합니다.
 
-**Why still Medium level:** Workflows are important but relatively simple concepts. They build on Part 3's project memory and use it more systematically. The step up to High comes with domain knowledge.
+**왜 여전히 Medium 레벨인가:** 워크플로우는 중요하지만 상대적으로 단순한 개념입니다. 파트 3의 프로젝트 메모리를 기반으로 하고 더 체계적으로 사용합니다. High로의 도약은 도메인 지식과 함께 옵니다.
 
-### Part 5: Domain Knowledge (Slides 29–33, Level: High)
-**Purpose:** Reusable, on-demand expertise. Skills are the bridge between static memory (CLAUDE.md/Rules) and dynamic agents.
-- **What Are Skills:** Skills as packaged domain knowledge that Claude loads when relevant. The concept of progressive disclosure.
-- **Creating Skills:** Hands-on: building a `frontend-conventions` skill for the TodoApp that teaches Tailwind tokens, component patterns, and sidebar integration.
-- **Skill Frontmatter & Invocation:** The technical details: YAML frontmatter, manual vs auto-discovery invocation, the `context: fork` option.
+### 파트 5: 도메인 지식 (슬라이드 29-33, 레벨: High)
+**목적:** 재사용 가능한 온디맨드 전문 지식. 스킬은 정적 메모리(CLAUDE.md/Rules)와 동적 에이전트 사이의 다리입니다.
+- **스킬이란:** Claude가 관련이 있을 때 로드하는 패키지된 도메인 지식으로서의 스킬. 점진적 공개의 개념.
+- **스킬 생성:** 실습: TodoApp을 위한 `frontend-conventions` 스킬 구축 — Tailwind 토큰, 컴포넌트 패턴, 사이드바 통합을 가르칩니다.
+- **스킬 프론트매터 & 호출:** 기술적 세부사항: YAML 프론트매터, 수동 vs 자동 검색 호출, `context: fork` 옵션.
 
-**Why High level:** Skills are the first "multiplier" concept — one skill definition improves every future interaction in its domain. But skills are passive knowledge; they need agents to become active.
+**왜 High 레벨인가:** 스킬은 첫 번째 "승수" 개념입니다 — 하나의 스킬 정의가 해당 도메인의 모든 미래 상호작용을 개선합니다. 하지만 스킬은 수동적 지식입니다; 에이전트가 필요해야 활성화됩니다.
 
-### Part 6: Agentic Engineering (Slides 34–46, Level: High)
-**Purpose:** The destination covered in this presentation. Autonomous, specialized agents that coordinate to build features end-to-end.
-- **What Are Agents:** The concept of specialized subagents with constrained tools and preloaded skills.
-- **Frontend Engineer Agent:** A concrete agent that uses the TodoApp's frontend conventions, adds routes to sidebar, follows design tokens. Before/after comparison shows the transformation.
-- **Backend Engineer Agent:** Parallel agent for the backend — follows FastAPI route patterns, SQLAlchemy models, writes tests matching existing style.
-- **Commands & Orchestration:** The capstone pattern: Command → Agent → Skills. A single `/add-feature` command coordinates frontend + backend agents, each with their own skills, to deliver a complete feature. This is the architectural pinnacle.
-- **Hooks & MCP:** Lifecycle automation (pre-commit checks, sound notifications) and external tool integration. The final automation layer.
-- **Command → Agent → Skills:** The full architecture diagram. Shows how all pieces connect: commands invoke agents, agents load skills, skills provide knowledge. This is the "High level" understanding slide.
+### 파트 6: 에이전트 엔지니어링 (슬라이드 34-46, 레벨: High)
+**목적:** 이 프레젠테이션에서 다루는 목적지. 기능을 엔드투엔드로 구축하기 위해 조율되는 자율적 전문화 에이전트.
+- **에이전트란:** 제한된 도구와 사전 로드된 스킬이 있는 전문화 서브에이전트의 개념.
+- **프론트엔드 엔지니어 에이전트:** TodoApp의 프론트엔드 관례를 사용하고, 사이드바에 라우트를 추가하고, 디자인 토큰을 따르는 구체적인 에이전트. 전/후 비교는 변환을 보여줍니다.
+- **백엔드 엔지니어 에이전트:** 백엔드를 위한 병렬 에이전트 — FastAPI 라우트 패턴, SQLAlchemy 모델을 따르고, 기존 스타일에 맞는 테스트를 작성합니다.
+- **명령어 & 오케스트레이션:** 정점 패턴: 명령어 → 에이전트 → 스킬. 단일 `/add-feature` 명령어가 프론트엔드 + 백엔드 에이전트를, 각자의 스킬과 함께, 완전한 기능을 제공하도록 조율합니다. 이것이 아키텍처적 정점입니다.
+- **훅 & MCP:** 라이프사이클 자동화(커밋 전 검사, 사운드 알림)와 외부 도구 통합. 최종 자동화 계층.
+- **명령어 → 에이전트 → 스킬:** 전체 아키텍처 다이어그램. 모든 조각이 어떻게 연결되는지 보여줍니다: 명령어는 에이전트를 호출하고, 에이전트는 스킬을 로드하고, 스킬은 지식을 제공합니다. 이것이 "High 레벨" 이해 슬라이드입니다.
 
-**Why High level:** This section covers the highest-value practices taught in this presentation. Everything before it was building toward this. Orchestration and agentic workflows represent the ceiling of what this course covers — full Pro (multi-agent teams, advanced orchestration patterns) is beyond this presentation's scope.
+**왜 High 레벨인가:** 이 섹션은 이 프레젠테이션에서 가르치는 가장 가치 높은 관행을 다룹니다. 그 전의 모든 것은 이것을 향해 구축되고 있었습니다. 오케스트레이션과 에이전트 워크플로우는 이 과정이 다루는 상한선을 나타냅니다 — 완전한 Pro(다중 에이전트 팀, 고급 오케스트레이션 패턴)는 이 프레젠테이션의 범위를 넘어섭니다.
 
-### The High Level Slide (Slide 44)
-The celebration moment. Shows the complete TodoApp configuration:
-- CLAUDE.md for project context
-- Rules for path-scoped conventions
-- Skills for domain knowledge
-- Agents for consistent execution
-- Commands for orchestrated workflows
-- Hooks for lifecycle automation
-- MCP servers for external tools
+### High 레벨 슬라이드 (슬라이드 44)
+축하의 순간. 완전한 TodoApp 설정을 보여줍니다:
+- 프로젝트 컨텍스트를 위한 CLAUDE.md
+- 경로 범위 관례를 위한 Rules
+- 도메인 지식을 위한 Skills
+- 일관된 실행을 위한 Agents
+- 오케스트레이션된 워크플로우를 위한 Commands
+- 라이프사이클 자동화를 위한 Hooks
+- 외부 도구를 위한 MCP 서버
 
-### Appendix (Slides 47+, no weight)
-**Purpose:** Reference material. Every command, setting, and configuration option. No weight because these are reference lookups, not journey milestones. Includes: tool usage, all slash commands, commit/PR workflows, customization options, debugging tips, and golden rules.
+### 부록 (슬라이드 47+, 가중치 없음)
+**목적:** 참고 자료. 모든 명령어, 설정, 구성 옵션. 여정 이정표가 아닌 참고 조회이므로 가중치 없음. 포함: 도구 사용, 모든 슬래시 명령어, 커밋/PR 워크플로우, 커스터마이징 옵션, 디버깅 팁, 황금 규칙.
 
-## How to Use This Framework When Editing Slides
+## 슬라이드 편집 시 이 프레임워크 사용 방법
 
-When creating or modifying slides, consider:
+슬라이드를 만들거나 수정할 때 다음을 고려하세요:
 
-1. **Where does this concept sit on the journey?** A slide about "better error messages in prompts" belongs in Part 2 (prompting, Low level). A slide about "agent memory scopes" belongs in Part 6 (agentic, High level).
+1. **이 개념은 여정의 어디에 위치하는가?** "프롬프트에서 더 나은 오류 메시지"에 대한 슬라이드는 파트 2(프롬프팅, Low 레벨)에 속합니다. "에이전트 메모리 범위"에 대한 슬라이드는 파트 6(에이전트, High 레벨)에 속합니다.
 
-2. **What's the before/after?** Every significant slide should implicitly or explicitly show the contrast: what happens at Low level (vibe coding) vs what happens with this technique. Use the TodoApp to make it concrete.
+2. **전/후는 무엇인가?** 모든 중요한 슬라이드는 암묵적 또는 명시적으로 대비를 보여줘야 합니다: Low 레벨(Vibe Coding)에서 일어나는 일 vs 이 기술로 일어나는 일. TodoApp을 사용하여 구체적으로 만드세요.
 
-3. **Does the level assignment feel right?** Level transitions happen at Part section boundaries. Individual slides within a section inherit the section's level.
+3. **레벨 할당이 맞는가?** 레벨 전환은 파트 섹션 경계에서 일어납니다. 섹션 내 개별 슬라이드는 섹션의 레벨을 상속합니다.
 
-4. **Does it build on what came before?** Skills assume the developer already knows about CLAUDE.md and Rules. Agents assume they know about Skills. Commands assume they know about Agents. Never reference a concept before its section.
+4. **이전 것 위에 구축되는가?** 스킬은 개발자가 이미 CLAUDE.md와 Rules에 대해 알고 있다고 가정합니다. 에이전트는 Skills에 대해 알고 있다고 가정합니다. 명령어는 에이전트에 대해 알고 있다고 가정합니다. 개념의 섹션 이전에 절대 참조하지 마세요.
 
-5. **Use the TodoApp.** Abstract explanations lose the audience. Show the actual `routes/todos.py` code, the actual `Sidebar.tsx` component, the actual `CLAUDE.md` content. The running example is what makes the framework tangible.
+5. **TodoApp을 사용하세요.** 추상적인 설명은 청중을 잃게 합니다. 실제 `routes/todos.py` 코드, 실제 `Sidebar.tsx` 컴포넌트, 실제 `CLAUDE.md` 내용을 보여주세요. 실행 예시가 프레임워크를 구체적으로 만드는 것입니다.
 
-## Level Transition Reference Table
+## 레벨 전환 참조 표
 
-| Slide | Slide Name | data-level | Level Label |
-|-------|-----------|------------|-------------|
-| 10 | Better Prompting (section divider) | `data-level="low"` | Low |
-| 18 | Project Memory (section divider) | `data-level="medium"` | Medium |
-| 29 | Domain Knowledge (section divider) | `data-level="high"` | High |
-| 34 | Agentic Engineering (section divider) | `data-level="high"` | High |
+| 슬라이드 | 슬라이드 이름 | data-level | 레벨 레이블 |
+|---------|------------|------------|------------|
+| 10 | Better Prompting (섹션 구분) | `data-level="low"` | Low |
+| 18 | Project Memory (섹션 구분) | `data-level="medium"` | Medium |
+| 29 | Domain Knowledge (섹션 구분) | `data-level="high"` | High |
+| 34 | Agentic Engineering (섹션 구분) | `data-level="high"` | High |
 
-All other slides inherit the level from the last `data-level` attribute set before them. Slides 1–9 (Intro + Prerequisites) have no level and keep the bar hidden until slide 2 shows "Low" (slides 2–9 are below the first level transition at slide 10, so the bar shows empty/zero until slide 10).
+모든 다른 슬라이드는 그 앞에 설정된 마지막 `data-level` 속성에서 레벨을 상속합니다. 슬라이드 1-9(소개 + 사전 준비)는 레벨이 없고 슬라이드 2부터 바가 표시되기 전까지 바를 숨긴 상태로 유지합니다 (슬라이드 2-9는 슬라이드 10의 첫 번째 레벨 전환 아래에 있으므로 슬라이드 10까지 바가 비어있음/0으로 표시됩니다).
 
-**Note:** The main presentation (`presentation/index.html`) caps at **High** level — `data-level="pro"` is not used. The Pro tick mark remains visible on the journey bar as the theoretical ceiling, but the fill never reaches it. The video presentation (`1-video-workflow.html`) caps at **Medium** level.
+**참고:** 메인 프레젠테이션(`presentation/index.html`)은 **High** 레벨까지입니다 — `data-level="pro"`는 사용되지 않습니다. Pro 틱 마크는 이론적 상한선으로 여정 바에 표시되어 있지만 채움은 결코 거기까지 도달하지 않습니다. 비디오 프레젠테이션(`1-video-workflow.html`)은 **Medium** 레벨까지입니다.

@@ -1,6 +1,6 @@
-# Weather SVG Creator — Reference
+# 날씨 SVG 생성기 — 참고
 
-## SVG Template
+## SVG 템플릿
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160" width="300" height="160">
@@ -11,30 +11,30 @@
 </svg>
 ```
 
-### Placeholders
+### 플레이스홀더
 
-| Placeholder | Replace with | Example |
-|-------------|-------------|---------|
-| `[Celsius/Fahrenheit]` | Full unit name from input | `Celsius` |
-| `[value]` | Numeric temperature from input | `26.2` |
-| `[C/F]` | Unit abbreviation | `C` or `F` |
+| 플레이스홀더 | 교체할 값 | 예시 |
+|-------------|-----------|------|
+| `[Celsius/Fahrenheit]` | 입력의 전체 단위 이름 | `Celsius` |
+| `[value]` | 입력의 숫자 온도 | `26.2` |
+| `[C/F]` | 단위 약자 | `C` 또는 `F` |
 
-### Design Specs
+### 디자인 사양
 
-| Property | Value |
-|----------|-------|
-| Dimensions | 300 x 160 px |
-| Corner radius | 12 px |
-| Background | `#1a1a2e` (dark navy) |
-| Unit label | `#8892b0` (muted blue), 14px |
-| Temperature | `#ccd6f6` (light blue), 42px bold |
-| Location | `#64ffda` (teal accent), 16px |
-| Font | `system-ui` |
-| All text | Centered (`text-anchor="middle"` at x=150) |
+| 속성 | 값 |
+|------|-----|
+| 크기 | 300 x 160 px |
+| 모서리 반경 | 12 px |
+| 배경색 | `#1a1a2e` (어두운 네이비) |
+| 단위 라벨 | `#8892b0` (흐린 파란색), 14px |
+| 온도 | `#ccd6f6` (밝은 파란색), 42px 굵게 |
+| 위치 | `#64ffda` (청록색 강조), 16px |
+| 글꼴 | `system-ui` |
+| 모든 텍스트 | 가운데 정렬 (`text-anchor="middle"`, x=150) |
 
 ---
 
-## Output Markdown Template
+## 출력 마크다운 템플릿
 
 ```markdown
 # Weather Result
@@ -54,9 +54,9 @@ Dubai, UAE
 
 ---
 
-## Output Paths
+## 출력 경로
 
-| File | Path |
+| 파일 | 경로 |
 |------|------|
-| SVG card | `orchestration-workflow/weather.svg` |
-| Markdown summary | `orchestration-workflow/output.md` |
+| SVG 카드 | `orchestration-workflow/weather.svg` |
+| 마크다운 요약 | `orchestration-workflow/output.md` |
