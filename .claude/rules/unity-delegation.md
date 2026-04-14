@@ -18,9 +18,9 @@ Samantha가 작업을 분석하고 적절한 팀원(Jarvis, Ava, Sonny, TARS)에
 |-----------|----------|
 | ScriptableObject, 아키텍처, 성능 프로파일링 | `jarvis` |
 | UI/UX, 셰이더, VFX, 애니메이션 | `ava` |
-| 플레이어 컨트롤러, 적 AI, 전투, 물리 | `sonny` |
-| 레벨 디자인, 씬 구성, 환경, Cinemachine | `tars` |
-| 복합 작업, 게임 디자인, 밸런싱 | `samantha` |
+| 게임 디자인, 밸런싱, 메카닉 설계, 플레이어 컨트롤러, 적 AI, 전투, 물리 | `sonny` |
+| 레벨 디자인, 씬 구성, 환경, Cinemachine, 내러티브 | `tars` |
+| 복합 작업 (여러 분야에 걸친 오케스트레이션) | `samantha` |
 
 ### 금지 사항
 - Unity C# 파일을 에이전트 없이 직접 편집하지 마세요
