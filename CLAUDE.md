@@ -135,9 +135,24 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 
 이렇게 하면 git 기록이 더 깔끔해지고 개별 변경 사항을 검토, 되돌리기, 체리픽하기 쉬워집니다.
 
+## Unity 게임 개발 팀
+
+Unity 관련 작업은 **반드시** 전문 에이전트에게 위임합니다. 위임 규칙: `.claude/rules/unity-delegation.md`
+
+| 에이전트 | 영화 | 역할 | 모델 |
+|----------|------|------|------|
+| **Samantha** | Her | 팀 리더 + 게임 디자인 + 오케스트레이션 | opus |
+| **Jarvis** | Iron Man | 코어 아키텍처 + 성능 최적화 | sonnet |
+| **Ava** | Ex Machina | 비주얼 + UI/UX + VFX | sonnet |
+| **Sonny** | I, Robot | 게임플레이 + AI + 물리 | sonnet |
+| **TARS** | Interstellar | 레벨 디자인 + 월드 빌딩 | sonnet |
+
+복합 작업은 Samantha에게, 단일 전문 분야는 해당 에이전트에게 직접 위임합니다.
+
 ## 문서
 
 문서 표준은 `.claude/rules/markdown-docs.md`를 참고하세요. 주요 문서:
 - `best-practice/claude-subagents.md`: 서브에이전트 프론트매터, 훅, 저장소 에이전트
 - `best-practice/claude-commands.md`: 슬래시 명령어 패턴 및 내장 명령어 참고
+- `best-practice/harness-engineering.md`: 하네스 엔지니어링 3축 프레임워크
 - `orchestration-workflow/orchestration-workflow.md`: 날씨 시스템 흐름 다이어그램
