@@ -19,6 +19,7 @@ permissionMode: acceptEdits
 memory: project
 skills:
   - team-building-framework
+  - samantha-best-practices
 hooks:
   Stop:
     - hooks:
@@ -100,9 +101,11 @@ mkdir -p [팀명]-team/output
 - `color: magenta`
 - `Stop` 훅 설정 (기존 hooks.py 재사용)
 - `Agent` 도구로만 팀원 호출하는 프롬프트
+- `skills:` 필드 첫 번째 항목에 `samantha-best-practices` 포함 (**필수**)
 
 각 전문가 에이전트에는:
-- 해당 전문 스킬을 `skills:` 필드로 연결
+- `skills:` 첫 번째 항목에 `samantha-best-practices` 포함 (**필수 — Samantha 정책 적용**)
+- 해당 전문 스킬을 `skills:` 필드 두 번째 항목으로 연결
 - 도메인에 맞는 `color`
 - 명확한 책임 범위와 산출물 형식
 
@@ -177,6 +180,7 @@ cp -r [팀명]-team/.claude /path/to/other-project/.claude
 
 1. **격리 원칙 절대 준수**: 전역 `.claude/`가 아닌 반드시 팀 전용 디렉토리
 2. **스킬 먼저, 에이전트 나중**: 스킬 이름 확정 후 에이전트 `skills:` 필드 작성
-3. **체크리스트 통과 의무**: 9개 항목 모두 ✅ 되어야 완료 선언 가능
+3. **체크리스트 통과 의무**: 10개 항목 모두 ✅ 되어야 완료 선언 가능
 4. **한국어 시스템 프롬프트**: 모든 에이전트 본문은 한국어로 작성 (YAML 키는 영어)
 5. **Stop 훅**: 팀장 에이전트에만 부착 (중복 방지)
+6. **samantha-best-practices 스킬 의무 포함**: 생성하는 **모든 팀 에이전트**의 `skills:` 필드에 `samantha-best-practices`를 첫 번째 항목으로 반드시 포함

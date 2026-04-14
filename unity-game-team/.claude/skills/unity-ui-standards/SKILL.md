@@ -243,3 +243,52 @@ Safe Area 처리:
 - 노치/펀치홀 기기: SafeArea Panel로 래핑
 - Screen.safeArea를 런타임에 읽어 RectTransform 조정
 ```
+
+---
+
+## ⚠️ Gotchas — Claude가 자주 빠지는 UI 함정
+
+### G1. Canvas 재빌드 폭탄
+```csharp
+// ❌ 매 프레임 Layout 강제 재계산
+private void Update()
+{
+    LayoutRebuilder.ForceRebuildLayoutImmediate(_rect); // 성능 폭탄
+}
+
+// ✅ 실제 데이터 변경 시에만 갱신 (이벤트 기반)
+private void OnScoreChanged(int newScore)
+{
+    _scoreText.SetText(newScore.ToString()); // TMPro는 내부적으로 최적화
+}
+```
+
+### G2. 모든 Image에 Raycast Target 켜는 실수
+- **배경, 장식용 이미지**는 반드시 `Raycast Target = false`
+- 켜진 채로 방치하면 투명 레이어 전체에 클릭 이벤트 차단 발생
+- 규칙: **버튼, 슬라이더, 클릭 가능한 요소에만** Raycast Target 활성화
+
+### G3. 씬 전환 시 DOTween Sequence 미정리
+```csharp
+// ❌ 씬 전환 후 기존 Tween이 살아있어 NullReference 발생
+DOTween.Sequence().Append(transform.DOMoveX(10f, 1f));
+
+// ✅ OnDestroy에서 Kill
+private void OnDestroy()
+{
+    DOTween.Kill(transform); // 이 transform에 연결된 트윈 전부 Kill
+}
+```
+
+### G4. TextMeshPro에 string 직접 대입 남용
+```csharp
+// ❌ 매 프레임 string 할당 → GC 압박
+_text.text = "Score: " + _score.ToString();
+
+// ✅ SetText + 포맷 활용 (TMPro 내부 버퍼 재사용)
+_text.SetText("Score: {0}", _score);
+```
+
+### G5. World Space Canvas에 Event Camera 미설정
+- World Space Canvas는 반드시 `Event Camera`를 Main Camera로 설정
+- 설정 없으면 `Input.mousePosition` 기반 UI 클릭이 전부 작동 안 함

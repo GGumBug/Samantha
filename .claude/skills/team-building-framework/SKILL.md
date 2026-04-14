@@ -266,17 +266,60 @@ Agent(
 
 ---
 
-## 8. 체크리스트 — 팀 생성 완료 기준
+## 8. samantha-best-practices 스킬 강제 포함 규칙
+
+> **이 규칙은 팀 생성 시 절대적으로 준수해야 합니다.**
+
+### 8.1 원칙
+
+`samantha-best-practices` 스킬은 Samantha 프로젝트의 핵심 정책(에이전트 오케스트레이션, Git 커밋 규칙, 문서 표준, 훅 정책 등)을 담고 있습니다.
+이 스킬은 생성되는 **모든 팀 에이전트**의 `skills:` 필드에 **반드시** 포함되어야 합니다.
+
+### 8.2 적용 방법
+
+모든 에이전트 파일의 `skills:` 필드에 `samantha-best-practices`를 **첫 번째 항목**으로 추가:
+
+```yaml
+skills:
+  - samantha-best-practices      # 반드시 포함 (Samantha 프로젝트 정책 적용)
+  - [전문-스킬-이름]              # 에이전트별 전문 스킬
+```
+
+### 8.3 스킬 경로
+
+이 스킬은 **루트 프로젝트**에 위치합니다:
+```
+[CLAUDE_PROJECT_DIR]/.claude/skills/samantha-best-practices/SKILL.md
+```
+
+팀 디렉토리(`[팀명]-team/.claude/`)는 격리되어 있지만,
+Claude Code는 상위 디렉토리의 스킬을 `skills:` 필드로 참조할 수 있습니다.
+
+### 8.4 적용 대상
+
+| 에이전트 유형 | samantha-best-practices 포함 여부 |
+|-------------|----------------------------------|
+| 팀장 (오케스트레이터) | ✅ 필수 |
+| 전문가 에이전트 | ✅ 필수 |
+| QA/검증 에이전트 | ✅ 필수 |
+| 모든 팀원 | ✅ 필수 (예외 없음) |
+
+---
+
+## 9. 체크리스트 — 팀 생성 완료 기준
 
 ```
 [ ] [팀명]-team/ 디렉토리 존재
-[ ] CLAUDE.md 팀 개요 작성 완료
+[ ] CLAUDE.md 팀 개요 + Git Worktree 병렬 작업 가이드 포함
 [ ] .claude/commands/[진입점].md 생성 — 팀 오케스트레이션 명령어
 [ ] .claude/agents/[팀장].md 생성 — magenta 색상, Stop 훅 포함
 [ ] .claude/agents/[팀원N].md 생성 — 각자 고유 색상
-[ ] .claude/skills/ 생성 — 팀원별 관련 스킬 존재
+[ ] .claude/skills/ 생성 — 팀원별 관련 스킬 존재 (⚠️ Gotchas 섹션 포함)
 [ ] 모든 에이전트에 skills: 필드로 스킬 연결
+[ ] 모든 에이전트의 skills:에 samantha-best-practices 포함 (Samantha 정책 적용)
+[ ] 온디맨드 안전 훅 스킬 생성 ([팀명]-safe-mode, user-invocable: true)
 [ ] 데이터 계약이 Command 프롬프트에 명시됨
 [ ] output/ 디렉토리 존재
 [ ] 팀장 에이전트에 Stop 훅 설정
+[ ] CLAUDE.md에 레이어드 CLAUDE.md 패턴 안내 (대규모 프로젝트용)
 ```

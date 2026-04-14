@@ -17,6 +17,8 @@ color: magenta
 maxTurns: 20
 permissionMode: acceptEdits
 memory: project
+skills:
+  - samantha-best-practices
 hooks:
   Stop:
     - hooks:

@@ -18,6 +18,7 @@ maxTurns: 15
 permissionMode: acceptEdits
 memory: project
 skills:
+  - samantha-best-practices
   - unity-patterns
 ---
 

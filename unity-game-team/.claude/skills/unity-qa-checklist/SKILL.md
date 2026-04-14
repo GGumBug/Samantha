@@ -242,3 +242,21 @@ user-invocable: false
 **조건부 Go 사항** (있는 경우): 
 **다음 버전 처리 항목**: 
 ```
+
+---
+
+## ⚠️ Gotchas — Claude가 자주 빠지는 QA/검증 함정 (반드시 숙지)
+
+> 코드 작성 전/검증 시 주의하세요.
+
+### G1. Time.timeScale=0 때의 로직 처리 누락
+❌ 일시정지 상태에서 UI 애니메이션이나 로직이 멈추는 함정
+✅ UI 중 애니메이션이 필요한 부분은 `unscaledDeltaTime` 또는 DOTween의 `.SetUpdate(true)`를 사용해야 합니다.
+
+### G2. DontDestroyOnLoad 중복 생성 문제
+❌ 씬 리로드 시 Singleton 객체가 계속 늘어나는 함정
+✅ `Awake`에서 자신과 같은 타입의 Instance가 이미 존재하는지 체크 후 `Destroy(gameObject)` 처리 필수.
+
+### G3. 메모리 누수를 고려하지 않는 잦은 인스턴스화
+❌ 게임 진행 중 무기, 투사체, 적군 등을 `Instantiate`/`Destroy` 반복
+✅ 주기적으로 생성되는 객체는 반드시 **오브젝트 풀링(Object Pooling)** 전략을 사용하는지 확인(Sonny에게 요청)해야 합니다.

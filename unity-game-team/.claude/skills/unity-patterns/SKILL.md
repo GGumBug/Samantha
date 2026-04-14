@@ -262,3 +262,85 @@ public float moveSpeed = 5f;
 - Enemy ↔ Enemy: ❌ (성능 최적화)
 - Projectile ↔ Projectile: ❌
 ```
+
+---
+
+## ⚠️ Gotchas — Claude가 자주 빠지는 함정 (반드시 숙지)
+
+> 이 섹션은 Claude가 Unity 코드 작성 시 반복적으로 실수하는 패턴 목록입니다.
+> 코드 작성 전에 반드시 확인하세요.
+
+### G1. 이벤트 리스너 해제 누락
+```csharp
+// ❌ 자주 하는 실수: 구독만 하고 해제를 빠뜨림
+private void OnEnable()
+{
+    GameEvents.OnPlayerDied += HandlePlayerDied;
+}
+// OnDisable에서 해제 없음 → 메모리 누수, 중복 호출
+
+// ✅ 올바른 방법
+private void OnEnable()  => GameEvents.OnPlayerDied += HandlePlayerDied;
+private void OnDisable() => GameEvents.OnPlayerDied -= HandlePlayerDied;
+```
+
+### G2. Awake/Start 실행 순서 의존성
+```csharp
+// ❌ 위험: 다른 MonoBehaviour의 Awake가 먼저 실행됐다고 가정
+private void Awake()
+{
+    // GameManager.Instance가 아직 null일 수 있음!
+    _score = GameManager.Instance.CurrentScore;
+}
+
+// ✅ 올바른 방법: Start에서 다른 컴포넌트 참조
+private void Start()
+{
+    _score = GameManager.Instance.CurrentScore; // 모든 Awake 완료 후 보장
+}
+```
+
+### G3. new GameObject()로 프리팹 생성 금지
+```csharp
+// ❌ 금지: new 로 직접 생성
+var enemy = new GameObject("Enemy");
+enemy.AddComponent<EnemyController>();
+
+// ✅ 반드시 프리팹을 Instantiate
+var enemy = Instantiate(_enemyPrefab, spawnPos, Quaternion.identity);
+```
+
+### G4. Unity .meta 파일 절대 수동 삭제/수정 금지
+- `.meta` 파일은 GUID 포함 — 삭제하면 에셋 참조 전체 깨짐
+- 파일 이동/이름 변경은 반드시 **Unity Editor 내에서** 수행
+- bash로 `mv`, `cp`, `rm` 으로 에셋 파일 조작 금지
+
+### G5. Update에서 코루틴 남용
+```csharp
+// ❌ Update에서 매 프레임 코루틴 시작
+private void Update()
+{
+    StartCoroutine(CheckHealth()); // 매 프레임 새 코루틴 생성!
+}
+
+// ✅ 상태 변화 시에만 시작
+private void OnHealthChanged(float newHealth)
+{
+    StartCoroutine(FlashHealthBar());
+}
+```
+
+### G6. Coroutine vs async/await 혼용 주의
+- Unity 메인 스레드에서만 Transform, GameObject 조작 가능
+- `async Task` 사용 시 `await` 후 Unity 객체 접근은 **항상 메인 스레드 여부 확인**
+- 가능하면 Unity 전용 코루틴(`IEnumerator`) 사용 권장
+
+### G7. ScriptableObject를 런타임에 직접 수정 금지
+```csharp
+// ❌ SO 에셋 직접 수정 → 에디터 플레이 중이면 영구 변경됨!
+_gameConfigSO.maxHealth = 50;
+
+// ✅ SO는 읽기 전용으로 사용, 런타임 데이터는 별도 클래스로
+_runtimeData.maxHealth = _gameConfigSO.maxHealth;
+_runtimeData.maxHealth = 50;
+```
