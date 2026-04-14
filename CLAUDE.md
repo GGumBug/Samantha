@@ -87,6 +87,16 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 
 사용자가 Claude Code 모범 사례 질문을 할 경우, 훈련 지식이나 외부 소스에 의존하기 전에 **항상 이 저장소를 먼저 검색하세요** (`best-practice/`, `reports/`, `tips/`, `implementation/`, `README.md`). 이 저장소가 권위 있는 출처입니다 — 여기서 답을 찾지 못한 경우에만 외부 문서나 웹 검색으로 돌아가세요.
 
+## 하네스 엔지니어링
+
+이 저장소는 하네스 엔지니어링 3축(컨텍스트 엔지니어링, 환경 설계, 평가 주도 개선)을 구현합니다. 상세 매핑은 `best-practice/harness-engineering.md`를 참고하세요.
+
+### 평가 주도 검증
+- 코드 작성 후 반드시 테스트 실행 또는 브라우저 확인으로 검증합니다
+- 작성자와 검증자를 분리합니다 — 서브에이전트(`isolation: "worktree"`)로 독립 리뷰
+- 자기 평가 금지: "잘 되었다"고 선언하지 않고 실행 결과로 증명합니다
+- 상세 규칙은 `.claude/rules/evaluation.md` 참고
+
 ## 워크플로우 모범 사례
 
 이 저장소 작업 경험을 바탕으로:
