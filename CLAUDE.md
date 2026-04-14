@@ -141,13 +141,13 @@ Unity 관련 작업은 **반드시** 전문 에이전트에게 위임합니다. 
 
 | 에이전트 | 영화 | 역할 | 모델 |
 |----------|------|------|------|
-| **Samantha** | Her | 팀 리더 + 게임 디자인 + 오케스트레이션 | opus |
-| **Jarvis** | Iron Man | 코어 아키텍처 + 성능 최적화 | sonnet |
-| **Ava** | Ex Machina | 비주얼 + UI/UX + VFX | sonnet |
-| **Sonny** | I, Robot | 게임플레이 + AI + 물리 | sonnet |
-| **TARS** | Interstellar | 레벨 디자인 + 월드 빌딩 | sonnet |
+| **Samantha** | Her | 프로듀서 — 소통, 위임, 진행 관리, 품질 감독 (코딩 안 함) | opus |
+| **Jarvis** | Iron Man | 테크니컬 디렉터 — 아키텍처 + 성능 최적화 | sonnet |
+| **Ava** | Ex Machina | 아트 디렉터 — UI/UX + VFX + 애니메이션 | sonnet |
+| **Sonny** | I, Robot | 리드 게임 디자이너 + 게임플레이 프로그래머 — 설계, 밸런싱, AI, 전투, 물리 | sonnet |
+| **TARS** | Interstellar | 레벨 디자이너 + 콘텐츠 디자이너 — 월드 빌딩, 환경 연출 | sonnet |
 
-복합 작업은 Samantha에게, 단일 전문 분야는 해당 에이전트에게 직접 위임합니다.
+복합 작업은 Samantha에게(오케스트레이션만), 단일 전문 분야는 해당 에이전트에게 직접 위임합니다.
 
 ## 문서
 
