@@ -17,6 +17,8 @@ color: cyan
 maxTurns: 15
 permissionMode: acceptEdits
 memory: project
+skills:
+  - unity-game-design
 ---
 
 # Ava — 게임 디자인 & 레벨 디자인

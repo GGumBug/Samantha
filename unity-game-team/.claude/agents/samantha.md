@@ -17,6 +17,13 @@ color: magenta
 maxTurns: 20
 permissionMode: acceptEdits
 memory: project
+hooks:
+  Stop:
+    - hooks:
+        - type: command
+          command: python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/scripts/hooks.py
+          timeout: 5000
+          async: true
 ---
 
 # Samantha — Unity 게임 개발 팀장
