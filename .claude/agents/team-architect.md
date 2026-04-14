@@ -73,25 +73,32 @@ hooks:
 
 다음 순서로 파일을 생성합니다:
 
-#### 3-1. 디렉토리 구조 생성
+#### 3-1. 디렉토리 구조 생성 및 핵심 자산 복사
+생성될 팀이 완벽히 독립적으로 작동하고 다른 프로젝트로 통째로 복사(이식)될 수 있도록, 루트에 있는 필수 자산을 새 팀 폴더로 복사합니다.
+
 ```bash
-# Bash로 필요한 모든 디렉토리를 한 번에 생성
+# 디렉토리 생성
 mkdir -p [팀명]-team/.claude/agents
 mkdir -p [팀명]-team/.claude/commands
 mkdir -p [팀명]-team/.claude/skills/[스킬명]
+mkdir -p [팀명]-team/.claude/hooks/scripts
 mkdir -p [팀명]-team/output
+
+# 핵심 자산 복사 (독립성 확보)
+cp -r .claude/skills/samantha-best-practices [팀명]-team/.claude/skills/
+cp .claude/hooks/scripts/hooks.py [팀명]-team/.claude/hooks/scripts/
 ```
 
 #### 3-2. `[팀명]-team/CLAUDE.md` 생성
 `team-building-framework` 스킬의 CLAUDE.md 템플릿을 사용하여 작성:
 - 팀 구성표 (에이전트명, 역할, 영감 출처)
 - ASCII 협업 흐름 다이어그램
-- 핵심 원칙
+- 핵심 원칙 (Worktree 병렬 가이드 등 포함)
 - 파일 구조 트리
 
 #### 3-3. 스킬 파일 생성
-각 전문가 에이전트가 사전 로드할 스킬을 먼저 생성합니다.
-스킬 내용: 해당 도메인의 모범 사례, 코딩 표준, 체크리스트 등.
+전문가 에이전트용 스킬과 온디맨드 안전 훅(`[팀명]-safe-mode`)을 생성합니다.
+모든 스킬 파일에는 반드시 `## ⚠️ Gotchas` 섹션을 포함시킵니다.
 
 #### 3-4. 에이전트 파일 생성
 스킬 이름이 확정된 후 에이전트 파일을 작성합니다.
@@ -99,7 +106,7 @@ mkdir -p [팀명]-team/output
 
 팀장 에이전트에는 반드시:
 - `color: magenta`
-- `Stop` 훅 설정 (기존 hooks.py 재사용)
+- `Stop` 훅 설정 (복사된 `hooks.py` 가리키도록 설정)
 - `Agent` 도구로만 팀원 호출하는 프롬프트
 - `skills:` 필드 첫 번째 항목에 `samantha-best-practices` 포함 (**필수**)
 
