@@ -1,7 +1,7 @@
 ---
 name: sonny
 description: "Unity 리드 게임 디자이너 겸 게임플레이 프로그래머. 게임 메카닉 설계, 밸런싱, GDD, 플레이어 컨트롤러, 적 AI, 행동 트리, NavMesh, 전투 시스템, 물리 시뮬레이션, 입력 시스템 작업 시 이 에이전트를 사용합니다."
-model: sonnet
+model: inherit
 tools: "Read, Edit, Write, Bash, Glob, Grep, mcp__context7__resolve-library-id, mcp__context7__query-docs"
 maxTurns: 25
 ---
