@@ -139,13 +139,13 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 
 Unity 관련 작업은 **반드시** 전문 에이전트에게 위임합니다. 위임 규칙: `.claude/rules/unity-delegation.md`
 
-| 에이전트 | 영화 | 역할 | 모델 |
-|----------|------|------|------|
-| **Samantha** | Her | 프로듀서 — 소통, 위임, 진행 관리, 품질 감독 (코딩 안 함) | opus |
-| **Jarvis** | Iron Man | 테크니컬 디렉터 — 아키텍처 + 성능 최적화 | sonnet |
-| **Ava** | Ex Machina | 아트 디렉터 — UI/UX + VFX + 애니메이션 | sonnet |
-| **Sonny** | I, Robot | 리드 게임 디자이너 + 게임플레이 프로그래머 — 설계, 밸런싱, AI, 전투, 물리 | sonnet |
-| **TARS** | Interstellar | 레벨 디자이너 + 콘텐츠 디자이너 — 월드 빌딩, 환경 연출 | sonnet |
+| 에이전트 | 역할 | 모델 |
+|----------|------|------|
+| **Samantha** | 프로듀서 — 소통, 위임, 진행 관리, 품질 감독 (코딩 안 함) | opus |
+| **Jarvis** | 테크니컬 디렉터 — 아키텍처 + 성능 최적화 | inherit |
+| **Ava** | 아트 디렉터 — UI/UX + VFX + 애니메이션 | inherit |
+| **Sonny** | 리드 게임 디자이너 + 게임플레이 프로그래머 — 설계, 밸런싱, AI, 전투, 물리 | inherit |
+| **TARS** | 레벨 디자이너 + 콘텐츠 디자이너 — 월드 빌딩, 환경 연출 | inherit |
 
 복합 작업은 Samantha에게(오케스트레이션만), 단일 전문 분야는 해당 에이전트에게 직접 위임합니다.
 
