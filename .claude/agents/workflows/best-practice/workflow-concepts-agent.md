@@ -50,7 +50,7 @@ Read ALL of the following:
 |------|-----------------|
 | `README.md` | The CONCEPTS table (lines 22-39 approximately) — extract every row: Feature name, link URL, location, description, and any badges |
 | `CLAUDE.md` | Any references to concepts or features not in the CONCEPTS table |
-| `reports/claude-global-vs-project-settings.md` | Features listed here (Tasks, Agent Teams, etc.) that may be missing from CONCEPTS |
+| `reports/claude-memory-and-settings.md` | Features listed here (Tasks, Agent Teams, etc.) that may be missing from CONCEPTS |
 
 ---
 
