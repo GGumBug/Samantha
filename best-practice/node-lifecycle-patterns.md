@@ -50,6 +50,16 @@ data.runStateData.PendingShopSnapshot = old.PendingShopSnapshot;
 2. 호출 맥락에서 다른 경로가 일부 효과를 수행하는지 확인 (중복 제외)
 3. "기존 호출을 새 오버로드로 대체해도 상태 동일" 테스트 시나리오 요구
 
+## 2.1 Map SSOT — 클리어 진입점 단일화
+
+§2의 `NodeCleared` 사례를 일반화한 규칙. 노드 비활성화·클리어는 **단일 진입점만** 허용해 부수효과 누락 자체를 구조적으로 차단한다.
+
+- [ ] 노드 클리어 신호는 **`NodeCleared(Vector2Int)` 단일 진입점만** — 무파라미터 / 현재참조 버전이 필요하면 SSOT로 위임만
+- [ ] 클리어 SSOT 부수효과 = `IsCleared=true` + 자신 `IsSelectable=false` + **같은 row 형제들 `IsSelectable=false`** + 다음 노드 활성화 + 저장 트리거 — **5종 모두 복제 검증**
+- [ ] 부수효과 순서: 자신·형제 잠금 → 다음 노드 활성화 → **저장 트리거는 항상 마지막** (잠금 상태가 디스크 직렬화에 포함되도록)
+- [ ] 신규 클리어 트리거(자동 패배·Skip·디버그 명령 등) 추가 시 SSOT 호출만 허용 — 직접 `IsCleared = true` 또는 `IsSelectable = true/false` 세팅 금지
+- [ ] 위반 grep: `IsCleared\s*=\s*true` 또는 `IsSelectable\s*=\s*(true|false)` → SSOT 메서드 외부 위치는 모두 위반 후보, 통합 PR 직전 0건 확인 (맵 초기 생성 시점 예외는 주석으로 명시)
+
 ## 3. 타이밍 의존성 제거 — "현재" 암묵 참조 대신 명시 ID/좌표
 
 "현재 선택된 X" 류 API(`_currentNode`, `_activeSession`)는 **포인터 갱신 타이밍에 코드 흐름이 결합**되어 버그 온상.
@@ -90,9 +100,36 @@ data.runStateData.PendingShopSnapshot = old.PendingShopSnapshot;
 
 1. **Navigation Service** (노드별): `ResumeMapAsync(bool allowCurrentReentry)` — reentry=true면 `ClearNodeEntryPending` 생략 + `ReopenCurrentNodeIfAvailable` 호출
 2. **Pending Snapshot** (노드별 + 공통 `PendingNodePosition`)
-3. **NodeResumePhase enum**: `ShopEntered`, `BattleEntered`, `BattleRewardPending`, `EncounterEntered`, `CampEntered`
-4. **Commit Hook**: `CommitPending*IfLeaving(PlayerData)` — 4개 `Mark*NodeEntered` 선두에서 호출
+3. **NodeResumePhase enum**: `ShopEntered`, `BattleEntered`, `BattleRewardPending`, `EncounterEntered`, `CampEntered`, `TreasureEntered`
+4. **Commit Hook**: `CommitPending*IfLeaving(PlayerData)` — 각 `Mark*NodeEntered` 선두에서 호출
 5. **재클릭 가드**: `phase && pending && pendingPos == nodeInfo` 4조건 AND로 기존 세션 복원 경로 분기
+
+### Strategy Pattern 확장 — N² 결합 제거
+
+Commit Hook을 **노드별 static 메서드**로 두면 `Mark*NodeEntered` N개 × `CommitPending*IfLeaving` N개 = **O(N²) 결합** 발생. 새 노드 추가 시 N개 Mark 메서드 모두를 수정해야 함 (OCP 위반).
+
+**처방 — `INodeSessionCommitter` 인터페이스로 추출**:
+
+```csharp
+public interface INodeSessionCommitter
+{
+    NodeResumePhase Phase { get; }
+    bool CommitIfLeaving(PlayerData data, NodeResumePhase enteringPhase);
+}
+```
+
+도메인별 구현체 (`BattleRewardSessionCommitter`, `ShopSessionCommitter`, `CampSessionCommitter`, `EncounterSessionCommitter`, `TreasureSessionCommitter` 등)를 `IReadOnlyList<INodeSessionCommitter>`로 주입, 통합 `MarkNodeEntered(phase)` 가 순회하도록 리팩토링.
+
+**효과** (2026-04-24 Hwaseo Treasure 노드 추가):
+- `NodeEntryService`: 347줄 → 184줄 (47% 축소)
+- 새 노드 추가 시 수정 위치: 10곳 → 6곳 (신규 Committer 클래스 + 등록만)
+- `Mark*` 메서드 간 Commit 호출 중복 제거
+
+**추가 시 체크리스트**:
+- [ ] `NodeResumePhase` enum 값 추가
+- [ ] `I*SessionCommitter` 구현체 신설 (기존 도메인 매니저의 `ExitXxxSession` 또는 `ClearPendingXxx`를 호출)
+- [ ] `NodeEntryService` 등록 리스트에 추가
+- [ ] "자기 자신이 enter 중이면 스킵" 가드 확인 (`if (enteringPhase == Phase) return false`)
 
 ### Claimed vs Applied 분리 (보상 시스템)
 
