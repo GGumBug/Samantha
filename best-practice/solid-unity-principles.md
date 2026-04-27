@@ -19,6 +19,7 @@ Sonny/Jarvis가 **구현 전 자체 점검** 시 참조하는 단일 진실 소�
 - ❌ `switch (weaponType)` 로 분기 → 무기 추가마다 switch 수정
 - ✅ `IWeapon` 인터페이스 + ScriptableObject 기반 `WeaponData`
 - **Hwaseo 사례**: 새 노드 타입 추가 시 `NodeEntryService`에 페어(`MarkXxxNodeEntered` + `CommitPendingXxxIfLeaving`) 추가만으로 확장. 도메인 서비스/GameScene 수정 불필요
+- **Hwaseo Strategy Pattern 사례 (2026-04-24)**: `NodeEntryService`의 `Mark*NodeEntered` 5개 메서드가 각자 `CommitPending*IfLeaving` static 5개를 일일이 호출하는 O(N²) 결합 구조였음. `INodeSessionCommitter` 인터페이스 + 도메인별 5개 구현체(`BattleRewardSessionCommitter`, `ShopSessionCommitter`, `CampSessionCommitter`, `EncounterSessionCommitter`, `TreasureSessionCommitter`)를 `IReadOnlyList<INodeSessionCommitter>` 로 주입, 통합 `MarkNodeEntered(phase)` 가 순회하도록 리팩토링 → 347줄 → 184줄 (47% 축소), 새 노드 추가 시 수정 위치 10곳 → 6곳. OCP의 Unity 실전 구현.
 
 ### L (Liskov Substitution)
 서브타입은 기반 타입을 대체할 수 있어야. **계약 위반 금지**.
@@ -119,6 +120,7 @@ Sonny/Jarvis가 **구현 전 자체 점검** 시 참조하는 단일 진실 소�
 - **MonoBehaviour Everywhere**: 순수 로직까지 MonoBehaviour에 넣어 유닛 테스트 불가
 - **Inspector Spaghetti**: 수많은 SerializeField로 Inspector 관계망이 복잡해 추적 불가
 - **"일단 작동하게"**: 하드코딩 후 리팩토링 약속 — 거의 이행 안 됨
+- **도메인 컴포넌트 중복 구현 (Copy over Reuse)**: 신규 UI/기능이 기존과 유사한 책임을 가질 때 전용 컴포넌트를 새로 작성하는 유혹. **2026-04-24 Hwaseo 사례**: Treasure 보상 패널에 유물 아이콘 + 호버 툴팁 + 착용자 표시 요구 → `UITreasureRelicSlot` 신설 유혹. 실제 해법은 기존 `UIRelicIconSlot.Bind(RelicDefinition)` 재사용으로 아이콘/툴팁/착용자 전부 자동 처리. `UITreasure.cs`에서 `ApplyRelicIcon/ApplyRelicName/ApplyRelicFallback` 3개 메서드 + 2개 필드가 `_relicIconSlot` 1개 필드로 축소됨. **규칙**: "X 로직 참고" 지시 수신 시 **도메인 전문 컴포넌트가 이미 존재하는지 먼저 grep** (`UI*IconSlot`, `*Presenter`, `*Binder` 류).
 - **Polymorphic Field Sentinel 오해**: 하나의 필드가 타입/의미를 이중으로 가질 때(예: 숫자 "0" = 빈 값 sentinel vs 문자열 = 실제 ID), 코드가 sentinel 해석을 빠뜨리면 silent misinterpretation 발생. **2026-04-17 Hwaseo 사례**: `EncounterAction.Value2=0`을 literal ID `"0"`으로 오해 → `ReserveRelicAsync("0")` null 반환 → 유물 미지급. **해결**: sentinel 상수 명명 + 전용 헬퍼.
   ```csharp
   private const string EmptyIdSentinel = "0";
