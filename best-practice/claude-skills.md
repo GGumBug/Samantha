@@ -51,5 +51,5 @@ Claude Code 스킬 — 프론트매터 필드와 공식 번들 스킬.
 ## 출처
 
 - [Claude Code 스킬 — 공식 문서](https://code.claude.com/docs/en/skills)
-- [모노레포에서의 스킬 검색](../reports/claude-skills-for-larger-mono-repos.md)
+- [모노레포에서의 스킬 검색](../reports/claude-operational-limits.md)
 - [Claude Code 변경 이력](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md)
