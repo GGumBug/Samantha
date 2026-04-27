@@ -66,7 +66,7 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 - `skills`: 에이전트 컨텍스트에 사전 로드할 스킬 이름 목록
 - `mcpServers`: 이 서브에이전트를 위한 MCP 서버 (서버 이름 또는 인라인 설정)
 - `hooks`: 이 서브에이전트에 범위가 지정된 라이프사이클 훅 (모든 훅 이벤트 지원; `PreToolUse`, `PostToolUse`, `Stop`이 가장 일반적)
-- `memory`: 영구 메모리 범위 — `user`, `project`, 또는 `local` (`reports/claude-agent-memory.md` 참고)
+- `memory`: 영구 메모리 범위 — `user`, `project`, 또는 `local` (`reports/claude-memory-and-settings.md` 참고)
 - `background`: 항상 백그라운드 작업으로 실행하려면 `true`로 설정
 - `effort`: 노력 수준 재정의: `low`, `medium`, `high`, `max` (기본값: 세션에서 상속)
 - `isolation`: 임시 git 워크트리에서 실행하려면 `"worktree"`로 설정
