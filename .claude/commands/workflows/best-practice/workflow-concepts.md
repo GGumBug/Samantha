@@ -28,7 +28,7 @@ Spawn using `subagent_type: "workflow-concepts-agent"`. Give it this prompt:
 > 2. Claude Code Changelog: https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md
 > 3. Claude Code Features Overview: https://code.claude.com/docs/en/overview
 >
-> Then read the local README.md (specifically the CONCEPTS table), CLAUDE.md, and `reports/claude-global-vs-project-settings.md`. Analyze differences between what the official docs list as Claude Code concepts/features and what our README CONCEPTS table documents. Return a structured findings report covering missing concepts, changed concepts, deprecated concepts, URL accuracy, description accuracy, and badge accuracy.
+> Then read the local README.md (specifically the CONCEPTS table), CLAUDE.md, and `reports/claude-memory-and-settings.md`. Analyze differences between what the official docs list as Claude Code concepts/features and what our README CONCEPTS table documents. Return a structured findings report covering missing concepts, changed concepts, deprecated concepts, URL accuracy, description accuracy, and badge accuracy.
 
 ### Agent 2: claude-code-guide
 
