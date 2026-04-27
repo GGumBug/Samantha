@@ -26,5 +26,6 @@
   "disableFileChangedHook": false,
   "disableTaskCreatedHook": false,
   "disablePermissionDeniedHook": false,
-  "disableLogging": true
+  "disableLogging": true,
+  "soundVolume": 0.5
 }
