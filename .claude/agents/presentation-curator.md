@@ -98,7 +98,7 @@ presentation-styling 스킬에 따라:
 
 - `best-practice/claude-settings.md` (설정 우선순위 및 훅 수)
 - `.claude/hooks/HOOKS-README.md` (훅 이벤트 총계와 이름)
-- `reports/claude-global-vs-project-settings.md` (설정 우선순위 표현)
+- `reports/claude-memory-and-settings.md` (설정 우선순위 표현)
 
 #### 5d. 이 에이전트 업데이트 (자기 자신)
 
