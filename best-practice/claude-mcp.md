@@ -22,7 +22,7 @@ MCP(Model Context Protocol) 서버는 Claude Code를 외부 도구, 데이터베
 |----------|------|--------|
 | [**Context7**](https://github.com/upstash/context7) | 최신 라이브러리 문서를 컨텍스트로 가져옴. 오래된 학습 데이터로 인한 환각 API 방지 | [Reddit: "코딩에 최고의 MCP"](https://reddit.com/r/mcp/comments/1qarjqm/) · [npm](https://www.npmjs.com/package/@upstash/context7-mcp) |
 | [**Playwright**](https://github.com/microsoft/playwright-mcp) | 브라우저 자동화 — UI 기능을 자율적으로 구현, 테스트, 검증. 스크린샷, 탐색, 폼 테스트 | [Reddit: 프론트엔드에 필수](https://reddit.com/r/mcp/comments/1m59pk0/) · [문서](https://playwright.dev/) |
-| [**Claude in Chrome**](https://github.com/nicobailon/claude-code-in-chrome-mcp) | Claude를 실제 Chrome 브라우저에 연결 — 콘솔, 네트워크, DOM 검사. 사용자가 실제로 보는 것 디버깅 | [Reddit: 디버깅에 "게임 체인저"](https://reddit.com/r/mcp/comments/1qarjqm/5_mcps_that_have_genuinely_made_me_10x_faster/nza0i7t/) · [비교 보고서](../reports/claude-in-chrome-v-chrome-devtools-mcp.md) |
+| [**Claude in Chrome**](https://github.com/nicobailon/claude-code-in-chrome-mcp) | Claude를 실제 Chrome 브라우저에 연결 — 콘솔, 네트워크, DOM 검사. 사용자가 실제로 보는 것 디버깅 | [Reddit: 디버깅에 "게임 체인저"](https://reddit.com/r/mcp/comments/1qarjqm/5_mcps_that_have_genuinely_made_me_10x_faster/nza0i7t/) · [비교 보고서](../reports/claude-browser-decision.md) |
 | [**DeepWiki**](https://github.com/devanshusemwal/deepwiki-mcp) | 모든 GitHub 저장소의 구조화된 위키 스타일 문서 가져오기 — 아키텍처, API 표면, 관계 | [Reddit: "Context7와 함께 게이트웨이 뒤에 두기"](https://reddit.com/r/mcp/comments/1qarjqm/) |
 | [**Excalidraw**](https://github.com/antonpk1/excalidraw-mcp-app) | 프롬프트에서 손으로 그린 Excalidraw 스케치로 아키텍처 다이어그램, 순서도, 시스템 설계 생성 | [GitHub](https://github.com/antonpk1/excalidraw-mcp-app) |
 
