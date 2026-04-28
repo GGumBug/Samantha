@@ -11,6 +11,13 @@
     "deepwiki": {
       "command": "npx",
       "args": ["-y", "deepwiki-mcp"]
+    },
+    "google-sheets": {
+      "command": "uvx",
+      "args": ["mcp-google-sheets@latest"],
+      "env": {
+        "SERVICE_ACCOUNT_PATH": "C:\\Users\\alsrl\\OneDrive\\Desktop\\Hwaseo\\privatekey\\hwaseo-a5ae6df14105.json"
+      }
     }
   }
 }
