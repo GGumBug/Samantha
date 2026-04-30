@@ -19,9 +19,10 @@ Unity 코드 작업 시 **사용자가 매번 요구하지 않아도** 다음 �
 사용자가 "시니어 판단해줘"라고 매번 말하지 않아도 **모든 코드 변경 작업에 자동 적용**되는 4단계 표준 사고. 누락 시 사고 재발(caller-driven snapshot 사고 패턴 등) 보장.
 
 **Step 1 — 변경 전 영향 분석 (Before 자동)**:
-- grep으로 변경 대상 심볼/패턴의 **모든 호출처/의존처** 식별
-- 영향 범위를 분류 테이블로 명시 (자동 위임/수동 처리/외부 시스템)
-- "이 변경이 SSOT 어느 축에 영향?" 자동 검증 (코드 식별자 / 사용자 노출 / 메타)
+- grep으로 변경 대상 심볼/패턴의 **모든 호출처/의존처** 식별, 영향 범위를 분류 테이블로 명시 (자동 위임/수동 처리/외부 시스템). "SSOT 어느 축에 영향?" 검증 (코드 식별자 / 사용자 노출 / 메타)
+- **상속 계층 분석 시 `: BaseClass\b` grep + 결과 표 작성 의무**. 사전 조사를 일부 종에 제한 금지 — grep 결과 모두 포함 (2026-04-30 Category 18건 + TooltipTarget 발견)
+- **사용자 의도 모호 질문(예: "~는 어떻게 된거지?")은 부분 마이그레이션 누락 노출 신호** — 답변 전 grep 전수 검사 의무
+- **자산 마이그레이션 script 작성 시 파일명 정렬 vs 시트 Code Name 정렬의 case sensitivity 일관성 사전 검증 의무** — 상세 [best-practice/asset-migration-sort-consistency.md](../../best-practice/asset-migration-sort-consistency.md)
 
 **Step 2 — 합리화 회피 (During 자동)**:
 다음 표현이 머릿속에 떠오르면 **즉시 SSOT 위반/책임 회피 신호**로 판정:
@@ -122,9 +123,11 @@ grep -rE "class.*(VisualData|ViewData|RowData|Model|Snapshot).*\{" -A 30 | grep 
 grep -rE "(name|desc|description|title|label)\s*=\s*L10n\.(T|Format)\("
 ```
 
-**둘 다 0건 아니면 안티패턴 잔재** — 추가 sweep 필수.
+**둘 다 0건 아니면 안티패턴 잔재** — 추가 sweep 필수. **Pattern B 발견 시 view 가 직접 박제하는지 caller chain 추적 의무** — grep 결과 자동 위반 판정 금지, 사용 흐름 검증 (PlayerId/unitId 기반 lazy re-resolve 사용 시 정합).
 
 (2026-04-29 Shop 유물 표시 재발 사고: Relic 마이그레이션 1차에서 `RelicDefinition.NameTextKr` 제거했지만 `ShopSlotVisualData.DisplayName` 와 `UIShopSlot._tooltipTitle` 가 여전히 string snapshot → 상점 슬롯 + 툴팁이 활성 중 언어 토글 미반영. 사용자 시니어 검토자 역할로 layer 누락 패턴 박제 요청)
+
+**4-Layer 데이터 흐름 일관성** (Tooltip + {value} placeholder 등 다중 layer 파이프라인): [best-practice/multilayer-locale-snapshot.md](../../best-practice/multilayer-locale-snapshot.md) — 키 보존 + 표시 직전 lazy resolve.
 
 ##### 2-0-2. View-Level ILocaleAware 강제 — Manager/Static-Event 우회 금지
 
@@ -173,6 +176,8 @@ grep -rE "LocalizationDispatcher\.LocaleApplied\s*\+=" Assets/Scripts
 
 (2026-04-29 Encounter L10n 사고: Sonny 가 manager-level subscription 채택 → UIEncounterPanelView 가 ILocaleAware 미구현 → 사용자가 "이 구조가 말이 돼?" 메타 비판. 3차례 진단 로그 추가 후에야 view-level 패턴으로 unification. 헌법 §0 메타 원칙 직접 위반 — Sonny 가 검증된 패턴 무시 + 추측 기반 패턴 도입)
 
+**Subclass 확장 시**: 부모 `OnLocaleApplied` 를 `virtual` + 자식 `override` + `base` 호출. 상세는 [best-practice/locale-aware-subclass-extension.md](../../best-practice/locale-aware-subclass-extension.md).
+
 #### 2-1. 클래스 불변식 캡슐화 — 양방향 검증 의무
 
 setter나 메서드가 **클래스 불변식을 자동으로 유지**하도록 만들 때(예: `IsSelectable=false → outgoing edges Inactive` 자동 동기화), **반대 방향도 항상 참인지 명시적으로 검증**한다:
@@ -216,12 +221,13 @@ SSOT는 SOLID보다 양보 폭이 좁습니다. "두 곳에 같은 상태"는 �
 
 - **사용처 1곳뿐인 인터페이스/추상 클래스** — 모킹 의도가 명확하지 않으면 구체 클래스로 충분
 - **확장 가능성 추측에 기반한 패턴 도입** — "나중에 늘어날 수도 있으니 Strategy 미리 깔자" 금지. 늘어날 때 도입.
-- **5줄 메서드를 3개로 쪼개기** — SRP 위반 신호가 없으면 인라인이 더 읽기 쉬움
-- **DI 컨테이너 도입 위한 DI 컨테이너** — Unity 환경에서 생성자 주입은 수동 주입으로 충분
+- **5줄 메서드를 3개로 쪼개기 / DI 컨테이너 도입 위한 DI 컨테이너** — SRP 위반 신호 없으면 인라인. Unity 수동 주입으로 충분.
 - **이벤트 남발** — 호출 사슬이 명확한 1:1 호출은 직접 호출이 디버깅에 유리
-- **헌법 검증 단락을 형식적으로 채우기** — 위반/트레이드오프가 없으면 단락 자체를 생략
+- **헌법 검증 단락을 형식적으로 채우기** — 위반/트레이드오프 없으면 단락 자체를 생략
 
 YAGNI(You Aren't Gonna Need It)가 SOLID보다 우선하는 경우가 자주 있음.
+
+**Dead Path 우선 검증 의무**: 마이그레이션 대상 발견 시 **사용처 grep으로 dead path 가능성 우선 검증** — 제거 옵션을 마이그레이션보다 먼저 검토. (2026-04-30 Camp success message 체인 dead path 사례 — 옵션 A -60 LoC 채택. 본 세션 §5 YAGNI 적용 4건 누적: UICardRemovalPanel 삭제 / Camp dead path / Dialogue.Title / Category 시트 통합)
 
 ### 6. Escape Hatch (헌법 완화 허용 상황)
 
