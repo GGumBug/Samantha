@@ -81,6 +81,42 @@ Hwaseo 2026-04-17 Encounter resume 버그 해결 과정에서 확립. 초기 몇
 - 단일 수정: `GameScene.StartEncounter` 가드의 `&& snapshot.IsEnded` **1줄 제거**
 - 로그 12건 전수 제거 (grep 0 확인)
 
+## 시각 표시 사고 시 데이터 Layer 격리 우선
+
+UI에 **잘못된 텍스트/이미지가 swap 표시**되는 사고(예: 상단/하단 라벨 swap, 다른 entity의 데이터 표시)는 **prefab/SerializeField/RectTransform 정합 검증보다 데이터 origin 격리 진단 로그가 빠르다**. 정적 분석은 시각 layer 가설(GameObject 명명, fileID, 위치 swap)에 시간을 낭비시킨다.
+
+**진단 우선순위 역전 규칙**: prefab YAML 분석 + RectTransform 위치 + SerializeField fileID 검증을 시도하기 전에, **데이터 흐름 layer마다 Debug.Log를 찍어 잘못된 데이터가 어느 layer에서 진입했는지 격리**하라.
+
+### 4-Layer 진단 로그 템플릿
+
+```csharp
+// Layer 1 — Source (시트/자산 → 도메인)
+Debug.Log($"[X-DIAG][L1] id={id} name={data.Name} desc={data.Description}");
+
+// Layer 2 — Carrier (도메인 → UI 전달 boundary)
+Debug.Log($"[X-DIAG][L2] hover boundary id={target.Id} key={target.Key}");
+
+// Layer 3 — Display (View 내부 set 시점)
+Debug.Log($"[X-DIAG][L3] set name={nameKey} desc={descKey}");
+
+// Layer 4 — Final (TextMeshPro에 박힌 최종 string)
+Debug.Log($"[X-DIAG][L4] final txtName={_txtName.text} txtDesc={_txtDesc.text}");
+```
+
+L1에서 이미 swap 발견 → 시트/자산 마이그레이션 버그 (코드 무죄). L3에서 swap 발견 → UI set 코드 버그. L4까지 정합인데 시각 swap → 그제서야 prefab 정합 의심.
+
+### 사용자 시니어 검토자 신호 패턴
+
+사용자가 다음 형태로 개입하면 **prefab/코드 의심 차단 + 데이터 origin 격리 지시 신호**:
+
+- "프리팹은 문제없으니 X 의심말고 Y 디버그 찍어"
+- "관련없는 Z 데이터가 W에 뜨는데 버그 이유 추적"
+- "데이터 임포트 검증 완료, 다음 layer 확인"
+
+이 신호 수신 시 즉시 정적 분석 중단 + 4-layer 진단 로그 모드로 전환. 사용자가 시각 layer 정합을 이미 confirm한 상태이므로 **데이터 흐름만 의심**.
+
+(2026-04-30 카드 swap 사고: 본 세션이 prefab YAML / RectTransform / fileID 검증에 시간 소비 → 사용자가 "디버그 찍어" 명시 → 즉시 시트 데이터 layer (skill.0201 name 위치에 desc 텍스트) origin 확정. 본 세션 시니어 검토자 개입 4건 누적 — Encounter L10n + 카드 swap + Effect tooltip 외)
+
 ## 프로토콜 체크리스트
 
 - [ ] 진단 로그 prefix 통일 (`[XXX-DIAG]`)
@@ -91,3 +127,5 @@ Hwaseo 2026-04-17 Encounter resume 버그 해결 과정에서 확립. 초기 몇
 - [ ] 단일 원인 지목 후 최소 수정
 - [ ] 진단 로그 전수 제거 (grep 0)
 - [ ] 임시 변수 정리
+- [ ] **시각 swap 사고 — prefab 의심 전 데이터 layer 4단 로그 우선**
+- [ ] **사용자 "X 의심말고 Y 보라" 신호 시 정적 분석 즉시 중단**
