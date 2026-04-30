@@ -14,7 +14,7 @@ Grep("UnityEngine\.Random|Random\.Range", output_mode="content")
 → 플랜 파일에 테이블로 고정
 ```
 
-**왜?** 플랜 작성 시 눈에 띄는 파일만 적으면 꼭 몇 개가 누락됩니다. Hwaseo 케이스에서는 `EnemyBrain`, `TargetResolver`, `BattleUnitRegistry`, `PlayerManager.PickWeighted`, `ShopPricingService`, `ShopBankService` 7개가 1차 플랜에서 누락되어 추가 배치로 마무리해야 했습니다.
+**왜?** 눈에 띄는 파일만 적으면 누락 발생. Hwaseo 1차 플랜에서 `EnemyBrain`/`TargetResolver`/`BattleUnitRegistry`/`PlayerManager.PickWeighted`/`ShopPricingService`/`ShopBankService` 7개 누락 → 추가 배치 필요. PropertyDrawer 등 **동일 클래스 내 다중 GUI 메서드**(§12.6)는 grep 결과를 메서드별로 분류 의무.
 
 ## 2. 설계 단계 — "이중 안전망" 구조
 
@@ -93,6 +93,10 @@ Fallback label을 따로 두면 "주입이 실제로 호출되는지"를 운영 
 복수 메서드는 파이프로 1회 grep: `\.Foo\(|\.Bar\(|\.Baz\(`
 
 Unity `[SerializeField]` 필드 이름 변경 시 저장값이 유실되므로 `[FormerlySerializedAs("oldName")]` 부착은 별도 필수 절차.
+
+## 12.6 PropertyDrawer 직렬화 필드 변경 — GUI 메서드 동시 grep
+
+`[CustomPropertyDrawer]` 직렬화 필드 변경 시 단일 GUI 메서드만 fix → 다른 GUI 메서드 NRE 폭발. `GetPropertyHeight`가 `OnGUI`보다 먼저 호출되므로 레이아웃 진입 전 터짐. **의무 grep**: 동일 클래스 내 `FindPropertyRelative\("필드명"\)` 전수 — `OnGUI`/`GetPropertyHeight`/`OnInspectorGUI`/`CanCacheInspectorGUI` 모두. (2026-04-30 686a0a5c `OnGUI`만 fix → 4c5cd879 follow-up 사례)
 
 ## 12.5 SSOT 단일 진입점 보존
 
