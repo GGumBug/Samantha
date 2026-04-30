@@ -15,7 +15,7 @@ Hwaseo 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, 룰, 모�
 | [claude-cli-startup-flags.md](best-practice/claude-cli-startup-flags.md) | CLI 시작 플래그 |
 | [claude-power-ups.md](best-practice/claude-power-ups.md) | Claude Code 파워업 팁 |
 | [harness-engineering.md](best-practice/harness-engineering.md) | 하네스 엔지니어링 3축 프레임워크 |
-| [evidence-based-debugging.md](best-practice/evidence-based-debugging.md) | 증거 기반 디버깅 4단계 프로토콜 |
+| [evidence-based-debugging.md](best-practice/evidence-based-debugging.md) | 증거 기반 디버깅 4단계 프로토콜 + 데이터 layer 격리 |
 | [refactoring-lessons.md](best-practice/refactoring-lessons.md) | 대규모 리팩토링 실전 체크리스트 |
 | [overload-semantic-equivalence.md](best-practice/overload-semantic-equivalence.md) | 오버로드 의미론 등가성 검증 |
 | [deferred-commit-pattern.md](best-practice/deferred-commit-pattern.md) | Backup → Mutate → Commit/Rollback 패턴 |
@@ -25,6 +25,10 @@ Hwaseo 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, 룰, 모�
 | [solid-unity-principles.md](best-practice/solid-unity-principles.md) | SOLID Unity 적용 카탈로그 |
 | [determinism-hooks.md](best-practice/determinism-hooks.md) | 결정론 RNG 훅 |
 | [reflection-protocol.md](best-practice/reflection-protocol.md) | 회고 프로토콜 |
+| [asset-migration-sort-consistency.md](best-practice/asset-migration-sort-consistency.md) | 자산 마이그레이션 정렬 일관성 (case sensitivity) |
+| [sheet-batch-readback.md](best-practice/sheet-batch-readback.md) | Google Sheets batch update sort 트리거 read-back 검증 |
+| [multilayer-locale-snapshot.md](best-practice/multilayer-locale-snapshot.md) | 다중 layer L10n caller-driven snapshot 박멸 |
+| [locale-aware-subclass-extension.md](best-practice/locale-aware-subclass-extension.md) | ILocaleAware subclass virtual + base 호출 (LSP) |
 
 ## RULES — .claude/rules/
 
