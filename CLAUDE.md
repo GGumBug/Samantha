@@ -135,17 +135,17 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 
 이렇게 하면 git 기록이 더 깔끔해지고 개별 변경 사항을 검토, 되돌리기, 체리픽하기 쉬워집니다.
 
-## Unity 게임 개발 팀
+## 웹 풀스택 개발 팀
 
-Unity 관련 작업은 **반드시** 전문 에이전트에게 위임합니다. 위임 규칙: `.claude/rules/unity-delegation.md`
+웹 프로젝트(Next.js/React/TS) 관련 작업은 **반드시** 전문 에이전트에게 위임합니다. 위임 규칙: `.claude/rules/web-delegation.md`
 
 | 에이전트 | 영화 | 역할 | 모델 |
 |----------|------|------|------|
 | **Samantha** | Her | 프로듀서 — 소통, 위임, 진행 관리, 품질 감독 (코딩 안 함) | opus |
-| **Jarvis** | Iron Man | 테크니컬 디렉터 — 아키텍처 + 성능 최적화 | sonnet |
-| **Ava** | Ex Machina | 아트 디렉터 — UI/UX + VFX + 애니메이션 | sonnet |
-| **Sonny** | I, Robot | 리드 게임 디자이너 + 게임플레이 프로그래머 — 설계, 밸런싱, AI, 전투, 물리 | sonnet |
-| **TARS** | Interstellar | 레벨 디자이너 + 콘텐츠 디자이너 — 월드 빌딩, 환경 연출 | sonnet |
+| **Joi** | Blade Runner 2049 | 프론트엔드 아키텍트 — 디자인 시스템, shadcn/ui, Tailwind, 접근성, 테마, i18n | sonnet |
+| **Friday** | Iron Man | 앱 엔지니어 — Next.js App Router, 라우팅, 상태, zod 폼, TanStack Table | sonnet |
+| **HAL** | 2001: A Space Odyssey | 백엔드 엔지니어 — API 라우트, SQLite, 파일·PDF 파이프라인, 외부 데이터 통합 | sonnet |
+| **GERTY** | Moon | AI 엔지니어 — Gemini/OpenAI 추상화, 프롬프트 엔지니어링, 응답 파싱, AI 기능 설계 | sonnet |
 
 복합 작업은 Samantha에게(오케스트레이션만), 단일 전문 분야는 해당 에이전트에게 직접 위임합니다.
 
