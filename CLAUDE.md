@@ -110,6 +110,15 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 
 상세는 `best-practice/reflection-protocol.md` 참고. 세션 중 회귀 발생 또는 사용자 시니어 검토자 개입이 있었으면 종료 직전 `/reflect` 사용 권장.
 
+## 디자인 시스템 (Visual SSOT)
+
+`design-system/` 디렉토리는 웹 팀의 시각 의사결정 단일 진실 원천입니다. Linear-inspired 다크 캔버스 시스템을 Pretendard 한글 폰트로 적응했습니다. 모든 페이지·컴포넌트는 토큰(`{colors.*}`, `{typography.*}`, `{spacing.*}`, `{rounded.*}`) 경유 — 임의값 사용 금지.
+
+- 진입점: `design-system/DESIGN.md` (5대 원칙 + 인덱스)
+- 폰트: `design-system/fonts/Pretendard/PretendardVariable.woff2` (자체 호스팅 의무)
+- 권위 적용: Joi 에이전트가 모든 시각 작업에 자동 참조
+- 로고: 현재 placeholder (회사 로고 결정 후 `design-system/assets/logo/`에 추가)
+
 ## 워크플로우 모범 사례
 
 이 저장소 작업 경험을 바탕으로:
