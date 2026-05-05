@@ -171,6 +171,13 @@
             "timeout": 5000,
             "async": true,
             "statusMessage": "Stop"
+          },
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/scripts/reflection-reminder.py",
+            "timeout": 5000,
+            "async": true,
+            "statusMessage": "ReflectionReminder"
           }
         ]
       }
