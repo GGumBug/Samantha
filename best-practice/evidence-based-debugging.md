@@ -64,6 +64,8 @@
 ### 같은 가설 2회 이상 실패
 같은 가설로 두 번 수정했는데 증상 남으면 **즉시 가설 폐기**. 로그 수집으로 전환.
 
+> 사례: GaugeMeter 시각 버그 — "viewBox 잘림" 가설로 1차/2차 fix 모두 실패. 진짜 원인은 SVG `large-arc-flag` 로직 오류였음. 같은 layer를 두 번 의심한 순간 다른 layer(path 명령 인자)로 즉시 전환했어야 함.
+
 ### 영구 로깅 방치
 진단 로그를 제거하지 않고 방치 → 프로덕션 콘솔 스팸. SRP 위반.
 - 수정 완료 직후 `grep` 전수 확인
@@ -103,6 +105,40 @@ L1에서 이미 swap 발견 → DB/API 마이그레이션 버그 (코드 무죄)
 - "API 응답 검증 완료, 다음 layer 확인"
 
 이 신호 수신 시 즉시 정적 분석 중단 + 4-layer 진단 로그 모드로 전환. 사용자가 시각 layer 정합을 이미 confirm한 상태이므로 **데이터 흐름만 의심**.
+
+## SVG 시각 버그 진단 — "잘림" 표현은 다층 원인
+
+SVG 컴포넌트에서 사용자가 "잘림", "이상함", "찌그러짐" 으로 신고한 시각 버그는 **viewBox 단일 의심 금지**. 같은 시각 증상이 최소 4개 layer에서 발생한다.
+
+### SVG 시각 버그 4-Layer
+
+| Layer | 원인 | 의심 신호 |
+|-------|------|----------|
+| L1 — viewBox / 좌표계 | viewBox 범위 좁음, transform 잘못 | 일부만 보이고 명확한 직사각형 경계 |
+| L2 — path 명령 인자 (d 속성) | `large-arc-flag`, `sweep-flag`, M/L/A 좌표 오류 | 호(arc)가 반대 방향으로 그려짐, 곡선이 끊김 |
+| L3 — stroke / fill / opacity | stroke-width 0, fill='none' + stroke 누락 | 좌표 정확하지만 화면에 안 보임 |
+| L4 — CSS 변환 / 부모 컨테이너 | overflow:hidden, transform:scale, 부모 width 0 | 다른 환경에선 정상, 특정 컨테이너에서만 깨짐 |
+
+### 정공법 — path 명령 인자 전수 검증 의무
+
+SVG path의 **모든 시그니처 인자**를 한 번에 검증한다. 좌표만 검증하면 flag 회귀를 놓친다.
+
+```
+A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+```
+
+`large-arc-flag` (0|1), `sweep-flag` (0|1) 같은 boolean 인자도 **단위 테스트의 명시 케이스**가 되어야 한다. 좌표 검증만으로는 다음을 못 잡는다:
+- 호의 진행 방향이 반대 (sweep-flag)
+- 작은 호 vs 큰 호 swap (large-arc-flag)
+- 동일 좌표 + 다른 flag → 시각만 다름
+
+### SVG 작업 체크리스트
+
+- [ ] viewBox 의심 전에 path d 속성 인자 전수 print → 시각 검토
+- [ ] arc(A) 명령 사용 시 large-arc-flag·sweep-flag 단위 테스트 케이스 명시
+- [ ] 각 layer(viewBox / path 인자 / stroke / 부모 CSS) 격리 의심
+- [ ] **사용자 시각 검토 회귀 2회 이상 발생 시 layer 전환 의무** (같은 layer 3회 의심 금지)
+- [ ] 우회 금지: "viewBox만 늘리면 일단 보임" 식 합리화 차단 — 진짜 원인 명시 후 수정
 
 ## 프로토콜 체크리스트
 
