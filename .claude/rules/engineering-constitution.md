@@ -147,6 +147,7 @@ SSOT는 SOLID보다 양보 폭이 좁습니다. "두 곳에 같은 상태"는 �
 - [ ] **삭제 용이성**: 기능 제거 시 영향 파일이 5개 이하로 국소화되는지
 - [ ] **서버/클라이언트 경계**: Next.js App Router에서 `'use client'` 경계가 명확한지. 직렬화 불가능한 객체가 boundary 넘는지 검증
 - [ ] **순수 함수 단위 테스트 검토**: 외부 의존성 없는 순수 함수는 테스트 작성 검토. 강제는 아니지만, 불변식이나 상태 전이를 다루는 코드는 테스트가 회귀 방지 비용 대비 가치가 큼.
+- [ ] **테스트 가정의 차원 명시**: 단위 테스트는 **검증 차원을 코멘트/describe 라벨로 명시**. 좌표만 검증하는 테스트는 "좌표 차원만 검증 — flag·sweep·시각 회귀 별도 검증 필요" 명시. 합리화 차단: "테스트 N건 통과 = 시각 회귀 없음" 추론 금지. 통과 테스트 수는 검증 깊이 증명이 아님.
 
 ### 5. 오버엔지니어링 안티패턴 (적극 회피)
 
@@ -196,8 +197,4 @@ YAGNI(You Aren't Gonna Need It)가 SOLID보다 우선하는 경우가 자주 있
 
 ### 참고
 
-- [best-practice/refactoring-lessons.md](../../best-practice/refactoring-lessons.md) — 일반 리팩토링 교훈
-- [best-practice/evidence-based-debugging.md](../../best-practice/evidence-based-debugging.md) — 증거 기반 디버깅 4단계 프로토콜
-- [best-practice/reflection-protocol.md](../../best-practice/reflection-protocol.md) — 세션 인사이트 반영 프로토콜
-- [.claude/rules/web-delegation.md](web-delegation.md) — 웹 위임 규칙
-- [.claude/rules/evaluation.md](evaluation.md) — 평가 주도 검증
+- [refactoring-lessons](../../best-practice/refactoring-lessons.md) · [evidence-based-debugging](../../best-practice/evidence-based-debugging.md) · [reflection-protocol](../../best-practice/reflection-protocol.md) · [web-delegation](web-delegation.md) · [evaluation](evaluation.md)
