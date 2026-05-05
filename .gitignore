@@ -1,2 +1,9 @@
 plan/
 .vscode/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Claude Code 로컬 상태
+.claude/hooks/.reflection-reminder-last
