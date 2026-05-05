@@ -50,12 +50,25 @@
 
 ## Semantic
 
-마케팅에서 채도 색은 단 하나만 허용 — **녹색 status pill**.
+마케팅에서 채도 색은 단 하나만 허용 — **녹색 status pill**. 데이터 비즈 컴포넌트(07-design-tokens)에 한해 warning/danger 2색 추가 허용.
 
 | 토큰 | 값 | 사용처 |
 |------|-----|-------|
-| `{colors.semantic-success}` | `#27a644` | status pill, 성공 인디케이터 |
+| `{colors.semantic-success}` | `#27a644` | status pill, 성공 인디케이터, 게이지 0-30, delta 양수 |
+| `{colors.semantic-warning}` | `#f0a04b` | 게이지 70-90, trigger 경계 (데이터 시각화 전용) |
+| `{colors.semantic-danger}` | `#d4564b` | 게이지 90+, delta 음수, trigger 발동 (데이터 시각화 전용) |
 | `{colors.semantic-overlay}` | `#000000` | 모달 오버레이 스크림 (순수 검정) |
+
+## Data Visualization (07-design-tokens 전용)
+
+데이터 비즈 컴포넌트(`heatmap-cell` 등)에서만 사용. **마케팅 CTA·강조에 사용 금지**.
+
+| 토큰 | 값 | 사용처 |
+|------|-----|-------|
+| `{colors.heatmap-positive-base}` | `#2a4a3a` | 히트맵 양수 셀 base (~+20%까지 `#3a6a4a`로 그라데이션) |
+| `{colors.heatmap-negative-base}` | `#3a2a2a` | 히트맵 음수 셀 base (~-10%까지 `#5a3a3a`로 그라데이션) |
+
+**라벤더 보존 원칙 유지**: 위 4색(warning/danger/heatmap-pos/neg)은 데이터 시각화 전용. 라벤더(`{colors.primary}`)는 여전히 브랜드·1차 CTA·포커스·링크 강조 4가지 외 사용 금지.
 
 ## CSS 변수 매핑 (구현 가이드)
 
@@ -81,6 +94,12 @@
   
   /* Semantic */
   --color-success: #27a644;
+  --color-warning: #f0a04b;
+  --color-danger: #d4564b;
+
+  /* Data Visualization */
+  --color-heatmap-pos-base: #2a4a3a;
+  --color-heatmap-neg-base: #3a2a2a;
 }
 ```
 
