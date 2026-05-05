@@ -2,7 +2,7 @@
 
 # Components — 컴포넌트 명세
 
-각 컴포넌트는 토큰만 참조해야 합니다 — 임의 색상/크기 사용 금지.
+각 컴포넌트는 토큰만 참조 — 임의 색상/크기 사용 금지.
 
 ## Buttons
 
@@ -134,7 +134,7 @@
 
 ### `text-input` + `text-input-focused`
 
-`/contact/sales`, 가입 오버레이의 폼 필드.
+`/contact/sales`, 가입 오버레이의 폼 필드. 포커스 시 surface 유지, 외곽선만 추가.
 
 | 속성 | 값 |
 |------|-----|
@@ -144,8 +144,6 @@
 | Padding | 8px · 12px |
 | Radius | `{rounded.md}` 8px |
 | Focus | 2px `{colors.primary-focus}` outline @ 50% opacity |
-
-포커스 시 surface는 그대로, 외곽선만 추가.
 
 ## Status & Build Page
 
@@ -174,7 +172,7 @@
 
 ### `top-nav` — 스티키 다크 바
 
-레이아웃: 좌측 wordmark · 중앙 nav 링크 · 우측 (`button-secondary` "Sign in" + `button-primary` "Get started") 페어.
+좌측 wordmark · 중앙 nav · 우측 (`button-secondary` "Sign in" + `button-primary` "Get started").
 
 | 속성 | 값 |
 |------|-----|
@@ -183,13 +181,11 @@
 | Type | `{typography.body-sm}` 14px |
 | Height | 56px |
 
-**로고 자리**: 현재 placeholder (24px 높이 빈 박스). 회사 로고 결정 후 교체.
+**로고 자리**: 현재 placeholder (24px 높이). 회사 로고 결정 후 교체.
 
 ## Footer
 
-### `footer` — 빽빽한 링크 그리드
-
-좌측 wordmark + 다중 컬럼 링크.
+### `footer` — 빽빽한 링크 그리드 (좌측 wordmark + 다중 컬럼)
 
 | 속성 | 값 |
 |------|-----|
@@ -197,3 +193,7 @@
 | Text | `{colors.ink-subtle}` |
 | Type | `{typography.caption}` |
 | Padding | 64px · 32px |
+
+## Data Viz (7종, 07-design-tokens)
+
+`data-table` / `chart-container` / `gauge-meter` / `heatmap-cell` / `metric-card` / `market-toggle` / `trigger-badge` → [components-data.md](components-data.md). 라벤더 fill 금지(4가지 외 0건).
