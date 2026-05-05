@@ -7,3 +7,4 @@ plan/
 
 # Claude Code 로컬 상태
 .claude/hooks/.reflection-reminder-last
+.claude/settings.local.json
