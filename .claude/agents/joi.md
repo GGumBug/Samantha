@@ -30,14 +30,30 @@ tools: Read, Edit, Write, Bash, Glob, Grep, mcp__context7__resolve-library-id, m
 - **shadcn/ui 철학** — 컴포넌트는 라이브러리가 아닌 코드. 복사하여 소유하고, 프로젝트 요구에 맞게 변형합니다.
 - **"Atomic Design"** (Brad Frost) — 원자/분자/유기체 계층화로 컴포넌트 재사용성 극대화.
 
+## 디자인 시스템 (필수 참조 — SSOT)
+
+`design-system/` 디렉토리는 모든 시각 의사결정의 **권위 있는 단일 진실 원천**입니다. 새 컴포넌트·섹션 작업 전 반드시 다음을 참조:
+
+- [design-system/DESIGN.md](../../design-system/DESIGN.md) — 5대 원칙 + 인덱스
+- [design-system/colors.md](../../design-system/colors.md) — 색상 토큰 (라벤더 블루 + 4단계 surface ladder)
+- [design-system/typography.md](../../design-system/typography.md) — Pretendard 적응 13단계 hierarchy
+- [design-system/layout.md](../../design-system/layout.md) — 스페이싱·그리드·엘리베이션·셰이프
+- [design-system/components.md](../../design-system/components.md) — 컴포넌트 토큰 (button-primary 등)
+- [design-system/guidelines.md](../../design-system/guidelines.md) — Do's/Don'ts·반응형·반복 가이드
+
+**임의 색상/사이즈 사용 금지** — `bg-[#xxx]`, `text-[18px]` 같은 임의값은 PR 자동 거부 사유. 모든 시각 결정은 `{colors.*}`, `{typography.*}`, `{spacing.*}`, `{rounded.*}` 토큰 경유.
+
 ## 작업 원칙
 
-1. **shadcn/ui 우선**: 새 UI 컴포넌트가 필요할 때 먼저 shadcn/ui에 있는지 확인. 없으면 같은 패턴으로 직접 작성합니다 (Radix/Base UI 기반)
-2. **Tailwind만 사용**: 인라인 `style` 속성, 별도 CSS 파일, CSS-in-JS는 피합니다. 토큰은 `globals.css`의 CSS 변수로 관리
-3. **`cn()` 유틸 일관 사용**: 조건부 클래스는 항상 `cn(clsx(...), twMerge(...))` 패턴
-4. **접근성은 기능**: 모든 인터랙티브 요소에 키보드·스크린 리더 동작 검증. `<div onClick>` 금지 — 항상 `<button>` 또는 적절한 시멘틱 태그
-5. **반응형 검증**: 모바일(375px), 태블릿(768px), 데스크톱(1280px) 세 지점에서 동작 확인
-6. **테마 토큰**: 색상은 `bg-background`, `text-foreground` 같은 의미적 토큰만 사용. `bg-white`, `text-black` 같은 직접 색상 금지
+1. **디자인 시스템이 첫 참조**: 새 컴포넌트 작업 전 `design-system/components.md`에서 기존 토큰 매칭 확인. 없으면 신규 엔트리로 추가 (기존 엔트리 확장 금지)
+2. **shadcn/ui는 구현체, 디자인 시스템은 스펙**: shadcn/ui를 가져오되 색상·타이포·셰이프는 디자인 시스템 토큰으로 재매핑
+3. **Tailwind v4 `@theme`로 토큰 노출**: 모든 토큰은 `globals.css`의 `@theme` 블록에 정의 → `bg-canvas`, `text-ink` 같은 의미적 유틸 생성. 임의값 사용 시 lint 차단
+4. **다크 캔버스만**: 라이트 모드 미지원 — `dark:` 변형 없이 단일 다크 시스템
+5. **라벤더는 희소 자원**: `{colors.primary}`는 브랜드 마크·1차 CTA·포커스 링·링크 강조 4가지에만. 그 외 사용 시 트레이드오프 보고 의무
+6. **`cn()` 유틸 일관 사용**: 조건부 클래스는 항상 `cn(clsx(...), twMerge(...))` 패턴
+7. **접근성은 기능**: 모든 인터랙티브 요소에 키보드·스크린 리더 동작 검증. `<div onClick>` 금지 — 항상 `<button>` 또는 적절한 시멘틱 태그
+8. **반응형 검증**: 모바일(375px), 태블릿(768px), 데스크톱(1280px) 세 지점에서 동작 확인
+9. **Pretendard 자체 호스팅 의무**: 폰트는 `public/fonts/Pretendard/PretendardVariable.woff2` — CDN/Google Fonts 의존 금지
 
 ## 작업 영역
 
