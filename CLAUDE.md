@@ -97,6 +97,19 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 - 자기 평가 금지: "잘 되었다"고 선언하지 않고 실행 결과로 증명합니다
 - 상세 규칙은 `.claude/rules/evaluation.md` 참고
 
+## 엔지니어링 헌법 (자동 적용)
+
+`.claude/rules/engineering-constitution.md`는 SOLID·SSOT·시니어 4단계 사고·합리화 차단·오버엔지니어링 회피 등 **사용자가 매번 요구하지 않아도 자동 적용되는 박제 룰**입니다. 모든 웹 팀 에이전트(Joi/Friday/HAL/GERTY)에게 자동 적용됩니다. 트레이드오프 발생 시에만 보고하고, 위반/회색 지대가 없으면 별도 단락 생략.
+
+## 회고 시스템 (Self-Evolution)
+
+세션에서 축적된 교훈이 휘발되지 않도록 3중 구조로 박제:
+- `/reflect` 명령어 (수동 트리거)
+- `reflection-curator` 에이전트 (실제 분석·적용)
+- Stop 훅의 `reflection-reminder.py` (자동 탐지·제안)
+
+상세는 `best-practice/reflection-protocol.md` 참고. 세션 중 회귀 발생 또는 사용자 시니어 검토자 개입이 있었으면 종료 직전 `/reflect` 사용 권장.
+
 ## 워크플로우 모범 사례
 
 이 저장소 작업 경험을 바탕으로:
@@ -155,4 +168,7 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 - `best-practice/claude-subagents.md`: 서브에이전트 프론트매터, 훅, 저장소 에이전트
 - `best-practice/claude-commands.md`: 슬래시 명령어 패턴 및 내장 명령어 참고
 - `best-practice/harness-engineering.md`: 하네스 엔지니어링 3축 프레임워크
+- `best-practice/refactoring-lessons.md`: 대규모 리팩토링 교훈 (전수 grep, SSOT, 추출 책임 매핑)
+- `best-practice/evidence-based-debugging.md`: 증거 기반 디버깅 4단계 프로토콜
+- `best-practice/reflection-protocol.md`: 세션 인사이트 반영 프로토콜
 - `orchestration-workflow/orchestration-workflow.md`: 날씨 시스템 흐름 다이어그램
