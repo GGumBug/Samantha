@@ -13,6 +13,7 @@ Unity 코드 작업 시 **사용자가 매번 요구하지 않아도** 다음 �
 - 패턴/추상화 도입은 항상 비용(가독성↓, 신규 진입자 학습 비용↑, 디버깅 stack frame↑)을 동반함
 - "원칙을 적용하지 않는 것"이 더 시니어한 결정인 경우가 자주 있음 — 이 판단을 회피하지 말 것
 - "원칙대로 했다"가 자체 정당화가 될 수 없음. 항상 **"왜 이 비용을 지불했는가"**가 함께 설명되어야 함
+- 시니어 자가 검토는 외부 비판 압력에 비례 — 편집 직전 외부 비판자 시점 6 질문 시뮬레이션 권장 ([best-practice/external-critique-simulation.md](../../best-practice/external-critique-simulation.md))
 
 #### 0-1. Senior Default Mode (모든 변경 작업의 기본 사고 체계)
 
@@ -223,6 +224,7 @@ SSOT는 SOLID보다 양보 폭이 좁습니다. "두 곳에 같은 상태"는 �
 - **확장 가능성 추측에 기반한 패턴 도입** — "나중에 늘어날 수도 있으니 Strategy 미리 깔자" 금지. 늘어날 때 도입.
 - **5줄 메서드를 3개로 쪼개기 / DI 컨테이너 도입 위한 DI 컨테이너** — SRP 위반 신호 없으면 인라인. Unity 수동 주입으로 충분.
 - **이벤트 남발** — 호출 사슬이 명확한 1:1 호출은 직접 호출이 디버깅에 유리
+- **호출자가 .Forget()으로 결과 무시하는 비동기 stub** — 채우기보다 제거 검토. 상세 [best-practice/dead-stub-pattern.md](../../best-practice/dead-stub-pattern.md).
 - **헌법 검증 단락을 형식적으로 채우기** — 위반/트레이드오프 없으면 단락 자체를 생략
 
 YAGNI(You Aren't Gonna Need It)가 SOLID보다 우선하는 경우가 자주 있음.
