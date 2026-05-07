@@ -29,6 +29,12 @@ Hwaseo 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, 룰, 모�
 | [sheet-batch-readback.md](best-practice/sheet-batch-readback.md) | Google Sheets batch update sort 트리거 read-back 검증 |
 | [multilayer-locale-snapshot.md](best-practice/multilayer-locale-snapshot.md) | 다중 layer L10n caller-driven snapshot 박멸 |
 | [locale-aware-subclass-extension.md](best-practice/locale-aware-subclass-extension.md) | ILocaleAware subclass virtual + base 호출 (LSP) |
+| [dead-stub-pattern.md](best-practice/dead-stub-pattern.md) | 호출자가 결과 무시하는 비동기 stub은 채우기보다 제거 |
+| [external-critique-simulation.md](best-practice/external-critique-simulation.md) | 시니어 자가 검토 외부 비판자 6 질문 시뮬레이션 |
+| [race-fix-meta-patterns.md](best-practice/race-fix-meta-patterns.md) | Unity 부트/씬 전환 race 메타 패턴 (3 채널 시뮬레이션 등) |
+| [unity-csharp-version-check.md](best-practice/unity-csharp-version-check.md) | Unity C# LangVersion 사전 검증 (record struct/required 등) |
+| [paradigm-transition-asymmetry.md](best-practice/paradigm-transition-asymmetry.md) | 코루틴→UniTask 등 패러다임 마이그레이션 비대칭 안전성 |
+| [unity-ecs-lite-oop-srp.md](best-practice/unity-ecs-lite-oop-srp.md) | Unity ECS-lite + OOP SRP Composite prefab 정공 |
 
 ## RULES — .claude/rules/
 
