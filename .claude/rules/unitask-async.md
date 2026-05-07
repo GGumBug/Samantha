@@ -4,7 +4,7 @@
 
 Unity 프로젝트의 모든 비동기 코드는 **UniTask 기반**으로 작성한다. `Task`/`async void`/`Coroutine` 혼용은 GC, 캡처, 취소 누락, 라이프사이클 누수의 주범. 다음 9개 룰은 **타협 불가 기본값** — 매번 프롬프트에서 상기시키지 않아도 모든 Unity 에이전트에 박제된다.
 
-상세 인시던트 분석과 Before/After 코드는 [best-practice/unitask-async-patterns.md](../../best-practice/unitask-async-patterns.md) 참조.
+상세 인시던트 분석과 Before/After 코드는 [best-practice/unitask-async-patterns.md](../../best-practice/unitask-async-patterns.md) 참조. 코루틴→UniTask 마이그레이션 비대칭(작성자 깜빡 패턴)은 [best-practice/paradigm-transition-asymmetry.md](../../best-practice/paradigm-transition-asymmetry.md).
 
 ### 룰 1 — `async void` 절대 금지 (단, Unity 이벤트 메서드 예외)
 
