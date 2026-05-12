@@ -92,6 +92,7 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 - [ ] **"현재" 암묵 참조 API 이동** 시(예: `_currentNode`, `_activeSession`): 이동 후 호출 시점의 포인터 타이밍을 명시하고, 필요 시 명시 파라미터(좌표/ID) 기반 오버로드 요구
 - [ ] **SSOT 통합 위임** 시 프롬프트에 5요소 모두 포함: ① 단일 진입점 메서드명 ② 모든 호출자 grep 결과 ③ 부수효과 매트릭스 ④ 통합 후 레거시 진입점 제거 의무 ⑤ 종료 게이트 grep 패턴 (`refactoring-lessons.md §12.5` 6항목 참조)
 - [ ] **패턴 미러링 보고 시 코드 형태 grep 비교 + 인용 의무**: "다른 노드 N곳 참고/미러링" 보고 시 실제 grep 결과로 현재 편집 코드와 참고 코드의 정확한 형태(가드 유무, 호출 순서, lazy-init 여부 등)를 인용해야 함. "패턴을 따랐다" 자체 정당화 회피 (헌법 §0 메타 원칙). (2026-04-27 Treasure 부트 보장 인시던트: `if (HasInstance)` 가드가 다른 노드 11곳 패턴(가드 없이 `Instance` 직접 호출)과 코드 형태가 달라 lazy-init을 막아 race 유지)
+- [ ] **패턴 미러링 — 코드 형태 grep + "적용 영역 일치" 분리 검증 의무**: grep 으로 코드 형태 일치만으로는 부족. 각 미러링 사례의 **"패턴 적용 영역"이 현재 작업과 일치하는지** 명시 검증 — ① 시간축 적용 영역(부트 의존 / 상태 의존 / 라이프사이클 단계) ② 호출 시점 의존성(lazy-init 트리거 필요 여부 / Singleton 부트 race 가능성). 영역이 다른 미러링은 **무효 정당화** — 코드 형태만 같아도 함정 가능. (2026-05-12 btnMap race fix: `HasInstance` 가드 다른 viewer 6곳 미러링 보고했으나 6곳 모두 상태 의존 컨텍스트, UIGame.OnEnable 만 부트 의존 → 영역 mismatch 로 race 발생. 상세 [best-practice/race-fix-meta-patterns.md](../../best-practice/race-fix-meta-patterns.md) §7)
 - [ ] **신규 시그니처 사용 시 Unity C# 버전 호환 확인** (record struct/required member/file-scoped types 등은 LangVersion override 필요). 상세 [best-practice/unity-csharp-version-check.md](../../best-practice/unity-csharp-version-check.md)
 
 상세:
