@@ -81,6 +81,42 @@ Hwaseo 2026-04-17 Encounter resume 버그 해결 과정에서 확립. 초기 몇
 - 단일 수정: `GameScene.StartEncounter` 가드의 `&& snapshot.IsEnded` **1줄 제거**
 - 로그 12건 전수 제거 (grep 0 확인)
 
+## 사례 — Hwaseo btnMap SSOT race fix + AudioManager NRE (2026-05-12)
+
+race / lazy-init / Singleton 라이프사이클 의심 시 4단계 프로토콜 완주 사례.
+
+**observe**:
+- 사용자 보고 #1: Battle/Boss/Elite 노드 진입 시 btnMap 활성화 안 됨
+- 사용자 보고 #2: btnMap 클릭 시 AudioManager.PlayEffect NRE
+
+**hypothesize**:
+- H1a (btnMap): UIGame.OnEnable 시점에 `BattleManager.HasInstance=false` → 가드 통과 실패 → 구독 영구 누락
+- H1b (AudioManager): Singleton 인스턴스 교체 race — Setup 호출 인스턴스 ≠ PlayEffect 호출 인스턴스
+
+**verify (진단 로그)**:
+- `[BTNMAP-DIAG] OnEnable enter | HasInstance(before)=?` 로 race 시점 상태 캡쳐
+- `[AUDIO-DIAG] Init/Setup/PlayEffect | InstanceID=?` 로 인스턴스 교체 검증
+- Editor.log 시퀀스를 사용자 → Claude 전달
+
+**result**:
+- H1a 확정: `HasInstance(before)=False` 로그 출력 → 실제 race 발생 evidence
+- H1b 폐기: `InstanceID=-120158` 단일 일관 → Singleton 교체 없음, 일회성 race 추정
+
+**fix**:
+- btnMap: `Instance` getter 직접 호출 (lazy init 트리거) → race 해소
+- AudioManager: Phase A defensive 가드 (Database null 체크) → NRE 차단
+
+**cleanup**:
+- 진단 로그 14개 라인 제거 (병렬 위임 Sonny+Jarvis)
+- Phase A 가드는 안전망으로 보존
+
+### race / lazy-init / Singleton 라이프사이클 의심 시 표준 패턴
+
+1. `[XXX-DIAG]` prefix 진단 로그
+2. `GetInstanceID()` + `HasInstance(before)=?` 형태로 **race 발생 시점 상태** 직접 캡쳐
+3. Editor.log 시퀀스를 사용자 → Claude 로 전달해 evidence 확정
+4. fix 후 재진단으로 정상 시퀀스 확인 + 진단 로그 제거
+
 ## 시각 표시 사고 시 데이터 Layer 격리 우선
 
 UI에 **잘못된 텍스트/이미지가 swap 표시**되는 사고(예: 상단/하단 라벨 swap, 다른 entity의 데이터 표시)는 **prefab/SerializeField/RectTransform 정합 검증보다 데이터 origin 격리 진단 로그가 빠르다**. 정적 분석은 시각 layer 가설(GameObject 명명, fileID, 위치 swap)에 시간을 낭비시킨다.
