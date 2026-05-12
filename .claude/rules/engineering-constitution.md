@@ -24,6 +24,7 @@ Unity 코드 작업 시 **사용자가 매번 요구하지 않아도** 다음 �
 - **상속 계층 분석 시 `: BaseClass\b` grep + 결과 표 작성 의무**. 사전 조사를 일부 종에 제한 금지 — grep 결과 모두 포함 (2026-04-30 Category 18건 + TooltipTarget 발견)
 - **사용자 의도 모호 질문(예: "~는 어떻게 된거지?")은 부분 마이그레이션 누락 노출 신호** — 답변 전 grep 전수 검사 의무
 - **자산 마이그레이션 script 작성 시 파일명 정렬 vs 시트 Code Name 정렬의 case sensitivity 일관성 사전 검증 의무** — 상세 [best-practice/asset-migration-sort-consistency.md](../../best-practice/asset-migration-sort-consistency.md)
+- **Unity 라이프사이클 메시지(`Awake`/`Start`/`OnEnable`/`OnDestroy`) 신설 시 부모 클래스 grep 의무** — Unity 메시지는 reflection 기반이라 자식 정의 시 부모 호출 누락 위험 (`override` 강제 없음, 컴파일러/IDE 경고 없음). 상세 [best-practice/unity-lifecycle-message-override.md](../../best-practice/unity-lifecycle-message-override.md). (2026-05-12 UIShop Awake 가로채기 회귀 인시던트)
 
 **Step 2 — 합리화 회피 (During 자동)**:
 다음 표현이 머릿속에 떠오르면 **즉시 SSOT 위반/책임 회피 신호**로 판정:
@@ -31,6 +32,7 @@ Unity 코드 작업 시 **사용자가 매번 요구하지 않아도** 다음 �
 - ❌ "Quick fix로 일단" / "나중에 정리"
 - ❌ "caller가 항상 직접 호출하니" / "dead path니까"
 - ❌ "단순 수정이라 검증 생략"
+- ❌ "코드 형태로 디자인 의도 단정" — config 필드 유무/호출 패턴 등은 의도 추론 1회까지, 단정 시 사용자 확인 1차 시도. (2026-05-12 ShopSystemConfig `PriceIncreasePerUse` 존재로 "반복 사용 디자인" 추론 → 실제 1회성 솔드아웃 의도 위배)
 
 위 표현 시도 시 자동 차단 → 옵션 (A) 근본 해결 우선 검토. (C) Quick fix는 사용자 명시 승인 + 후속 task 등록 필수.
 
@@ -44,6 +46,9 @@ Unity 코드 작업 시 **사용자가 매번 요구하지 않아도** 다음 �
 | 비동기 / UniTask | ① 정상 완료 ② **OnDestroy 중 취소** ③ 재진입 atomicity ④ exception 흡수 |
 | 리팩토링 / 시그니처 변경 | ① 호출처 grep 0건 ② **부수효과 매트릭스 등가성** ③ revert 안전 |
 | 신기능 / API 추가 | ① 정상 호출 ② **null/empty/edge case** ③ 의존성 boundary 격리 |
+| 비동기 라이프사이클 / Singleton 부트 race | ① 정상 부트 순서 ② **view OnEnable 시점 매니저 미부트 (lazy-init 가드 함정)** ③ Scene 전환 시 인스턴스 교체 ④ 시간축 안전성 evidence (HasInstance(before) / InstanceID 진단) |
+
+(2026-05-12 btnMap race fix 인시던트: Sonny 1차 "race 안전" 단정이 정적 안전성만 검증, 시간축 미검증. [best-practice/race-fix-meta-patterns.md](../../best-practice/race-fix-meta-patterns.md) §6+§7 박제)
 
 **Step 4 — 사용자 보고 시 시니어 판단 명시 (After 자동)**:
 - 합리화 시도가 차단됐는지 명시
