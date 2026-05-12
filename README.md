@@ -35,6 +35,7 @@ Hwaseo 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, 룰, 모�
 | [unity-csharp-version-check.md](best-practice/unity-csharp-version-check.md) | Unity C# LangVersion 사전 검증 (record struct/required 등) |
 | [paradigm-transition-asymmetry.md](best-practice/paradigm-transition-asymmetry.md) | 코루틴→UniTask 등 패러다임 마이그레이션 비대칭 안전성 |
 | [unity-ecs-lite-oop-srp.md](best-practice/unity-ecs-lite-oop-srp.md) | Unity ECS-lite + OOP SRP Composite prefab 정공 |
+| [unity-lifecycle-message-override.md](best-practice/unity-lifecycle-message-override.md) | Unity 라이프사이클 메시지(Awake/Start/OnEnable) 가로채기 함정 + Init() Template Method |
 
 ## RULES — .claude/rules/
 
