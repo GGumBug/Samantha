@@ -65,6 +65,54 @@ additive 씬 multi-active는 race 다발 영역. 다음 컴포넌트는 **씬당
 - additive load/unload hook에서 **`EventSystem.current` 검증 + 단일화 코드** 박제
 - AudioListener는 카메라 prefab에서 `enabled=false` 기본값, 활성 카메라가 명시적으로 `true`
 
+## 6. "race 안전" 단정 시 정적 안전성 vs 시간축 안전성 분리 의무
+
+race fix 보고에서 **"race 안전"이라고 단정**하기 전에 두 축을 분리해서 모두 검증한다 — 한 축만 보면 정적 단정의 함정에 빠진다.
+
+| 축 | 검증 내용 | 누락 시 결과 |
+|----|----------|-------------|
+| **정적 안전성** | null deref 방지, 예외 안전, 가드 존재 | (위반) NRE / 컴파일 오류 — 즉시 탐지 가능 |
+| **시간축 안전성** | view OnEnable이 매니저 Awake보다 먼저 실행될 수 있는지 / lazy-init getter가 호출되는지 / Scene 전환 시 인스턴스 교체 발생하는지 | (위반) **부트 race 영구 보존** — 사용자 재현 전까지 미탐지 |
+
+**정적 안전성만으로 "race 안전" 단정 금지.** 시간축 검증 절차:
+1. 모든 view OnEnable 시점에 의존 매니저가 부트 완료 상태인가? (Scene 동시 활성화 시 race 가능)
+2. `HasInstance` 같은 단순 null 체크 가드가 lazy-init을 트리거 안 하는가? (트리거 안 하면 영구 미부트 보존)
+3. 가드 통과 실패 시 fallback / retry 경로가 있는가? (없으면 구독 영구 누락)
+
+(2026-05-12 btnMap race fix 인시던트: Sonny 1차 위임이 BattleManager.IsActive SSOT 신설 + UIGame view-level 구독 + `if (BattleManager.HasInstance)` 가드 적용 후 "race 안전" 단정. 사용자 재현 시 Battle/Boss/Elite 노드 진입에서 btnMap 활성화 실패. root cause: `Singleton<T>.HasInstance`는 단순 null 체크라 lazy-init 미트리거, UIGame.OnEnable 시점 BattleManager 미부트 → 가드 통과 실패 → 구독 영구 누락. Editor.log `[BTNMAP-DIAG] OnEnable enter | HasInstance(before)=False` 로 시간축 race evidence 확정. 헌법 §0-1 Step 4 시니어 판단 의무의 갭 보강)
+
+## 7. Lazy-init Singleton "상태 의존 vs 부트 의존" 컨텍스트 분류
+
+Lazy-init Singleton 사용 시 호출 컨텍스트를 분류해서 가드 적합성을 판정한다 — **컨텍스트 mismatch 시 미러링 무효**.
+
+| 컨텍스트 | 정의 | 권장 패턴 | 함정 |
+|---------|------|-----------|------|
+| **상태 의존** | 이미 부트된 후 상태 접근 (예: 다른 매니저 update tick 내부에서 BattleManager 상태 조회) | `HasInstance` 가드 OK — null 체크로 충분 | 없음 |
+| **부트 의존** | 첫 트리거가 필요한 경우 (예: UIGame.OnEnable 시점 첫 구독) | `Instance` getter 직접 호출 필수 — lazy init 자동 트리거 | `HasInstance` 가드는 **영구 미부트 상태 보존**, 구독 영구 누락 |
+
+**Hwaseo `Singleton<T>` 의미 차이**:
+```csharp
+// Singleton.cs:12 — 단순 null 체크, lazy init 트리거 안 함
+public static bool HasInstance => _instance != null;
+
+// Singleton.cs:14-35 — null 시 FindAnyObjectByType + CreateInstance 자동 실행
+public static T Instance {
+    get {
+        if (_instance == null) {
+            _instance = FindAnyObjectByType<T>();
+            if (_instance == null) _instance = CreateInstance();
+        }
+        return _instance;
+    }
+}
+```
+
+**HasInstance 가드 사용 전 컨텍스트 분류 grep 의무**:
+1. 호출 시점이 매니저 부트 이후 보장되는가? → 상태 의존, 가드 OK
+2. 호출 시점이 부트 race 가능한가? → 부트 의존, getter 직접 호출 필수
+
+(2026-05-12 btnMap race fix: Sonny가 다른 viewer 6곳 `HasInstance` 가드 패턴 미러링 보고했으나 6곳 모두 **상태 의존** 컨텍스트, UIGame.OnEnable만 **부트 의존**이라 미러링 무효 정당화)
+
 ## 본 세션 사례 매핑
 
 | 사고 # | 메타 패턴 |
@@ -74,6 +122,7 @@ additive 씬 multi-active는 race 다발 영역. 다음 컴포넌트는 **씬당
 | 4 | §2 try/finally 책임 |
 | 5, 8 | §4 책임 이전 매트릭스 |
 | 6, 9, 10, 11, 12 | §5 additive multi-active |
+| 13 (2026-05-12 btnMap) | §6 정적 vs 시간축 + §7 부트 의존 컨텍스트 |
 
 ## 참고
 
