@@ -80,6 +80,8 @@ Unity C# 파일이라도 **모든** 조건을 충족하면 에이전트 위임 �
 
 UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset 수정 전에 Inspector 확인을 우선**합니다. Ava 위임 프롬프트에 반드시 명시: "Button.Disabled Color, SerializeField 할당, CanvasGroup.alpha를 코드 수정 전에 먼저 의심하고, 같은 가설 2회 실패 시 사용자에게 Inspector 확인을 요청하라".
 
+**prefab 시각 회귀 시 git diff 우선 의무**: 사용자가 "어제까지 멀쩡했는데 이상해짐" 같이 회귀를 보고하면 Ava 위임 프롬프트 1순위는 **`git diff <prefab>` + `git log --oneline <prefab>`** 으로 변경 이력 확인. 코드/asset 수정 시도보다 먼저. 직접 의심한 컴포넌트 외 어떤 필드가 함께 바뀌었는지 diff 가 가장 빠른 답을 준다 (특히 prefab variant 의 modifications 블록).
+
 ### 리팩토링 위임 체크리스트
 
 심볼 제거·시그니처 변경·인라인 추출 위임 시 프롬프트에 명시:
@@ -98,6 +100,37 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 상세:
 - [best-practice/refactoring-lessons.md](../../best-practice/refactoring-lessons.md) — 일반 리팩토링 교훈
 - [best-practice/node-lifecycle-patterns.md](../../best-practice/node-lifecycle-patterns.md) — 상태 머신·노드 생명주기 패턴
+
+### 위임 prompt 범위 보존 의무 (필수)
+
+위임 prompt 는 **사용자가 명시한 작업 범위만** 포함한다. 에이전트가 "겸사겸사 다른 부분도 정리할까?" / "관련 파일도 함께 수정?" 같이 **범위 외 작업을 자가 확장**하면 다음 사고 발생:
+
+- 의도 외 변경이 working tree 에 누적 (헌법 §unity-delegation 워킹트리 인지 의무로도 사후 발견 비용 큼)
+- 사용자 검증 부담 폭발 — "내가 부탁한 것 외에 무엇이 바뀌었나" 추적
+- 위임 비용/turn 낭비 — 한 번에 너무 많이 하다 `maxTurns=25` 절단
+
+**필수 prompt 골격**:
+
+```
+[작업 범위]
+- {파일/심볼/시나리오 명시}
+
+[범위 외 작업 금지]
+- 같은 파일 안의 다른 수정 / 리팩토링 / 정리 금지
+- 발견한 별도 이슈는 보고만 하고 수정 금지 (사용자 결정 후 별도 위임)
+
+[허용된 부수 작업]
+- {필요 시: import 정리 / 컴파일 에러 fix 한정}
+```
+
+**자가 확장 의심 신호** (위임 결과 점검 시):
+- 보고에 "겸사겸사" / "함께" / "관련해서" 같이 작업 확장 표현
+- `git diff --stat` 에 prompt 명시 외 파일 등장
+- 줄수가 예상보다 1.5배 이상
+
+발견 시 `git restore` 로 범위 외 변경 즉시 롤백 검토 + 사용자 보고.
+
+(2026-05-13 본 세션 회고: 시각 회귀 prompt 에 명시 안 한 컴포넌트 정리가 함께 진행되어 사용자가 별도 검증해야 한 사례)
 
 ### 중앙 허브 파일 병렬 작업 직렬화 (필수)
 

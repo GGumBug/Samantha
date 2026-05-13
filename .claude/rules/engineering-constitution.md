@@ -33,6 +33,7 @@ Unity 코드 작업 시 **사용자가 매번 요구하지 않아도** 다음 �
 - ❌ "caller가 항상 직접 호출하니" / "dead path니까"
 - ❌ "단순 수정이라 검증 생략"
 - ❌ "코드 형태로 디자인 의도 단정" — config 필드 유무/호출 패턴 등은 의도 추론 1회까지, 단정 시 사용자 확인 1차 시도. (2026-05-12 ShopSystemConfig `PriceIncreasePerUse` 존재로 "반복 사용 디자인" 추론 → 실제 1회성 솔드아웃 의도 위배)
+- ❌ "이번엔 단순하니 측정 생략" / "코드 분석으로 충분" — 같은 영역 2회 추측 fix 시 **측정 도구 작성 의무**. 정적 안전성/grep/시뮬레이션은 시간축·확률·분포 버그 검증 불가. 상세 [best-practice/measurement-driven-debug.md](../../best-practice/measurement-driven-debug.md). (2026-05-13 본 세션 박제)
 
 위 표현 시도 시 자동 차단 → 옵션 (A) 근본 해결 우선 검토. (C) Quick fix는 사용자 명시 승인 + 후속 task 등록 필수.
 
@@ -265,10 +266,3 @@ YAGNI(You Aren't Gonna Need It)가 SOLID보다 우선하는 경우가 자주 있
 - `/reflect`는 `reflection-curator` 에이전트를 호출해 인사이트를 `.claude/` 또는 `best-practice/`에 박제할지 사용자에게 확인 후 적용
 - 박제 대상 우선순위: ① 옵션 회귀 케이스(예: 옵션 5 → 5b) ② 헌법으로 잡지 못한 실패 패턴 ③ 위임 비용/가치 ROI 데이터
 - 회고가 박제되지 않은 채 세션이 끝나면, "사용자가 다음 번에 같은 지적을 또 해야 함" — 이건 헌법 §0 메타 원칙 위반(사용자에게 부담 떠넘김)
-
-### 참고
-
-- [best-practice/refactoring-lessons.md](../../best-practice/refactoring-lessons.md) — 일반 리팩토링 교훈
-- [best-practice/node-lifecycle-patterns.md](../../best-practice/node-lifecycle-patterns.md) — 상태 머신·노드 생명주기 패턴
-- [.claude/rules/unity-delegation.md](unity-delegation.md) — Unity 위임 규칙
-- [.claude/rules/evaluation.md](evaluation.md) — 평가 주도 검증

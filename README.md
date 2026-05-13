@@ -36,6 +36,7 @@ Hwaseo 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, 룰, 모�
 | [paradigm-transition-asymmetry.md](best-practice/paradigm-transition-asymmetry.md) | 코루틴→UniTask 등 패러다임 마이그레이션 비대칭 안전성 |
 | [unity-ecs-lite-oop-srp.md](best-practice/unity-ecs-lite-oop-srp.md) | Unity ECS-lite + OOP SRP Composite prefab 정공 |
 | [unity-lifecycle-message-override.md](best-practice/unity-lifecycle-message-override.md) | Unity 라이프사이클 메시지(Awake/Start/OnEnable) 가로채기 함정 + Init() Template Method |
+| [measurement-driven-debug.md](best-practice/measurement-driven-debug.md) | 같은 영역 2회 추측 fix 실패 시 측정 도구 작성 의무 + PRNG/hash mixing 분포 검증 |
 
 ## RULES — .claude/rules/
 
