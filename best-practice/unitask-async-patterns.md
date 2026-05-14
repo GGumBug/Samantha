@@ -143,7 +143,13 @@ private async UniTaskVoid FlushAsync(CancellationToken token)
 
 생략 시 기본 `Update`이지만 **명시로 의도 박제** — 미래 개발자 추적 비용 절감.
 
-## 5. 안티패턴 카탈로그
+## 5. Cancel-Cleanup Bypass + 강제 토글
+
+`try/catch (OperationCanceledException)` 흡수 시 try 본문의 cleanup 코드 (`SetActive(false)` / 콜백 발화) 가 우회되는 함정. 강제 토글 (`if (activeSelf) SetActive(false); SetActive(true);`) 로 4 진입 상태 멱등 보장.
+
+상세: [cancel-cleanup-bypass.md](cancel-cleanup-bypass.md).
+
+## 6. 안티패턴 카탈로그
 
 | # | 안티패턴 | 처방 |
 |---|----------|------|
@@ -169,3 +175,4 @@ private async UniTaskVoid FlushAsync(CancellationToken token)
 - [.claude/rules/engineering-constitution.md](../.claude/rules/engineering-constitution.md) — SOLID/SSOT
 - [refactoring-lessons.md](refactoring-lessons.md) §6 — 방어 분기 로깅
 - [evidence-based-debugging.md](evidence-based-debugging.md) — 비동기 race 진단
+- [multi-axis-fast-path-guard.md](multi-axis-fast-path-guard.md) — `_isHideInProgress` 같은 재진입 플래그를 fast path 가드에 합성

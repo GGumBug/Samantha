@@ -151,6 +151,23 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 - Ava/Jarvis 위임 시 `.meta` 파일 직접 생성이 포함되면 프롬프트 보고 항목에 **"사용자 Unity Editor에서 Missing 참조 확인 필수"** 를 명시하도록 지시
 - 가능하면 `.meta` 생성은 Unity Editor의 자동 생성에 맡기고, 에이전트는 `.cs`/`.asset` 본문만 작성
 
+### Unity 자동 prefab mutation 함정 (공유 asset 추가 시)
+
+새 폰트/머터리얼/스프라이트/Shader 등 **공유 asset 을 Assets/ 에 추가**하면 Unity 가 import 시점에 기존 prefab 의 reference GUID 를 자동 교체하는 사고가 발생할 수 있다. 결과: 작업 범위 외 prefab 들이 `Modified` 상태로 working tree 에 등장.
+
+**증상**:
+- `git status` 에 위임 작업과 무관한 `.prefab` 다수 등장
+- prefab modifications 블록에 `m_FontAsset` / `m_Material` / `m_Sprite` 등 GUID 만 변경된 entry
+- Inspector 에서 "보이는 폰트는 같은데 GUID 가 다른 asset 가리킴"
+
+**처방** (헌법 §unity-delegation "워킹트리 인지 의무" 와 cross-link):
+
+- 공유 asset (`*.ttf` / `*.asset` TMP_FontAsset / `*.mat` / `*.png` 등) 추가가 포함된 위임 종료 직후 **`git status` 전체 점검 의무**
+- 의도한 prefab (예: UIMapView, UITutorialGuidePanel) 외 prefab mutation 발견 시 사용자 보고 + (A) 의도 적용 / (B) `git restore` 옵션 제시
+- 사전 예방: 공유 asset 추가 위임 prompt 에 "**asset import 후 `git status` 로 의도 외 prefab mutation 확인 + 사용자 보고**" 의무 명시
+
+(2026-05-14 RIDIBatang 폰트 추가 인시던트: `1e51495b` 커밋에서 UIMapView 의 TMP_Text fontAsset GUID 가 자동 교체되어 의도된 폰트 마이그레이션과 함께 의도 외 prefab modification 도 발생. 사용자가 직접 발견 전까지 격리 안 됨)
+
 ### 서브에이전트 Read 권한 사전 점검
 
 `.claude/settings.json`의 `permissions.allow`에 `Read(*)` 또는 Unity 작업 영역 경로가 누락된 경우, 서브에이전트가 Samantha 디렉토리 밖 파일(예: `../Assets/`)을 **Read 불가**. Interactive 승인이 필요하므로 백그라운드 에이전트는 즉시 실패.

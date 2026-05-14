@@ -128,6 +128,8 @@ Sonny/Jarvis가 **구현 전 자체 점검** 시 참조하는 단일 진실 소�
       => string.IsNullOrWhiteSpace(id) || id == EmptyIdSentinel;
   ```
   규칙: polymorphic field를 해석하는 코드는 **sentinel 판정을 전용 메서드로 분리** (SRP 확보, 향후 sentinel 추가 용이).
+- **Speculative Observer Pattern (투기적 이벤트 도입)**: 1:1 호출 사슬을 "나중에 구독자 늘어날 수도 있으니" 미리 `event Action`/`UnityEvent`로 추상화하는 유혹. **2026-05-13 Hwaseo 사례**: UIMapView 시각 회귀 진단 중 단일 호출자→단일 수신자 흐름에 이벤트를 끼워넣으려 한 시도가 외부 비판 시뮬레이션에서 차단됨. 추상화 시 stack frame 증가 + 호출 시점 추적 비용 폭증 + Inspector listener 누락 시 silent fail. **규칙**: 헌법 §3 적용 — **3회 반복** 또는 **확장 요구가 코드에 명시**될 때만 도입. 1·2회 호출 사슬은 직접 호출이 디버깅·합류자 학습 비용 모두 우위. "확장 가능성 추측"은 안티패턴 신호어 (헌법 §5 "확장 가능성 추측에 기반한 패턴 도입" 금지 조항).
+- **Root-Only GetComponent 사각지대**: 자식 GameObject 의 컴포넌트를 `GetComponent<T>()` 단일 호출로 찾으려 시도. Unity API 는 **호출된 GameObject 의 컴포넌트만** 반환 — 자식/부모 미탐색. **2026-05-13 Hwaseo 사례**: UIMapView 자식 노드 prefab 의 시각 컴포넌트 진단 시 root 에서 `GetComponent` 만 호출 → null → "컴포넌트 없음" 오판단 → 불필요한 prefab 수정 시도. **규칙**: ① 자식 탐색은 `GetComponentInChildren<T>(includeInactive: true)` 명시 ② 부모 탐색은 `GetComponentInParent<T>()` ③ **API 선택 자체를 진단 단계에 박제** — null 결과 = "컴포넌트 없음"이 아닌 "탐색 범위 mismatch" 가능성을 먼저 의심. Inspector hierarchy 트리와 코드 API 가 일치하는지 사전 검증 의무.
 
 ## 참고 문헌
 

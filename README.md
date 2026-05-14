@@ -37,6 +37,10 @@ Hwaseo 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, 룰, 모�
 | [unity-ecs-lite-oop-srp.md](best-practice/unity-ecs-lite-oop-srp.md) | Unity ECS-lite + OOP SRP Composite prefab 정공 |
 | [unity-lifecycle-message-override.md](best-practice/unity-lifecycle-message-override.md) | Unity 라이프사이클 메시지(Awake/Start/OnEnable) 가로채기 함정 + Init() Template Method |
 | [measurement-driven-debug.md](best-practice/measurement-driven-debug.md) | 같은 영역 2회 추측 fix 실패 시 측정 도구 작성 의무 + PRNG/hash mixing 분포 검증 |
+| [ui-transition-prefab-convention.md](best-practice/ui-transition-prefab-convention.md) | UI 트랜지션 prefab=Start SSOT 컨벤션 (CSS slide-from-* 정합) |
+| [ui-visibility-two-layer-srp.md](best-practice/ui-visibility-two-layer-srp.md) | 사전 생성 UI 의 가시성 SSOT 2-layer (panel root vs content child) 분리 |
+| [multi-axis-fast-path-guard.md](best-practice/multi-axis-fast-path-guard.md) | 시간축 다른 invariant 합성 가드 + caller-callee enabler 협업 |
+| [cancel-cleanup-bypass.md](best-practice/cancel-cleanup-bypass.md) | try/catch OperationCanceled cleanup 우회 + 강제 토글 4-state 멱등 |
 
 ## RULES — .claude/rules/
 
