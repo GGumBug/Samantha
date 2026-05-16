@@ -16,7 +16,7 @@
 
 | 엉드루 단계 | 페이지 | 핵심 위젯 | 데이터 소스 |
 |----------|------|---------|----------|
-| 1. Macro 평가 | `/dashboard` (홈) | 조기 경보 게이지 0-100, KOSPI·NASDAQ 12M P/E·EPS 성장 나란히, 일일 변동성, Term Spread (US/KR), 외국인·기관 누적 수급, LPPL 진단, IRF 전이 시각화 | KIS + 한국은행 ECOS + yfinance + FRED |
+| 1. Macro 평가 | `/dashboard` (홈) | INTENSITY 게이지(MLP/SVM inference)·Stage 1-5 배지·FORWARD EXPECTANCY 5 bucket 표·PERFORMANCE ANALYTICS 누적수익률+Sharpe+MDD·MODEL INPUTS 7 변수 sparkline·모델 토글(Model 1 Forced / Model 2 Optimal)·Refresh | KIS + 한국은행 ECOS + yfinance + FRED |
 | 2. 주도 섹터 | `/sectors` | 섹터별 누적 수익률 히트맵 (KOSPI 행 + NASDAQ 행), 52주 신고가 밀도, 양 시장 교차 상관 | KIS 섹터 + GICS·NASDAQ 섹터 (yfinance) |
 | 3. 정량 스크리닝 | `/screener` | 4대 스타일(수익성·성장성·저평가·모멘텀) 슬라이더 + 시장 필터 + 결과 ranking | DART + KIS (한국) / SEC EDGAR + yfinance (미국) |
 | 4. 심층 분석 | `/stock/[ticker]` | 시장 자동 감지(`005930.KS` vs `NVDA`), 재무 시계열·ROIC, SWOT/5 Forces (AI 보조), MA·볼밴, 수급(한국: 외국인·기관 / 미국: institutional ownership) | DART/SEC + KIS/yfinance + AI |
@@ -82,6 +82,7 @@ zod 스키마로 응답 검증, 동일 입력 재현성 ≥ 80% 보장.
 ## 단계별 로드맵
 
 > **시니어 판단**: 사용자 명시적 우선순위(시간 걸려도 유지보수+확장성)에 따라 **Phase 0 (Foundation)** 을 추가. Phase 0 없이 Phase 1로 직행하면 페이지마다 동일 추상화를 반복 작성하게 됨.
+> 단, 사용자 진짜 의도(GEMSTONE 이미지)와 Phase 1 좁히기가 충돌하면 좁히기 거부 후 가치 정의 재정의 우선. 본 재정의는 메모리 룰 feedback_senior_judgment_priority의 '가치 정의 단계 적용' 확장.
 
 ### Phase 0 — Foundation (1~2주, 사용자 노출 0)
 
@@ -100,10 +101,21 @@ zod 스키마로 응답 검증, 동일 입력 재현성 ≥ 80% 보장.
 | 9 | sync 스케줄러 골격 | HAL — 향후 cron 또는 수동 |
 | 10 | 컴포넌트 검증 페이지 `/dev/preview` | Friday — 모든 새 토큰 한 화면 |
 
-### Phase 1 — Dashboard (Foundation 완료 후, 1~2주)
-**1개 페이지에 집중** — Phase 0 자산을 재사용만, 새로 만들지 않음:
-- `/dashboard` (KOSPI·NASDAQ 거시 나란히, 12M P/E, 일일 변동성, 수급)
-- 데이터: yfinance (양 시장 모두) — 사용자 결정에 따라 KIS는 후속 단계에서 도입
+### Phase 0.5 — ML/백테스트 인프라 (Foundation 완료 후, 1~2주, 사용자 노출 0)
+
+| # | 자산 | 책임 |
+|---|------|------|
+| 1 | 데이터 수집 파이프라인 (yfinance + FRED + ECOS, 2005~ 일별) | HAL |
+| 2 | 변수 계산 엔진 — 7 변수 | HAL |
+| 3 | 학습 데이터셋 생성기 | HAL+GERTY |
+| 4 | ML 학습 스크립트 (Python scikit-learn MLP·SVM, ONNX/JSON export) | GERTY |
+| 5 | ML inference 어댑터 (Node.js 순수 행렬 연산) | GERTY+HAL |
+| 6 | 백테스트 엔진 (OOS-expanding window, Stage 1-5, Forward Expectancy 5 bucket) | HAL |
+| 7 | 디자인 시스템 신규 토큰 — 7 GEMSTONE 토큰 | Joi |
+| 8 | /dev/preview 확장 — 7 토큰 + Phase 1 위젯 prototypes | Friday |
+
+### Phase 1 — GEMSTONE EWS Dashboard (Foundation 0.5 완료 후, 2~3주)
+`/dashboard`를 GEMSTONE 시장 투자매력도 화면으로 정공 구현. 좌상단 INTENSITY 게이지(74점 형식, MLP/SVM 시그널 inference), Stage 1-5 단계 배지, "비중 확대/축소" 라벨, 우상단 FORWARD EXPECTANCY 5 bucket 통계 표, 좌중단 PERFORMANCE ANALYTICS 누적수익률 차트(2005~ OOS-expanding window) + 메트릭 3종(누적수익률 vs BM, Sharpe, MDD), 우중단 MODEL INPUTS 7 변수 sparkline 카드(NEUTRAL/REVERSION 라벨), 헤더 모델 토글(Model 1 Forced [2,8,9,16] vs Model 2 Optimal), 시장 토글 KOSPI200/S&P 500, Refresh. **데이터: yfinance + FRED + ECOS, 2005~ 일별. ML 모델은 Foundation 0.5에서 학습→export, Phase 1은 inference만.**
 
 ### Phase 2 — Stock + Journal (1~2주)
 - `/stock/[ticker]` (시장 자동 감지, 재무 시계열 + MA·볼밴)
@@ -116,16 +128,17 @@ zod 스키마로 응답 검증, 동일 입력 재현성 ≥ 80% 보장.
 - `/screener` (4대 스타일 스코어, 시장 필터)
 - `/watchlist` (관심 종목 — 양 시장 통합)
 
-### Phase 4 — Portfolio + Triggers + LPPL (3~4주)
+### Phase 4 — Portfolio + Triggers (3주)
 - `/portfolio` (KRW·USD 통합 보유 자산, 환율 환산, 시뮬레이션)
 - `/triggers` (사용자 설정 알림 + 푸시·이메일)
-- LPPL 모델 + 조기 경보 점수 본격 구현
+- 외국인·기관 누적 수급 (KIS 도입 시), invalidation 트리거 알림, IRF 전이 시각화
+- **LPPL · 조기 경보 점수는 Phase 1로 승격됨** (GEMSTONE EWS INTENSITY/Stage 1-5에 통합)
 
 ### Phase 5 — Backtest (선택, 4주+)
 - 4대 스타일 조합으로 과거 ~10년 시뮬레이션 (양 시장)
 - KIS OpenAPI 통합도 이 시점에 도입 검토
 
-**전체 예상**: Phase 0(2주) + Phase 1(2주) + Phase 2(2주) + Phase 3(3주) + Phase 4(4주) = ~13주. 초기 Foundation 투자가 후속 페이지 속도를 가속.
+**전체 예상**: Phase 0(완료) + Phase 0.5(2주) + Phase 1(2.5주) + Phase 2(2주) + Phase 3(3주) + Phase 4(3주) = ~15주. 초기 Foundation 투자가 후속 페이지 속도를 가속.
 
 ## Critical Files (예상 구조)
 
@@ -179,3 +192,6 @@ src/
 5. **알림 채널** — 브라우저 푸시 / 이메일 / Telegram
 6. **백테스트** — Phase 3 필수 vs V4로 미룸
 7. **MVP 범위 조정** — Phase 1을 더 좁히고 싶은지(예: dashboard만 먼저)
+8. **MLP/SVM 학습 데이터 윈도우** — 2005~2019 in-sample, 2020~ OOS (확정 필요)
+9. **변수 7개 최종 확정 시점** — Foundation 0.5 시작 전 vs 학습 데이터셋 생성 시점
+10. **MODEL INPUTS NEUTRAL/REVERSION 임계값** — 변수별 z-score 컷오프 정의
