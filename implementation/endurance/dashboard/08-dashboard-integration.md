@@ -1,8 +1,22 @@
 [← README.md로 돌아가기](README.md)
 
-# 08 — Dashboard Integration + `/dev/preview` 갱신
+# 08 — Dashboard Integration + `/dev/preview` 갱신 (v2 GEMSTONE A~G)
 
-**위임**: Friday | **위치**: `endurance/src/app/dashboard/page.tsx` (01의 grid를 04~07 실제 위젯으로 교체) + `endurance/src/app/dev/preview/_sections/DashboardPreview.tsx` (Foundation 10에 신규 섹션 추가) | **의존**: Phase 1 01, 02, 04, 05, 06, 07
+> **변경 이력**
+> - v2 (2026-05-16): GEMSTONE EWS 재정의에 맞춰 책임 갱신. 사유: 사용자가 GEMSTONE 스크린샷 단언 후 정공 재정의 (옵션 D). 기존 v1 구현 코드는 이 명세 §"v1 코드 처리"에 따라 처리.
+> - v1 (이전): 04 P/E + 05 Volatility + 06 Term Spread + 07 Gauge 4 위젯 2×2 grid 통합.
+
+**위임**: Friday | **위치**: `endurance/src/app/dashboard/page.tsx` (01의 grid를 자산 11~17 GEMSTONE 위젯 A~G로 교체) + `endurance/src/app/dev/preview/_sections/DashboardPreview.tsx` (Foundation 10에 신규 섹션 추가) | **의존**: Phase 1 01, 02, 11, 12, 13, 14, 15, 16, 17
+
+## v1 코드 처리
+
+v1 위젯 배치(04 P/E·05 Volatility·06 Term Spread·07 Gauge) → **v2 위젯 배치(A~G, 자산 11~17)**. 반응형 grid **재설계 필요**:
+
+- v1 2×2 grid(Gauge / P/E / Volatility / Term Spread) → v2 GEMSTONE 7 위젯 grid (좌상 INTENSITY+Stage, 우상 Forward Expectancy, 좌중 Performance Analytics, 우중 MODEL INPUTS 7카드, 헤더 시장+모델 토글+Refresh)
+- v1 `getDashboardSnapshot` 1회 호출 + 4 위젯 props 분배 → v2 동일 패턴 유지(1회 호출 + 7 위젯 props 분배). SSOT 패턴 보존
+- v1 `ErrorBadgeRow` 보존 — 자산 11~17 모두 부분 실패 시 동일 패턴 적용
+- v1 data-testid 명명 규약 보존 + 신규 GEMSTONE 위젯 testid 추가 (아래 §data-testid 규약 표 v2)
+- v1 단위/통합 테스트 → v2 위젯 7종 기준 재작성 (mocking은 02 v2 `DashboardSnapshot` 기준)
 
 ## Purpose
 
@@ -24,30 +38,35 @@ Phase 1 01~07 자산이 머지된 후, 01의 placeholder grid를 04~07 위젯 4�
 ### `/dashboard` 페이지 통합 (01-route-shell의 DashboardGrid 구현)
 
 ```typescript
-// src/app/dashboard/page.tsx (01에서 placeholder였던 부분을 본격 통합)
+// src/app/dashboard/page.tsx (v2 GEMSTONE A~G 통합)
 import { getDashboardSnapshot } from "@/lib/dashboard/data";
-import { MarketToggleHeader } from "./_components/MarketToggleHeader";
-import { PeMetricCards } from "./_components/PeMetricCards";
-import { VolatilitySparkline } from "./_components/VolatilitySparkline";
-import { TermSpreadChart } from "./_components/TermSpreadChart";
-import { EarlyWarningGauge } from "./_components/EarlyWarningGauge";
+import { MarketToggleHeader } from "./_components/MarketToggleHeader"; // 자산 16
+import { IntensityGaugeStageBadge } from "./_components/IntensityGaugeStageBadge"; // 자산 11 (A)
+import { ModelMetaCardToggle } from "./_components/ModelMetaCardToggle"; // 자산 12 (B)
+import { ForwardExpectancyTable } from "./_components/ForwardExpectancyTable"; // 자산 13 (C)
+import { PerformanceAnalyticsChart } from "./_components/PerformanceAnalyticsChart"; // 자산 14 (D)
+import { ModelInputsCards } from "./_components/ModelInputsCards"; // 자산 15 (E)
+import { RefreshButton } from "./_components/RefreshButton"; // 자산 17 (G)
 import { ErrorBadgeRow } from "./_components/ErrorBadgeRow";
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
-  const { market: raw } = await searchParams;
+  const { market: raw, model: rawModel } = await searchParams;
   const market = parseMarket(raw);
-  const snapshot = await getDashboardSnapshot(market);
+  const modelKind = parseModelKind(rawModel); // "model1_forced" | "model2_optimal"
+  const snapshot = await getDashboardSnapshot(market, { modelKind });
   return (
     <main className="mx-auto max-w-[1280px] px-6 py-section">
-      <MarketToggleHeader current={market} />
+      <header className="flex items-center justify-between">
+        <MarketToggleHeader current={market} />            {/* 자산 16 (F) */}
+        <ModelMetaCardToggle meta={snapshot.modelMeta} />  {/* 자산 12 (B) — 모델 토글 + 메타 */}
+        <RefreshButton market={market} modelKind={modelKind} />  {/* 자산 17 (G) */}
+      </header>
       <ErrorBadgeRow errors={snapshot.errors} />
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <EarlyWarningGauge blocks={snapshot.blocks} size="md" />
-        <PeMetricCards blocks={snapshot.blocks} />
-        <VolatilitySparkline blocks={snapshot.blocks} />
-        <div className="md:col-span-2">
-          <TermSpreadChart blocks={snapshot.blocks} heightPx={240} />
-        </div>
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+        <IntensityGaugeStageBadge blocks={snapshot.blocks} />        {/* A — 좌상 */}
+        <ForwardExpectancyTable blocks={snapshot.blocks} />          {/* C — 우상 */}
+        <PerformanceAnalyticsChart blocks={snapshot.blocks} />       {/* D — 좌중 */}
+        <ModelInputsCards blocks={snapshot.blocks} />                {/* E — 우중 (7카드 grid) */}
       </section>
     </main>
   );
@@ -76,90 +95,66 @@ export function ErrorBadgeRow({ errors }: ErrorBadgeRowProps): JSX.Element | nul
 export function DashboardPreviewSection(): JSX.Element;
 ```
 
-세 모드(KR / US / BOTH)로 4 위젯을 한 화면에 렌더 + 부분 실패 시뮬레이션(02 mock에서 errors 박은 상태) 시각 확인.
+3 시장 × 2 모델 = 6 조합으로 위젯 11~17(A~G) 한 화면 렌더 + 부분 실패 시뮬레이션.
 
 ## Implementation Notes
 
-### Grid 레이아웃 결정 (반응형)
+### Grid 레이아웃 (반응형)
 
-| 폭 | 레이아웃 |
-|----|---------|
-| 375px (mobile) | 1 column 세로 stack — Gauge → P/E cards → Volatility → Term Spread |
-| 768px (tablet) | 2 column — 1행 [Gauge, P/E] / 2행 [Volatility, Term Spread] |
-| 1280px (desktop) | 2 column 동일 + 더 넓은 padding |
-
-Term Spread는 시계열이라 가능하면 풀폭(desktop 2-col span) 권장.
+| 폭 | 레이아웃 (GEMSTONE 스크린샷 패턴) |
+|----|----------------------------------|
+| 375px | 1col 세로 stack — F+B+G 헤더 → A → C → D → E (7카드 grid 내부 2col) |
+| 768px | 2col — 1행 [A, C] / 2행 [D, E] / 헤더 풀폭 |
+| 1280px | 2col 동일 + 넓은 padding. E(7카드) 4×2-1 grid 내부 |
 
 ### 02 호출 단일 진입점 (헌법 §2 SSOT)
 
-- page.tsx에서 `getDashboardSnapshot(market)` **1회 호출**
-- snapshot.blocks를 4 위젯에 props로 분배
-- grep으로 `getDashboardSnapshot` 호출이 page.tsx 외 0건임을 본 자산 verification에서 검증 의무
+- page.tsx에서 `getDashboardSnapshot(market, { modelKind })` **1회 호출**
+- snapshot.blocks + snapshot.modelMeta를 위젯 11~17에 props 분배
+- grep으로 `getDashboardSnapshot` 호출이 page.tsx + 02 lib 외 0건임을 verification에서 검증
 
 ### 부분 실패 가시화
 
-- 02가 `errors=[{market:"US", code:"YFINANCE_503", ...}]` 반환 시
-- `ErrorBadgeRow`가 헤더 아래 한 줄에 "NASDAQ 데이터 일시 실패" trigger-badge 표시
-- 4 위젯은 `blocks`만 보고 그림 — KR 블록만 있으면 NASDAQ 자리는 자동으로 빈칸 (위젯 자체 빈 데이터 처리)
+- 02가 `errors=[{market:"US", code:"YFINANCE_503"}]` 반환 시 `ErrorBadgeRow`가 헤더 아래 trigger-badge 표시
+- 위젯 11~17은 `blocks`만 보고 그림 — 정상 시장만 렌더
 
-### `/dev/preview` 회귀 박제
-
-- Foundation 10 preview 페이지에 `<DashboardPreviewSection />` 추가
-- Section 3 토큰 회귀와 별개로, 본 섹션은 **실제 dashboard 위젯 조합** 회귀 감지
-
-### 헌법 §6 escape hatch 적용 가능 영역
-
-- 없음. 본 자산은 production 통합 코드
+### 헌법 §6 escape hatch: 없음. production 통합 코드
 
 ### 헌법 §0-1 Step 1 영향 분석
 
 | 변경 대상 | 영향 |
 |----------|------|
-| 01 shell `DashboardGrid` placeholder | 본 자산이 교체. 01 명세의 grid props 시그니처와 일치 |
-| 02 `getDashboardSnapshot` 시그니처 | page.tsx 호출처 변경 시 본 자산 동기 갱신 |
-| 04~07 위젯 props (`blocks: DashboardMacroBlock[]`) | 본 자산이 분배. 위젯 props 시그니처 통일성 검증 |
-| Foundation 10 preview 페이지 | 신규 섹션 추가 — Foundation 10 명세에 본 자산 추가 박제 (10 명세 갱신 의무) |
+| 01 shell `DashboardGrid` placeholder | 본 자산이 교체. 01 v2 grid props 시그니처와 일치 |
+| 02 v2 `getDashboardSnapshot` 시그니처 | page.tsx 호출처 변경 시 본 자산 동기 갱신 |
+| 위젯 11~17 props (`blocks: DashboardGemstoneBlock[]`) | 본 자산이 분배. 위젯 props 시그니처 통일성 검증 |
+| Foundation 10 preview 페이지 | 신규 v2 GEMSTONE 섹션 추가 — Foundation 10 명세 갱신 의무 |
 
 ### 헌법 §0-1 Step 2 합리화 회피
 
-- "위젯이 각자 getDashboardSnapshot 호출하면 자율": ❌ N번 호출 + 부분 실패 분산 → SSOT 위반. 1회 호출 + props 분배 의무
-- "ErrorBadgeRow 별도 컴포넌트 분리는 오버": ❌ ErrorBadgeRow는 errors 빈 배열 시 null 반환 + 색·레이아웃 책임 분리. 4 위젯이 각자 에러 처리하면 SSOT 위반 (헌법 §2)
+- "위젯이 각자 getDashboardSnapshot 호출하면 자율": ❌ SSOT 위반. 1회 호출 + props 분배 의무
+- "ErrorBadgeRow 별도 컴포넌트 분리는 오버": ❌ errors 빈 시 null + 색·레이아웃 책임 분리. 7 위젯이 각자 에러 처리하면 SSOT 위반
 
 ## Test Strategy
 
-### 통합
-- `/dashboard?market=BOTH` → 4 위젯 모두 렌더 + 양 시장 데이터 표시
-- `/dashboard?market=KR` → 4 위젯에 KR 데이터만 (NASDAQ 자리 자동 비움)
-- 02 mock에서 US reject → 헤더 아래 ErrorBadgeRow에 NASDAQ 에러 + 4 위젯은 KR 블록만 그림
-
-### 반응형
-- 375px / 768px / 1280px 폭에서 레이아웃 깨짐 0건
-- desktop에서 Term Spread 풀폭 span 확인
-
-### 표준 검증 시나리오 (헌법 §0-1 Step 3 — 신기능 통합)
-- ✅ 정상 호출: 3 market 모두 200
-- ✅ null/empty: 02 응답 blocks=[] → 4 위젯 모두 "데이터 없음" placeholder + 페이지 깨짐 0
-- ✅ 외부 API 실패: 부분 실패 시 ErrorBadgeRow 가시화
-- ✅ 02 호출 1회: page.tsx에서만 호출 (grep 0건 외)
-
-### 표준 검증 시나리오 (i18n — Phase 1 미적용)
-- 현재 i18n 미적용 — Open Questions에 박제
-- 추후 i18n 도입 시 ErrorBadgeRow + 위젯들이 `useTranslation` 구독 + 키 보존 props로 마이그레이션 의무 (헌법 §2-0-1)
+### 통합 + 반응형 + 표준 검증 (헌법 §0-1 Step 3 신기능 통합)
+- `/dashboard?market=KR|US|BOTH` × `?model=model1_forced|model2_optimal` 6 조합 모두 7 위젯 렌더
+- 02 mock 부분 실패 → ErrorBadgeRow 가시화 + 7 위젯은 정상 시장 block만 그림
+- 375px / 768px / 1280px 반응형 깨짐 0건
+- null/empty `blocks=[]` → 7 위젯 모두 placeholder + 페이지 깨짐 0
+- 02 호출 1회 (page.tsx grep 외 0건)
+- i18n 마운트 토글 시 7 위젯 + ErrorBadgeRow 자동 갱신 (caller-driven string 0건 grep — 헌법 §2-0-1)
 
 ## Verification
 
-- [ ] `endurance/src/app/dashboard/page.tsx` 가 01의 placeholder를 04~07 실제 위젯으로 교체
-- [ ] `endurance/src/app/dashboard/_components/ErrorBadgeRow.tsx` 존재
-- [ ] `endurance/src/app/dev/preview/_sections/DashboardPreview.tsx` 존재 + Foundation 10 preview에 섹션 추가
-- [ ] `tsc --noEmit` 무경고
-- [ ] `npm run build` 성공
-- [ ] `/dashboard` 직접 방문 시 4 위젯 모두 시각 렌더
-- [ ] `/dashboard?market=KR | US | BOTH` 3 모드 모두 정상
-- [ ] 02 부분 실패 시뮬레이션 → ErrorBadgeRow 가시
+- [ ] `endurance/src/app/dashboard/page.tsx` 가 01의 placeholder를 위젯 11~17(A~G)로 교체
+- [ ] `endurance/src/app/dashboard/_components/ErrorBadgeRow.tsx` 존재 (v1 보존)
+- [ ] `endurance/src/app/dev/preview/_sections/DashboardPreview.tsx` v2 GEMSTONE 7 위젯 렌더 + Foundation 10 명세 갱신
+- [ ] `tsc --noEmit` 무경고 + `npm run build` 성공
+- [ ] `/dashboard` 6 조합(market × model) 시각 정상
 - [ ] 반응형 3 폭 깨짐 0건
-- [ ] `grep "getDashboardSnapshot" endurance/src/` 결과가 page.tsx + 02 lib 외 0건 (단일 진입점)
-- [ ] `/dev/preview` Dashboard Preview 섹션 추가 확인 + Foundation 10 명세 갱신
-- [ ] grep으로 본 위젯 컴포넌트 내 `fetch(`, `yahoo-finance` 0건 (위젯 자체 호출 없음)
+- [ ] `grep "getDashboardSnapshot" endurance/src/` 결과 page.tsx + 02 lib 외 0건 (단일 진입점)
+- [ ] grep 위젯 컴포넌트 내 `fetch(`, `yahoo-finance`, `infer(` 0건 (위젯 직접 호출 0건)
+- [ ] anti-pattern §2-0-1 Pattern A·B grep 전 위젯 0건
 
 ### data-testid 명명 규약 (09 e2e 의존 박제)
 
@@ -167,14 +162,20 @@ Term Spread는 시계열이라 가능하면 풀폭(desktop 2-col span) 권장.
 
 | testid | 위치 | 책임 |
 |--------|------|------|
-| `market-toggle` | MarketToggle 컨테이너 (`radiogroup`) | 토글 자체 식별 |
-| `market-toggle-KR` | 토글 segment (KR radio button) | KR 시장 선택 시뮬레이션 |
-| `market-toggle-US` | 토글 segment (US radio button) | US 시장 선택 시뮬레이션 |
+| `market-toggle` | MarketToggle 컨테이너 (`radiogroup`) — 자산 16 | 토글 자체 식별 |
+| `market-toggle-KOSPI200` | 토글 segment (KR radio button, v2 라벨 갱신) | KOSPI200 시장 선택 시뮬레이션 |
+| `market-toggle-SP500` | 토글 segment (US radio button, v2 라벨 갱신) | S&P 500 시장 선택 시뮬레이션 |
 | `market-toggle-BOTH` | 토글 segment (BOTH radio button) | BOTH 시장 선택 시뮬레이션 |
-| `widget-pe-cards` | PeMetricCards wrapper (page.tsx) | P/E·EPS 위젯 식별 |
-| `widget-volatility-sparkline` | VolatilitySparkline wrapper | 변동성 위젯 식별 |
-| `widget-term-spread-chart` | TermSpreadChart wrapper | Term Spread 위젯 식별 |
-| `widget-early-warning-gauge` | EarlyWarningGauge wrapper | 게이지 위젯 식별 |
+| `model-toggle` | ModelMetaCardToggle 컨테이너 — 자산 12 | 모델 토글 자체 식별 |
+| `model-toggle-model1_forced` | Model 1 Forced [2,8,9,16] segment | Model 1 선택 시뮬레이션 |
+| `model-toggle-model2_optimal` | Model 2 Optimal segment | Model 2 선택 시뮬레이션 |
+| `widget-intensity-gauge` | IntensityGaugeStageBadge wrapper — 자산 11 | INTENSITY 게이지 식별 |
+| `widget-stage-badge` | Stage 배지 (자산 11 내부 노드) | Stage 1-5 배지 식별 |
+| `widget-forward-expectancy` | ForwardExpectancyTable wrapper — 자산 13 | Forward Expectancy 5 bucket 표 |
+| `widget-performance-analytics` | PerformanceAnalyticsChart wrapper — 자산 14 | Performance Analytics 차트+메트릭 |
+| `widget-model-inputs` | ModelInputsCards wrapper — 자산 15 | 7 변수 카드 grid 식별 |
+| `widget-model-meta` | ModelMetaCardToggle 메타 영역 — 자산 12 | OOS Sharpe 등 메타 카드 |
+| `widget-refresh` | RefreshButton — 자산 17 | Refresh 버튼 |
 | `error-badge-row` | ErrorBadgeRow wrapper (errors.length>0 시) | 부분 실패 가시화 root |
 | `error-badge-KR` | KR 시장 trigger-badge wrapper | KR 에러 식별 |
 | `error-badge-US` | US 시장 trigger-badge wrapper | US 에러 식별 |
@@ -186,8 +187,7 @@ Term Spread는 시계열이라 가능하면 풀폭(desktop 2-col span) 권장.
 
 ## Open Questions
 
-1. **Refresh 버튼**: 02에 `force: true` 옵션이 있음. UI에 Refresh 버튼 노출 여부 — Phase 1은 자동 로드만 + Refresh 미노출(YAGNI). Phase 2+ 검토
-2. **Term Spread 풀폭 vs 1열**: desktop에서 풀폭이 시각 임팩트 크지만 다른 위젯과 시각 비대칭. 사용자 검증 후 결정
-3. **모바일 게이지 사이즈**: 375px에서 `size="md"`는 클 수 있음. `size="sm"`으로 자동 다운사이즈 vs CSS로 scale — 후자가 단순
-4. **i18n**: Phase 1 한국어 단일. Phase 2+ 도입 시 본 자산 + 4 위젯 + ErrorBadgeRow 모두 마이그레이션 (헌법 §2-0-1 데이터 흐름 string snapshot 박멸)
-5. **`/dev/preview` 갱신이 Foundation 10 명세를 수정해야 함** — Phase 1 자산이 Phase 0 SSOT를 건드리는 첫 케이스. 본 PR에서 Foundation 10 명세에 "Phase 1 Dashboard Preview 섹션 추가" 1줄 갱신 의무 (헌법 §2 SSOT 동기)
+1. **위젯 grid 레이아웃 정확 매핑**: GEMSTONE 스크린샷 패턴(좌상 A·우상 C·좌중 D·우중 E·헤더 F+B+G) 시각 결정 — Phase 0.5 08 preview에서 결정.
+2. **모바일 위젯 우선순위**: 375px에서 7 위젯 세로 stack 순서 — INTENSITY가 가장 위가 자연. Phase 0.5 08 preview에서 결정.
+3. **i18n 적용 시점**: Phase 1 영어/한국어 혼재(라벨 영어, 도움말 한국어). Phase 2+ 본격 i18n 도입 시 본 자산 + 위젯 11~17 + ErrorBadgeRow 모두 §2-0-1 마이그레이션 의무.
+4. **Foundation 10 preview 갱신**: 본 자산 v2가 Foundation 10 명세에 "v2 GEMSTONE Dashboard Preview 섹션 추가" 1줄 갱신 의무 (SSOT 동기).
