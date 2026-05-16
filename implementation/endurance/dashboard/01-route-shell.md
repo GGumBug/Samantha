@@ -2,7 +2,20 @@
 
 # 01 — Route Shell + Market Toggle + Layout
 
+> **변경 이력**
+> - v2 (2026-05-16): GEMSTONE EWS 재정의에 맞춰 책임 갱신. 사유: 사용자가 GEMSTONE 스크린샷 단언 후 정공 재정의 (옵션 D). 기존 v1 구현 코드는 이 명세 §"v1 코드 처리"에 따라 처리.
+> - v1 (이전): 초기 정의.
+
 **위임**: Friday | **위치**: `endurance/src/app/dashboard/page.tsx` + `endurance/src/app/dashboard/_components/MarketToggleHeader.tsx` (Client) | **의존**: Foundation 07 `market-toggle` 토큰, Foundation 01 `Market` 타입
+
+## v1 코드 처리
+
+v1 구현(`page.tsx` + `MarketToggleHeader.tsx`) 보존, **라벨 텍스트만 갱신**. 컴포넌트 구조·라우팅·SSR 흐름·`router.replace` 패턴 변경 0건.
+
+- v1 라벨 `KR` / `US` / `BOTH` → v2 라벨 `KOSPI200` / `S&P 500` / `BOTH` (사용자 표시용)
+- v1 data-testid `market-toggle-KR` / `market-toggle-US` / `market-toggle-BOTH` → v2 `market-toggle-KOSPI200` / `market-toggle-SP500` / `market-toggle-BOTH`
+- 내부 식별자(`DashboardMarket = "KR" | "US" | "BOTH"`)는 v1 그대로 보존 — Foundation 01 `Market` 타입과 정합. **표시 라벨과 도메인 식별자 분리는 헌법 §2 SSOT 차원 다름** (코드 식별자 vs 사용자 노출 텍스트).
+- URL search param 키도 v1 그대로 `?market=KR|US|BOTH` 보존 — 외부 link·북마크 호환성 보장. 라벨 v2 갱신은 화면 표시 한정.
 
 ## Purpose
 
@@ -63,6 +76,20 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export type DashboardMarket = "KR" | "US" | "BOTH";
 
+// v2 표시 라벨 매핑 (도메인 식별자 → GEMSTONE 표시 라벨)
+const MARKET_DISPLAY_LABELS: Record<DashboardMarket, string> = {
+  KR: "KOSPI200",
+  US: "S&P 500",
+  BOTH: "BOTH",
+};
+
+// v2 data-testid 매핑
+const MARKET_TESTID_SUFFIX: Record<DashboardMarket, string> = {
+  KR: "KOSPI200",
+  US: "SP500",
+  BOTH: "BOTH",
+};
+
 interface MarketToggleHeaderProps {
   current: DashboardMarket;
 }
@@ -70,7 +97,7 @@ interface MarketToggleHeaderProps {
 export function MarketToggleHeader({ current }: MarketToggleHeaderProps): JSX.Element;
 ```
 
-토글 클릭 시 `router.replace(`${pathname}?market=${next}`, { scroll: false })`. SSR 재진입이 필요하므로 `replace` 사용 — `router.push`는 history 누적.
+토글 클릭 시 `router.replace(`${pathname}?market=${next}`, { scroll: false })`. SSR 재진입이 필요하므로 `replace` 사용. URL search param 키(`?market=KR|US|BOTH`)는 v1 그대로 보존.
 
 ### DashboardGrid (Server 컴포넌트, 08에서 구현)
 
@@ -138,6 +165,10 @@ interface DashboardGridProps {
 - [ ] 토글 변경 시 page scroll 위치 보존 (scroll: false)
 - [ ] 02-data-api 미머지 시점: `getDashboardSnapshot`을 stub으로 두고 placeholder grid 렌더 — shell 단독 머지 가능
 - [ ] grep으로 `Market` 타입의 새 정의 0건 확인 (Foundation 01 SSOT 준수)
+- [ ] v2 토글 라벨 GEMSTONE 갱신: `KOSPI200` / `S&P 500` / `BOTH` 표시 — 한국어/영어 텍스트 0건 (라벨은 표시 layer 한정)
+- [ ] v2 data-testid 갱신: `market-toggle-KOSPI200` / `market-toggle-SP500` / `market-toggle-BOTH` (09 e2e 의존)
+- [ ] grep `market-toggle-KR\|market-toggle-US` 본 파일 0건 (v1 testid 잔재 제거)
+- [ ] anti-pattern grep §2-0-1 Pattern A·B 0건 (caller가 라벨 string 박지 않음 — 컴포넌트 내부 매핑)
 
 ## Open Questions
 
