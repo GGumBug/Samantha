@@ -1,8 +1,20 @@
 [← README.md로 돌아가기](README.md)
 
-# 09 — E2E Smoke (KR / US / 양쪽 토글)
+# 09 — E2E Smoke (v2 GEMSTONE: 시장+모델 토글 + 7 위젯 + Refresh)
 
-**위임**: Friday | **위치**: `endurance/tests/e2e/dashboard.spec.ts` (Playwright) + 필요 시 `playwright.config.ts` 설정 | **의존**: Phase 1 08 (Integration 완료된 `/dashboard`)
+> **변경 이력**
+> - v2 (2026-05-16): GEMSTONE EWS 재정의에 맞춰 책임 갱신. 사유: 사용자가 GEMSTONE 스크린샷 단언 후 정공 재정의 (옵션 D). 기존 v1 코드 처리 정책은 §"v1 코드 처리" 참고.
+> - v1 (이전): KR/US/BOTH 토글 + 4 위젯 시나리오 5종.
+
+**위임**: Friday | **위치**: `endurance/tests/e2e/dashboard.spec.ts` (Playwright) + 필요 시 `playwright.config.ts` 설정 | **의존**: Phase 1 08 (v2 Integration 완료된 `/dashboard`)
+
+## v1 코드 처리
+
+v1 시나리오 5종(default load, KR toggle, US toggle, BOTH toggle, scroll 보존) → **폐기, v2 시나리오 신규 작성**. v1 spec 파일(`dashboard.spec.ts`)은 코드 자체는 보존(git history 참고용)하되, 모든 test 함수를 v2 시나리오로 교체. fixture(`tests/fixtures/dashboard-snapshot.json`)는 02 v2 `DashboardSnapshot` 시그니처 기준 재생성 의무.
+
+- v1 fixture: v1 `DashboardMacroBlock` 4 필드 → 폐기
+- v2 fixture: `DashboardGemstoneBlock`(intensity·forwardExpectancy·performance·modelInputs) + `DashboardModelMeta` 기준 신규 작성
+- v1 testid 잔재(`widget-pe-cards`·`widget-volatility-sparkline`·`widget-term-spread-chart`·`widget-early-warning-gauge`) → v2 testid(`widget-intensity-gauge`·`widget-stage-badge`·`widget-forward-expectancy`·`widget-performance-analytics`·`widget-model-inputs`·`widget-model-meta`·`widget-refresh`)로 교체
 
 ## Purpose
 
@@ -17,130 +29,165 @@ Phase 1 종료 게이트. **실제 브라우저에서 `/dashboard` 페이지가 
 
 ## Public Interface
 
-### Playwright 시나리오 3종
+### Playwright 시나리오 7종 (v2)
 
 ```typescript
 // endurance/tests/e2e/dashboard.spec.ts
 import { test, expect } from "@playwright/test";
 
-test.describe("/dashboard Phase 1 smoke", () => {
-  test("default load → BOTH market, 4 widgets rendered", async ({ page }) => {
+test.describe("/dashboard Phase 1 v2 GEMSTONE smoke", () => {
+  test("default load → BOTH market + model1_forced, 7 widgets rendered", async ({ page }) => {
     await page.goto("/dashboard");
     await expect(page.locator('[data-testid="market-toggle"]')).toBeVisible();
-    await expect(page.locator('[data-testid="market-toggle"] [aria-checked="true"]')).toHaveText(/BOTH|양쪽/);
-    // 4 위젯 data-testid 의무 (08에서 박제)
-    await expect(page.locator('[data-testid="widget-pe-cards"]')).toBeVisible();
-    await expect(page.locator('[data-testid="widget-volatility-sparkline"]')).toBeVisible();
-    await expect(page.locator('[data-testid="widget-term-spread-chart"]')).toBeVisible();
-    await expect(page.locator('[data-testid="widget-early-warning-gauge"]')).toBeVisible();
+    await expect(page.locator('[data-testid="model-toggle"]')).toBeVisible();
+    // v2 7 위젯 testid 의무 (08에서 박제)
+    await expect(page.locator('[data-testid="widget-intensity-gauge"]')).toBeVisible();
+    await expect(page.locator('[data-testid="widget-stage-badge"]')).toBeVisible();
+    await expect(page.locator('[data-testid="widget-forward-expectancy"]')).toBeVisible();
+    await expect(page.locator('[data-testid="widget-performance-analytics"]')).toBeVisible();
+    await expect(page.locator('[data-testid="widget-model-inputs"]')).toBeVisible();
+    await expect(page.locator('[data-testid="widget-model-meta"]')).toBeVisible();
+    await expect(page.locator('[data-testid="widget-refresh"]')).toBeVisible();
   });
 
-  test("toggle KR → URL updates, widgets re-fetch with KR data", async ({ page }) => {
+  test("market toggle KOSPI200 → URL updates, widgets re-fetch", async ({ page }) => {
     await page.goto("/dashboard?market=BOTH");
-    await page.locator('[data-testid="market-toggle-KR"]').click();
+    await page.locator('[data-testid="market-toggle-KOSPI200"]').click();
     await expect(page).toHaveURL(/market=KR/);
-    // KOSPI 라벨 표시, NASDAQ 자리 비움
-    await expect(page.locator('text=KOSPI')).toBeVisible();
-    await expect(page.locator('text=NASDAQ')).not.toBeVisible();
+    await expect(page.locator('text=KOSPI200')).toBeVisible();
   });
 
-  test("toggle US → URL updates, widgets re-fetch with US data", async ({ page }) => {
+  test("market toggle S&P 500 → URL updates, widgets re-fetch", async ({ page }) => {
     await page.goto("/dashboard?market=BOTH");
-    await page.locator('[data-testid="market-toggle-US"]').click();
+    await page.locator('[data-testid="market-toggle-SP500"]').click();
     await expect(page).toHaveURL(/market=US/);
-    await expect(page.locator('text=NASDAQ')).toBeVisible();
-    await expect(page.locator('text=KOSPI')).not.toBeVisible();
+    await expect(page.locator('text=S&P 500')).toBeVisible();
   });
 
-  test("toggle BOTH → both markets data visible", async ({ page }) => {
+  test("model toggle Model 2 Optimal → URL updates + model meta changes", async ({ page }) => {
+    await page.goto("/dashboard?market=BOTH");
+    const beforeSharpe = await page.locator('[data-testid="widget-model-meta"]').textContent();
+    await page.locator('[data-testid="model-toggle-model2_optimal"]').click();
+    await expect(page).toHaveURL(/model=model2_optimal/);
+    const afterSharpe = await page.locator('[data-testid="widget-model-meta"]').textContent();
+    expect(afterSharpe).not.toEqual(beforeSharpe); // OOS Sharpe 값 변경
+  });
+
+  test("Stage 1-5 badge displays expected stage from intensity score", async ({ page }) => {
     await page.goto("/dashboard?market=KR");
-    await page.locator('[data-testid="market-toggle-BOTH"]').click();
-    await expect(page).toHaveURL(/market=BOTH/);
-    await expect(page.locator('text=KOSPI')).toBeVisible();
-    await expect(page.locator('text=NASDAQ')).toBeVisible();
+    const stageBadge = page.locator('[data-testid="widget-stage-badge"]');
+    await expect(stageBadge).toBeVisible();
+    // fixture 시나리오에서 intensity.score=74 → Stage 4 (Warning) 라벨 표시
+    await expect(stageBadge).toContainText(/Stage [1-5]/);
+  });
+
+  test("Forward Expectancy 5 bucket 표 — 5 rows with horizon labels", async ({ page }) => {
+    await page.goto("/dashboard?market=KR");
+    const table = page.locator('[data-testid="widget-forward-expectancy"]');
+    await expect(table).toBeVisible();
+    // 5 horizon bucket: 5d / 20d / 60d / 120d / 250d
+    await expect(table.locator('text=/5d|20d|60d|120d|250d/')).toHaveCount(5);
+  });
+
+  test("Performance Analytics chart + 3 metrics (cumReturn, Sharpe, MDD)", async ({ page }) => {
+    await page.goto("/dashboard?market=KR");
+    const widget = page.locator('[data-testid="widget-performance-analytics"]');
+    await expect(widget).toBeVisible();
+    await expect(widget.locator('text=/Cumulative|누적/i')).toBeVisible();
+    await expect(widget.locator('text=/Sharpe/i')).toBeVisible();
+    await expect(widget.locator('text=/MDD|Drawdown/i')).toBeVisible();
+  });
+
+  test("MODEL INPUTS — 7 sparkline cards with gemstone IDs", async ({ page }) => {
+    await page.goto("/dashboard?market=KR");
+    const widget = page.locator('[data-testid="widget-model-inputs"]');
+    await expect(widget).toBeVisible();
+    // 7 GEMSTONE 카드: garnet/emerald/moonstone/sapphire/topaz/ruby/amber
+    await expect(widget.locator('[data-testid^="model-input-card-"]')).toHaveCount(7);
+  });
+
+  test("Refresh button → snapshot.generatedAt updates", async ({ page }) => {
+    await page.goto("/dashboard?market=KR");
+    const refresh = page.locator('[data-testid="widget-refresh"]');
+    await expect(refresh).toBeVisible();
+    await refresh.click();
+    // 로딩 indicator 표시 후 다시 데이터 visible — 자세 검증은 자산 17 단위 테스트
+    await expect(refresh).toBeEnabled();
   });
 
   test("scroll position preserved on toggle (router.replace { scroll: false })", async ({ page }) => {
     await page.goto("/dashboard");
     await page.evaluate(() => window.scrollTo(0, 500));
-    await page.locator('[data-testid="market-toggle-KR"]').click();
+    await page.locator('[data-testid="market-toggle-KOSPI200"]').click();
     const scrollY = await page.evaluate(() => window.scrollY);
-    expect(scrollY).toBeGreaterThanOrEqual(400); // scroll 보존 (이동 시 약간의 reflow는 허용)
+    expect(scrollY).toBeGreaterThanOrEqual(400);
   });
 });
 ```
 
-### data-testid 명명 규약 (08에서 박제)
+### data-testid 명명 규약 v2 (08에서 박제)
 
-08-dashboard-integration이 다음 data-testid를 위젯·토글에 박는 의무:
+08-dashboard-integration v2가 다음 data-testid를 위젯·토글에 박는 의무 (SSOT는 08 명세):
 
 | 컴포넌트 | data-testid |
 |---------|-------------|
-| Market Toggle 컨테이너 | `market-toggle` |
-| Toggle segment (각각) | `market-toggle-KR`, `market-toggle-US`, `market-toggle-BOTH` |
-| P/E Metric Cards | `widget-pe-cards` |
-| Volatility Sparkline | `widget-volatility-sparkline` |
-| Term Spread Chart | `widget-term-spread-chart` |
-| Early Warning Gauge | `widget-early-warning-gauge` |
-| Error Badge Row | `error-badge-row` |
+| Market Toggle 컨테이너 (자산 16) | `market-toggle` |
+| Market segment (v2 라벨 갱신) | `market-toggle-KOSPI200`, `market-toggle-SP500`, `market-toggle-BOTH` |
+| Model Toggle 컨테이너 (자산 12) | `model-toggle` |
+| Model segment | `model-toggle-model1_forced`, `model-toggle-model2_optimal` |
+| INTENSITY 게이지 + Stage 배지 (자산 11) | `widget-intensity-gauge`, `widget-stage-badge` |
+| Model 메타 카드 (자산 12) | `widget-model-meta` |
+| Forward Expectancy 5 bucket 표 (자산 13) | `widget-forward-expectancy` |
+| Performance Analytics 차트+메트릭 (자산 14) | `widget-performance-analytics` |
+| MODEL INPUTS 7 카드 grid (자산 15) | `widget-model-inputs`, `model-input-card-{gemstoneId}` |
+| Refresh 버튼 (자산 17) | `widget-refresh` |
+| Error Badge Row | `error-badge-row`, `error-badge-KR`, `error-badge-US` |
 
 본 자산이 e2e 시나리오를 박는 시점에 08 명세에 위 data-testid 명명 규약을 동기 갱신 의무 (헌법 §2 SSOT — testid는 e2e와 컴포넌트가 공유하는 식별자).
 
 ## Implementation Notes
 
-- **Playwright 설치**: Phase 1 최초 e2e이므로 `npm install -D @playwright/test` + `npx playwright install` 필요. **본 PR이 최초 도입**
-- **dev server 실행**: Playwright config에서 `webServer: { command: "npm run dev", port: 3000 }` 자동 기동
-- **네트워크 mock 여부**: 실제 yfinance 호출은 CI에서 flaky → MSW 또는 Playwright `page.route()`로 `/api/dashboard` 응답 fixture 사용 권장. **fixture 데이터는 `tests/fixtures/dashboard-snapshot.json`에 박제**
-- **`data-testid` 의무**: e2e가 시각·label 텍스트에 의존하면 i18n·UI 변경 시 깨짐. data-testid는 UI 변경과 무관한 안정 식별자
-- **시나리오 5종이 본 자산 범위**: default load, KR toggle, US toggle, BOTH toggle, scroll 보존. 그 외(예: refresh, 에러 상태)는 Phase 2+ 추가
-- **헌법 §6 escape hatch**: 없음. 본 자산은 production CI 게이트
+- **Playwright 도입**: `npm install -D @playwright/test` + `npx playwright install`. dev server 자동 기동 (`webServer.command: "npm run dev"`)
+- **네트워크 mock**: yfinance·ML inference flaky → Playwright `page.route()`로 `/api/dashboard` fixture 사용. fixture 파일: `tests/fixtures/dashboard-gemstone-snapshot.json`
+- **`data-testid` 의무**: i18n·UI 변경에 안정. label 텍스트 의존 금지 (caller-driven 안티패턴)
+- **v2 시나리오 7~10종**: default load + market 토글(KOSPI200/SP500) + model 토글 + Stage 배지 + Forward Expectancy 표 + Performance 차트 + MODEL INPUTS 7카드 + Refresh + scroll 보존
+- **헌법 §6 escape hatch**: 없음. production CI 게이트
 
 ### 헌법 §0-1 Step 1 영향 분석
 
 | 변경 대상 | 영향 |
 |----------|------|
-| 08의 컴포넌트 data-testid 명명 | 본 자산이 의존. 08 명세에 명명 규약 박제 의무 |
-| 01의 토글 URL 동작 (`?market=`) | 본 자산이 검증. 01 명세 변경 시 본 시나리오 갱신 |
-| 02의 응답 fixture | 본 자산이 mock으로 박음. 02 응답 스키마 변경 시 fixture 갱신 의무 |
-| `playwright.config.ts` 신규 도입 | endurance 프로젝트 최초 e2e 인프라. CI 통합 후속 작업 명시 |
-
-### 헌법 §0-1 Step 2 합리화 회피
-
-- "수동 시각 검증으로 충분": ❌ Phase 1 종료 후 Phase 2~5에서 회귀 발생 시 자동 감지 불가. e2e 박제 의무
-- "data-testid 안 박고 label 텍스트로 잡기": ❌ i18n·문구 변경 시 깨짐. data-testid 의무
+| 08 v2의 data-testid 명명 | 본 자산이 의존. 08 SSOT |
+| 01 v2 토글 URL 동작 + 라벨 갱신 | 본 자산이 검증. 01 v2 변경 시 본 시나리오 갱신 |
+| 02 v2 응답 fixture | 본 자산이 mock으로 박음. 02 v2 스키마 변경 시 fixture 재생성 의무 |
+| `playwright.config.ts` 신규 도입 | endurance 프로젝트 최초 e2e 인프라 |
 
 ## Test Strategy
 
-### 시나리오 통과 기준 (헌법 §0-1 Step 3 — 신기능 / e2e 시장 토글)
-- ✅ 정상 호출: KR/US/BOTH 3 모드 모두 4 위젯 렌더
-- ✅ 토글 시 데이터 갱신: URL 변경 + 위젯 내용 변경
-- ✅ 양쪽 모드 동시 표시: KOSPI + NASDAQ 텍스트 모두 visible
-- ✅ scroll 보존: 토글 시 페이지 스크롤 위치 유지
-- ✅ null/empty edge: 02 응답 빈 blocks fixture 시나리오(선택, Phase 1.1) — 본 PR은 정상 흐름만
-
-### 비동기 시나리오 (헌법 §0-1 Step 3 — Server Action / fetch)
-- ✅ 정상 완료: 위젯 4종 모두 렌더 후 visible
-- ✅ 토글 중 이전 fetch 취소: KR → US → KR 빠르게 토글 시 화면이 마지막 KR 데이터로 안정 (AbortSignal 동작 — 02 의무)
-- ✅ 재진입 atomicity: 동일 market 빠른 더블 클릭 시 위젯 중복 렌더 0건
+### 시나리오 통과 기준 (헌법 §0-1 Step 3 — 신기능 + 비동기)
+- 정상 호출 6 조합(market × model) 모두 7 위젯 렌더
+- 토글 데이터 갱신: URL + 위젯 내용 동기
+- AbortSignal: 빠른 토글 시 마지막 선택 데이터 안정
+- 재진입 atomicity: 더블 클릭 시 위젯 중복 렌더 0건
+- i18n 토글 시나리오: Phase 2+ 도입 시 추가 의무 (현재 미적용)
 
 ### CI 통합
-- GitHub Actions(또는 동등)에서 `npm run test:e2e` 실행
-- fixture 사용 → 외부 API 의존 0건 (재현성 보장)
+- `npm run test:e2e` GitHub Actions 실행. fixture로 외부 API 의존 0건
 
 ## Verification
 
-- [ ] `endurance/tests/e2e/dashboard.spec.ts` 존재 + 시나리오 5종 작성
-- [ ] `playwright.config.ts` 존재 + webServer 자동 기동
-- [ ] `tests/fixtures/dashboard-snapshot.json` 존재 + 02 응답 형태
-- [ ] `npm run test:e2e` 로컬에서 통과 (전 5 시나리오)
-- [ ] 08 명세에 data-testid 명명 규약 동기 박제 (Verification 항목)
-- [ ] CI에서 e2e 시나리오 실행 가능 — 본 PR 또는 후속 PR
-- [ ] fixture 데이터로 외부 API 의존 0건 검증
+- [ ] `endurance/tests/e2e/dashboard.spec.ts` v2 시나리오 7~10종 작성
+- [ ] `playwright.config.ts` + webServer 자동 기동
+- [ ] `tests/fixtures/dashboard-gemstone-snapshot.json` v2 시그니처 박힘
+- [ ] `npm run test:e2e` 로컬 통과
+- [ ] v1 fixture·시나리오 잔재 grep 0건 (`pe12mForward\|widget-pe-cards\|widget-term-spread-chart` 등)
+- [ ] 08 v2 data-testid 규약 동기 박제 확인
+- [ ] fixture로 외부 API 의존 0건
 
 ## Open Questions
 
-1. **CI 인프라**: 현재 endurance 프로젝트에 CI 워크플로우 미존재 가능성. 본 자산이 CI 워크플로우(`.github/workflows/e2e.yml` 또는 동등)도 함께 박을지 — **Phase 1 scope 외 가능성**. 합리적 분리: 본 PR은 로컬 통과만, CI 통합은 별도 후속 PR (Phase 1.1)
-2. **시각 회귀(스크린샷)**: Playwright `toHaveScreenshot()` 으로 시각 회귀 자동 감지 가능. 헌법 §4 검증 가치 큼. 그러나 Phase 1 초기에는 baseline 스크린샷 fluctuation 위험 — Phase 2+ 도입
-3. **모바일 e2e**: Playwright `devices['iPhone 13']` 시뮬레이션 가능. Phase 1 desktop만 검증, mobile은 Phase 2+
-4. **fixture 데이터 SSOT**: fixture가 02 응답 스키마와 어긋나면 silent fail. zod로 fixture를 02 응답 스키마에 매번 검증할지 — Phase 2+ 자동화. Phase 1은 수동 동기
-5. **i18n 토글 시나리오**: i18n 미도입 상태이므로 본 자산 시나리오에 없음. i18n 도입 후 헌법 §0-1 Step 3 "마운트 중 언어 토글" 시나리오 추가 의무
+1. **CI 인프라**: endurance 프로젝트 CI 워크플로우 미존재 가능성. 본 PR vs 후속 분리 결정.
+2. **시각 회귀(`toHaveScreenshot`)**: Phase 2+ baseline 안정화 후 도입 검토.
+3. **모바일 e2e**: Phase 1 desktop만. mobile은 Phase 2+.
+4. **fixture zod 검증**: 02 v2 스키마와 fixture 자동 정합 검증 — Phase 2+ 자동화.
+5. **i18n 토글 시나리오**: Phase 2+ i18n 도입 후 헌법 §0-1 Step 3 "마운트 중 언어 토글" 추가 의무.
