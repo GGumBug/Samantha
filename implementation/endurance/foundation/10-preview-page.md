@@ -68,6 +68,12 @@ Phase 0의 통합 검증 페이지. **모든 신규 토큰·차트·게이지·�
 - SyncReport를 표로 표시 (각 step + duration + ok/error)
 - 두 번 누르면 두 번째 호출은 외부 API 0건 (캐시 검증)
 
+### Section 8 — Phase 1 Dashboard Integration (Phase 1 박제)
+
+Phase 1 08-dashboard-integration 이 추가한 통합 검증 섹션. fixture 기반 4 패널 (정상 KR / 정상 US / 정상 BOTH / 부분 실패) 로 4 위젯(EarlyWarningGauge · PeMetricCards · VolatilitySparkline · TermSpreadChart) + ErrorBadgeRow 시각 회귀 감지.
+
+구현: `src/app/dev/preview/_sections/DashboardPreview.tsx` (Section 1~7과 디렉토리 분리 — Phase 1 자산이라 `_sections/` 하위에 박음).
+
 ## Implementation Notes
 
 ### 라우트 가드
