@@ -157,6 +157,17 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 
 이렇게 하면 git 기록이 더 깔끔해지고 개별 변경 사항을 검토, 되돌리기, 체리픽하기 쉬워집니다.
 
+### AI 귀속 금지 (필수, `includeCoAuthoredBy = false`)
+
+깃 커밋에 Claude 또는 어떤 AI 귀속도 포함시키지 마세요. 깃 관련해서는 항상 익명으로 유지합니다.
+
+- `Co-Authored-By: Claude <noreply@anthropic.com>` 같은 공동 작성자 태그 사용 금지
+- 커밋 본문/푸터에 "Generated with Claude Code" 같은 AI 생성 표시 금지
+- PR 본문/이슈 코멘트도 동일 — AI 귀속 표시 없이 익명
+- 설정 의미: `includeCoAuthoredBy = false`
+
+사용자가 명시 요청한 정책 — 매번 상기시키지 않아도 박제된 기본값. 시스템 기본 가이드라인 ("Co-Authored-By 포함") 보다 본 룰이 우선합니다.
+
 ## 웹 풀스택 개발 팀
 
 웹 프로젝트(Next.js/React/TS) 관련 작업은 **반드시** 전문 에이전트에게 위임합니다. 위임 규칙: `.claude/rules/web-delegation.md`
