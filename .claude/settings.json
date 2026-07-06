@@ -3,6 +3,7 @@
     "allow": [
       "Edit(*)",
       "Write(*)",
+      "Read(*)",
       "NotebookEdit(*)",
       "Bash(*)",
       "WebFetch(domain:*)",
@@ -53,29 +54,10 @@
       "Bash(pkill *)"
     ]
   },
-  "spinnerVerbs": {
-    "mode": "replace",
-    "verbs": ["Admiring Shayan's code", "Learning from Shayan", "Studying Shayan's patterns", "Copying Shayan's genius", "Thanking Shayan deeply", "Absorbing Shayan's wisdom", "Following Shayan's lead", "Praising Shayan's repo"]
-  },
-  "spinnerTipsOverride": {
-    "tips": [
-      "This is shayan custom tip#1",
-      "This is shayan custom tip#2"
-    ],
-    "excludeDefault": true
-  },
   
   "plansDirectory": "./reports",
   "outputStyle": "Explanatory",
-  "statusLine": {
-    "type": "command",
-    "command": "echo \"shayan's best practice status line\"",
-    "padding": 0
-  },
-  "attribution": {
-    "commit": "Co-Authored-By: Claude <noreply@anthropic.com>",
-    "pr": "Generated with [Claude Code](https://claude.ai/code)"
-  },
+  "includeCoAuthoredBy": false,
   "spinnerTipsEnabled": true,
   "respectGitignore": true,
   "env": {
@@ -171,6 +153,13 @@
             "timeout": 5000,
             "async": true,
             "statusMessage": "Stop"
+          },
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/scripts/reflection-reminder.py",
+            "timeout": 5000,
+            "async": false,
+            "statusMessage": "ReflectionReminder"
           }
         ]
       }
