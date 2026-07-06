@@ -1,0 +1,200 @@
+[← CLAUDE.md로 돌아가기](../CLAUDE.md)
+
+# 대규모 리팩토링 교훈 — 실전 체크리스트
+
+Hwaseo 프로젝트의 결정론 런 시드 시스템 도입(38개 파일, 2026-04-15) 경험에서 도출한 교훈입니다. "전역 상태 제거", "결정론 보장", "대규모 인터페이스 도입" 유형의 리팩토링에 적용합니다.
+
+## 1. 플랜 단계 — 전수 검색이 먼저
+
+**절대 원칙**: 심볼·패턴을 "제거/대체"하는 리팩토링은 **플랜 작성 이전에** 전수 grep을 돌리고, 결과를 **분류 테이블**로 정리해야 합니다.
+
+```
+Grep("UnityEngine\.Random|Random\.Range", output_mode="content")
+→ 각 호출을 [게임플레이 분기 / VFX / 시드 생성용 / 의도적 유지] 4개 카테고리로 분류
+→ 플랜 파일에 테이블로 고정
+```
+
+**왜?** 눈에 띄는 파일만 적으면 누락 발생. Hwaseo 1차 플랜에서 `EnemyBrain`/`TargetResolver`/`BattleUnitRegistry`/`PlayerManager.PickWeighted`/`ShopPricingService`/`ShopBankService` 7개 누락 → 추가 배치 필요. PropertyDrawer 등 **동일 클래스 내 다중 GUI 메서드**(§12.6)는 grep 결과를 메서드별로 분류 의무.
+
+## 2. 설계 단계 — "이중 안전망" 구조
+
+결정론/재현성이 요구되는 시스템은 **두 겹의 보장**을 설계하세요:
+
+1. **1차**: 결과 스냅샷을 디스크에 저장
+2. **2차**: `Hash(seed, label, context)` 기반 서브시드로 결과 재생성
+
+"스냅샷 삭제 후에도 동일 결과"를 테스트하지 않으면 1차만 동작하는 설계인지 2차까지 동작하는지 구분 못 합니다.
+
+## 3. 해시 결정성 함정
+
+- `string.GetHashCode()` — .NET 런타임/프로세스마다 다른 값
+- `HashCode.Combine(...)` — 같은 이유로 비결정적
+- **반드시 FNV-1a 또는 SHA-256 수동 구현을 사용**
+
+## 4. 캐시 vs 재현성 — 상충 설계 주의
+
+"서비스에서 RNG 인스턴스를 캐시하면 빠르지만, 같은 label로 재호출 시 **진행된 상태**가 반환되어 '스냅샷 삭제 후 재현' 시나리오가 깨집니다". 재현성 우선 서비스는 **매 호출마다 새 인스턴스 반환**이 원칙, 캐시는 명시적으로 금지하세요.
+
+## 5. "새 객체 교체" 패턴의 필드 누락
+
+`data.snapshot = factory.CreateSnapshot(...)` 류 코드는 **기존 필드 복사 누락**을 유발합니다. Hwaseo에서 `CreateRunStateSnapshot`이 `RunSeed`를 포함하지 않아 매 Capture마다 RunSeed가 0으로 리셋되는 버그가 있었습니다.
+
+**처방**:
+- 새 인스턴스 교체 직전에 **보존할 필드를 로컬 변수로 꺼내두고** 교체 직후 재대입
+- 또는 `previousState`를 팩토리 인자로 받아 필드별 명시 복사
+
+## 6. 방어 분기는 반드시 로깅
+
+"`RunSeed==0`이면 새 시드 생성" 류의 안전망 분기는 **`Debug.LogWarning`을 반드시 동반**해야 합니다. 정상 플로우에서 트리거되면 결정론을 파괴합니다. 로그가 없으면 증상만 보이고 원인을 찾을 수 없습니다.
+
+## 7. 두 버그가 서로를 가리는 경우
+
+"매번 값이 바뀜" 증상은 종종 **중첩된 버그**입니다. 한 버그를 수정해도 다른 버그가 증상을 유지시키면 수정 효과가 안 보입니다.
+
+**처방**: 단일 변화 포인트마다 `Debug.Log` 추가 → 값의 변화 단계를 눈으로 추적 → 어느 단계에서 값이 달라지는지 특정 → 역추적으로 원인 발견.
+
+Hwaseo에서는 3개 버그 중첩:
+1. `SetCurrentNodeSelectedEnemySpawnDataId` 디스크 저장 누락
+2. `CreateRunStateSnapshot`의 RunSeed 복사 누락
+3. `TryLoad` 최초 생성 경로의 `InitializeRunRngFromLoadedData` 미호출
+
+각각을 고친 후에야 결정론이 완성됐습니다.
+
+## 8. Setter 주입 vs 생성자 주입
+
+싱글턴·풀 객체에서 **생성 시점에 DI 파라미터가 아직 확정되지 않은 경우**(예: act/row가 맵 로드 전에는 없음)는 **Setter 주입 + Fallback label**이 더 안전합니다.
+
+```csharp
+public void SetRng(IRunRandom rng) { _rng = rng; }
+private IRunRandom GetRng() => _rng ??= RunRngService.Instance.ForSubsystem("deck_fallback");
+```
+
+Fallback label을 따로 두면 "주입이 실제로 호출되는지"를 운영 중에 감지할 수 있습니다.
+
+> 에이전트 위임 관련 규칙(배치 크기 5개 한계, "completed" 신뢰 금지, 경계 충돌 방지)은 [.claude/rules/unity-delegation.md](../.claude/rules/unity-delegation.md) 에 명령형 체크리스트로 정리되어 있습니다.
+
+## 12. 메서드 시그니처 변경 시 — "메서드 이름만 grep"
+
+파라미터 제거·추가 시 **파라미터 값 기준 grep은 반드시 누락을 만든다**. 정규식은 "내가 상상한 패턴만" 찾기 때문:
+
+- `,\s*false\s*\)` 검색 → 단일 인자 `Foo(false)` 누락
+- `(false)` 검색 → `Foo(true)` 호출 누락
+- 두 번째 인자 검색 → 명명 인자 `Foo(saveImmediately: false)` 누락
+- 한 줄 형태 검색 → 줄바꿈 인자 `Foo(\n    false)` 누락
+
+**2026-04-15 PlayerDataManager 리팩토링에서 같은 종류 실수가 2차례 연속 발생** (1차: 6곳 누락, 2차 수정 후: `MarkBattleTutorialCompleted(true)` 누락).
+
+**유일하게 안전한 패턴 — 메서드 이름 자체만 grep**:
+```
+\.MarkBattleTutorialCompleted\(
+```
+결과를 **육안으로 검토**하여 괄호 안 인자 수가 새 시그니처와 맞는지 확인. 파라미터 값(true/false/변수)은 **전혀 검색하지 말 것**.
+
+복수 메서드는 파이프로 1회 grep: `\.Foo\(|\.Bar\(|\.Baz\(`
+
+Unity `[SerializeField]` 필드 이름 변경 시 저장값이 유실되므로 `[FormerlySerializedAs("oldName")]` 부착은 별도 필수 절차.
+
+## 12.6 PropertyDrawer 직렬화 필드 변경 — GUI 메서드 동시 grep
+
+`[CustomPropertyDrawer]` 직렬화 필드 변경 시 단일 GUI 메서드만 fix → 다른 GUI 메서드 NRE 폭발. `GetPropertyHeight`가 `OnGUI`보다 먼저 호출되므로 레이아웃 진입 전 터짐. **의무 grep**: 동일 클래스 내 `FindPropertyRelative\("필드명"\)` 전수 — `OnGUI`/`GetPropertyHeight`/`OnInspectorGUI`/`CanCacheInspectorGUI` 모두. (2026-04-30 686a0a5c `OnGUI`만 fix → 4c5cd879 follow-up 사례)
+
+## 12.5 SSOT 단일 진입점 보존
+
+동일 도메인 액션(노드 클리어, 데이터 저장, 시드 소비 등)이 여러 호출처에 흩어져 있고 부수효과가 미묘하게 다르면 **단일 진입점(SSOT)으로 수렴**시킨다. 호출자 분기·오버로드는 빠르게 부수효과 누락을 만든다.
+
+위임 프롬프트와 작업 종료 게이트에 그대로 인용 가능한 체크리스트:
+
+- [ ] 동일 도메인 액션이 N곳에 흩어졌으면 **단일 진입점부터 식별** — 파라미터 차이만 다른 오버로드는 SSOT 후보
+- [ ] 호출자 분기가 타이밍 의존(예: `_currentNode` 같은 암묵 포인터)이면 SSOT를 **명시 파라미터(좌표/ID)** 로 강제하고 무파라미터 버전은 폐기
+- [ ] SSOT 식별 grep 패턴: `\.MethodName\(` (이름만), 결과를 **호출자별 부수효과 매트릭스**로 정리
+- [ ] SSOT 통합 후 **레거시 진입점 즉시 제거** — 남기면 새 호출자가 다시 분기를 만든다
+- [ ] 종료 게이트: `grep -rn "OldEntryPoint(" → 0건`을 세션 종료 직전 확인
+- [ ] **부수효과 매트릭스 1:1 흡수 검증 의무** (오버로드 추가 / SSOT 신설 공통): 새 진입점이 기존 진입점(예: `ShopPurchaseService.TryPurchase`)의 모든 상태 변경(필드 마킹, 이벤트 발행, 카운터 증가)을 매트릭스로 나열 후 1:1 매핑. 부분 흡수는 SSOT 신설이 아니라 분기 추가. (2026-05-12 UIShop CardRemoval SSOT 신설 시 `slot.IsPurchased=true` 솔드아웃 마킹 누락 → 1회성 디자인 의도 위배 회귀)
+
+## 13. 추출(Extract) 리팩토링의 책임 매핑
+
+인라인 코드를 유틸/메서드 호출로 **추출**할 때 **컴파일 성공은 동작 동등성을 보장하지 않는다**. 컴파일러는 로직 동등성을 검증하지 못하므로, 인라인이 갖고 있던 **모든 책임**이 추출된 곳에 옮겨졌는지 수동 검증 필수.
+
+**2026-04-15 RoguelikeMap 회귀 사례**: `RoguelikeMapGenerator.GetRandomLocationByWeight`의 인라인 구현을 `LocationWeightUtil.GetRandomLocation` 호출로 교체했으나, 인라인이 수행하던 `minFloor/maxFloor` 필터링 책임이 유틸로 **이동하지 않고 사라짐**. Generator의 `validWeights` 사전 필터는 "0개 체크"로만 쓰이는 상태로 방치되어 **3층에 Elite가 등장**하는 회귀 버그가 플레이 테스트에서야 발견됨.
+
+### 추출 전 책임 목록화
+
+인라인 코드의 다음 책임을 목록화:
+- 입력 변환
+- 필터링 / 검증
+- 추첨 / 계산
+- 폴백 처리
+- 부수 효과 (로깅 등)
+
+### 추출 후 책임 매핑
+
+각 책임이 추출 후 어디로 이동했는지 확인:
+- 유틸 내부로 이동?
+- 호출자 측에 남음?
+- **사라지지 않았는가?** ← 회귀 버그의 원흉
+
+### 위험 신호 패턴
+
+- "이전 코드가 받던 파라미터를 새 코드가 안 받는다" → 그 파라미터의 효과가 사라졌을 가능성
+- "이전 호출자가 사전 필터를 했는데 새 유틸이 같은 필터를 갖지 않는다" → 책임 누락
+- "리팩토링 직후 코드가 더 단순해 보인다" → 단순화가 아니라 **기능 누락**일 가능성
+
+### 추출 위임 프롬프트 체크리스트
+
+에이전트 위임 시 명시:
+- [ ] 추출 전 인라인 코드의 모든 책임 목록화
+- [ ] 추출 후 각 책임이 어디로 이동하는지 명시
+- [ ] "기능 동등성 보존" 명시적 요구
+- [ ] 의도된 동작 시나리오 1-2개 (예: "minFloor=6인 LocationType은 actLevel=3에서 추첨되지 않아야 함")
+
+## 14. Unity 시각 버그 — Inspector 우선 진단
+
+UI 미표시·반투명·색상 이상 등 시각 버그는 **코드/asset 수정 전에 Inspector를 먼저 의심**한다. 2026-04-15 Hwaseo에서 두 건의 사례 모두 코드·anim을 여러 번 잘못 추적한 후 Inspector에서 해결됨.
+
+### 진단 우선순위 (위→아래)
+
+1. **Inspector 컴포넌트 설정값** — Button(Color Tint/Disabled Color), Image(Color/Material), CanvasGroup(alpha/interactable), Outline(effectColor)
+2. **SerializeField 할당 상태** — 비어 있는 필드
+3. Animator Controller / .anim 키프레임
+4. Material/Shader 설정
+5. 코드의 색상/알파 조작
+
+대부분 **상위 1-2개**에서 해결됨.
+
+### 대표 함정: Button Disabled Color
+
+- `interactable = false` 시 Button은 **Disabled Color**로 자동 전환
+- 기본 Disabled Color = `(0.78, 0.78, 0.78, 0.5)` — **알파 0.5 반투명이 디폴트**
+- "버튼 비활성화 시 반투명" 증상 = 거의 100% 이 설정
+
+### 행동 원칙
+
+- 같은 가설(예: "알파 조작")을 2회 이상 추적했는데 진전 없으면 **중단하고 사용자에게 Inspector 확인 요청**
+- **Fail Loud**: 코드 폴백(없으면 기본값 생성)은 런타임 동적 생성이 필요한 경우만. 고정 프리팹에는 Inspector 정정이 정석 — 폴백은 버그를 숨길 뿐
+- `.anim` 파일을 함부로 빈 클립으로 만들지 말 것(원인이 Inspector면 부수 피해)
+
+## 15. 세션 종료 전 반드시 grep 전수 검증
+
+Phase 마지막에 한 번 더:
+```
+Grep("[제거 대상 패턴]", path="Assets/Scripts")
+```
+잔재가 남아있으면 한 번에 처리. 컴파일이 통과했다고 결정론이 작동한다는 보장 없음. **타입 검증과 동작 검증은 별개**.
+
+## 16. 상태 머신·트랜잭션 패턴 교훈 — [node-lifecycle-patterns.md](node-lifecycle-patterns.md)
+
+## 17. 3단계 리팩토링 분할 기법 (Part A/B/C)
+
+대규모 리팩토링은 **"신규 추가 → 기존 수정 → 정적 검증"** 3단계로 분할하면 각 단계가 컴파일 Green을 유지하며 `maxTurns=25` 절단 회복이 쉬워짐. 2026-04-24 Hwaseo `NodeEntryService` Strategy Pattern 리팩토링(347→184줄, 호출자 수정 0건)에서 검증.
+
+| Part | 책임 | 제약 |
+|------|------|------|
+| **A — 신규 파일만** | 새 인터페이스 + 구현체 별도 디렉토리에 추가 | 기존 파일 **무수정**, 단독 컴파일 Green |
+| **B — 기존 파일 리팩토링** | Part A 산출물로 내부 구현 교체 | **공개 API 시그니처 유지** (wrapper 보호) |
+| **C — 정적 검증** | 전/후 동등성 + 원칙 달성 read-only 검증 | 편집 권한 없음 |
+
+**위임 프롬프트**: Part A "신규만", Part B "공개 API 유지", Part C "edit 금지, 보고 3섹션 이내". 각 Part 후 `git diff --stat` 확인.
+
+## 18. 도메인 전문 컴포넌트 선탐색
+
+"X 로직 참고" 지시를 받으면 **도메인 전문 컴포넌트가 이미 존재하는지 먼저 grep** (`UI*IconSlot`, `*Presenter`, `*Binder`). 상세: [solid-unity-principles.md](solid-unity-principles.md) 안티패턴 섹션 (UIRelicIconSlot 재사용 사례).
