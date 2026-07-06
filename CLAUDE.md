@@ -8,15 +8,6 @@
 
 ## 주요 구성 요소
 
-### 날씨 시스템 (예시 워크플로우)
-**명령어 → 에이전트 → 스킬** 아키텍처를 통해 두 가지 서로 다른 스킬 패턴을 시연합니다:
-- `/weather-orchestrator` 명령어 (`.claude/commands/weather-orchestrator.md`): 진입점 — 사용자에게 C/F를 묻고, 에이전트를 호출한 후 SVG 스킬을 호출합니다
-- `weather-agent` 에이전트 (`.claude/agents/weather-agent.md`): 사전 로드된 `weather-fetcher` 스킬을 사용해 온도를 가져옵니다 (에이전트 스킬 패턴)
-- `weather-fetcher` 스킬 (`.claude/skills/weather-fetcher/SKILL.md`): 에이전트에 사전 로드됨 — Open-Meteo에서 온도를 가져오는 지침
-- `weather-svg-creator` 스킬 (`.claude/skills/weather-svg-creator/SKILL.md`): 스킬 — SVG 날씨 카드를 생성하고 `orchestration-workflow/weather.svg` 및 `orchestration-workflow/output.md`에 저장합니다
-
-두 가지 스킬 패턴: 에이전트 스킬(`skills:` 필드를 통해 사전 로드) vs 스킬(`Skill` 도구를 통해 호출). 전체 흐름 다이어그램은 `orchestration-workflow/orchestration-workflow.md`를 참고하세요.
-
 ### 스킬 정의 구조
 `.claude/skills/<name>/SKILL.md`의 스킬은 YAML 프론트매터를 사용합니다:
 - `name`: 표시 이름 및 `/슬래시-명령어` (기본값: 디렉토리 이름)
@@ -29,9 +20,6 @@
 - `context`: 격리된 서브에이전트 컨텍스트에서 실행하려면 `fork`로 설정
 - `agent`: `context: fork`에 대한 서브에이전트 유형 (기본값: `general-purpose`)
 - `hooks`: 이 스킬에 범위가 지정된 라이프사이클 훅
-
-### 프레젠테이션 시스템
-`.claude/rules/presentation.md` 참고 — 모든 프레젠테이션 작업은 `presentation-curator` 에이전트에 위임됩니다.
 
 ### 훅 시스템
 `.claude/hooks/`의 크로스 플랫폼 사운드 알림 시스템:
@@ -66,7 +54,7 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 - `skills`: 에이전트 컨텍스트에 사전 로드할 스킬 이름 목록
 - `mcpServers`: 이 서브에이전트를 위한 MCP 서버 (서버 이름 또는 인라인 설정)
 - `hooks`: 이 서브에이전트에 범위가 지정된 라이프사이클 훅 (모든 훅 이벤트 지원; `PreToolUse`, `PostToolUse`, `Stop`이 가장 일반적)
-- `memory`: 영구 메모리 범위 — `user`, `project`, 또는 `local` (`reports/claude-agent-memory.md` 참고)
+- `memory`: 영구 메모리 범위 — `user`, `project`, 또는 `local`
 - `background`: 항상 백그라운드 작업으로 실행하려면 `true`로 설정
 - `effort`: 노력 수준 재정의: `low`, `medium`, `high`, `max` (기본값: 세션에서 상속)
 - `isolation`: 임시 git 워크트리에서 실행하려면 `"worktree"`로 설정
@@ -85,13 +73,9 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 
 ## 모범 사례 질문에 대한 답변
 
-사용자가 Claude Code 모범 사례 질문을 할 경우, 훈련 지식이나 외부 소스에 의존하기 전에 **항상 이 저장소를 먼저 검색하세요** (`best-practice/`, `reports/`, `tips/`, `implementation/`, `README.md`). 이 저장소가 권위 있는 출처입니다 — 여기서 답을 찾지 못한 경우에만 외부 문서나 웹 검색으로 돌아가세요.
+사용자가 Claude Code 모범 사례 질문을 할 경우, 훈련 지식이나 외부 소스에 의존하기 전에 **항상 이 저장소를 먼저 검색하세요** (`best-practice/`, `reports/`, `README.md`). 이 저장소가 권위 있는 출처입니다 — 여기서 답을 찾지 못한 경우에만 외부 문서나 웹 검색으로 돌아가세요.
 
-## 하네스 엔지니어링
-
-이 저장소는 하네스 엔지니어링 3축(컨텍스트 엔지니어링, 환경 설계, 평가 주도 개선)을 구현합니다. 상세 매핑은 `best-practice/harness-engineering.md`를 참고하세요.
-
-### 평가 주도 검증
+## 평가 주도 검증
 - 코드 작성 후 반드시 테스트 실행 또는 브라우저 확인으로 검증합니다
 - 작성자와 검증자를 분리합니다 — 서브에이전트(`isolation: "worktree"`)로 독립 리뷰
 - 자기 평가 금지: "잘 되었다"고 선언하지 않고 실행 결과로 증명합니다
@@ -128,10 +112,10 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 
 변경 사항을 커밋할 때 **파일별로 개별 커밋을 생성하세요**. 여러 파일 변경 사항을 하나의 커밋으로 묶지 마세요. 각 파일은 해당 파일 변경 사항에 특화된 설명 메시지와 함께 자체 커밋을 가져야 합니다.
 
-예를 들어, `README.md`, `best-practice/claude-subagents.md`, 스킬 파일이 모두 변경된 경우:
+예를 들어, `README.md`, `best-practice/solid-unity-principles.md`, 룰 파일이 모두 변경된 경우:
 - 커밋 1: `git add README.md` → README 관련 메시지로 커밋
-- 커밋 2: `git add best-practice/claude-subagents.md` → 서브에이전트 문서 관련 메시지로 커밋
-- 커밋 3: `git add .claude/skills/weather-fetcher/SKILL.md` → 스킬 관련 메시지로 커밋
+- 커밋 2: `git add best-practice/solid-unity-principles.md` → best-practice 문서 관련 메시지로 커밋
+- 커밋 3: `git add .claude/rules/unity-delegation.md` → 룰 관련 메시지로 커밋
 
 이렇게 하면 git 기록이 더 깔끔해지고 개별 변경 사항을 검토, 되돌리기, 체리픽하기 쉬워집니다.
 
@@ -150,20 +134,19 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 
 Unity 관련 작업은 **반드시** 전문 에이전트에게 위임합니다. 위임 규칙: `.claude/rules/unity-delegation.md`
 
-| 에이전트 | 영화 | 역할 | 모델 |
-|----------|------|------|------|
-| **Samantha** | Her | 프로듀서 — 소통, 위임, 진행 관리, 품질 감독 (코딩 안 함) | opus |
-| **Jarvis** | Iron Man | 테크니컬 디렉터 — 아키텍처 + 성능 최적화 | sonnet |
-| **Ava** | Ex Machina | 아트 디렉터 — UI/UX + VFX + 애니메이션 | sonnet |
-| **Sonny** | I, Robot | 리드 게임 디자이너 + 게임플레이 프로그래머 — 설계, 밸런싱, AI, 전투, 물리 | sonnet |
-| **TARS** | Interstellar | 레벨 디자이너 + 콘텐츠 디자이너 — 월드 빌딩, 환경 연출 | sonnet |
+| 에이전트 | 역할 | 모델 |
+|----------|------|------|
+| **Samantha** | 프로듀서 + **최상위 시니어 개발자** — 소통, 위임, 진행 관리, 시니어 품질 감독·race 시뮬레이션·메타 회고 (코딩 안 함) | opus |
+| **Jarvis** | 테크니컬 디렉터 — 아키텍처 + 성능 최적화 | inherit |
+| **Ava** | 아트 디렉터 — UI/UX + VFX + 애니메이션 | inherit |
+| **Sonny** | 리드 게임 디자이너 + 게임플레이 프로그래머 — 설계, 밸런싱, AI, 전투, 물리 | inherit |
+| **TARS** | 레벨 디자이너 + 콘텐츠 디자이너 — 월드 빌딩, 환경 연출 | inherit |
 
 복합 작업은 Samantha에게(오케스트레이션만), 단일 전문 분야는 해당 에이전트에게 직접 위임합니다.
 
 ## 문서
 
 문서 표준은 `.claude/rules/markdown-docs.md`를 참고하세요. 주요 문서:
-- `best-practice/claude-subagents.md`: 서브에이전트 프론트매터, 훅, 저장소 에이전트
-- `best-practice/claude-commands.md`: 슬래시 명령어 패턴 및 내장 명령어 참고
-- `best-practice/harness-engineering.md`: 하네스 엔지니어링 3축 프레임워크
-- `orchestration-workflow/orchestration-workflow.md`: 날씨 시스템 흐름 다이어그램
+- `best-practice/solid-unity-principles.md`: SOLID Unity 적용 카탈로그
+- `best-practice/refactoring-lessons.md`: 대규모 리팩토링 실전 체크리스트
+- `best-practice/race-fix-meta-patterns.md`: Unity 부트/씬 전환 race 메타 패턴
