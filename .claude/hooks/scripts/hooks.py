@@ -182,8 +182,12 @@ def play_sound(sound_name):
                         return False
                 else:
                     # Unix/Linux/macOS: use subprocess with audio player
+                    # macOS afplay supports -v flag for volume control (0.0=silent, 1.0=full)
+                    cmd = list(audio_player)
+                    if cmd[0] == "afplay":
+                        cmd.extend(["-v", str(get_sound_volume())])
                     subprocess.Popen(
-                        audio_player + [str(file_path)],
+                        cmd + [str(file_path)],
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL,
                         start_new_session=True
@@ -259,6 +263,51 @@ def is_hook_disabled(event_name):
         # If anything goes wrong, assume hook is enabled
         print(f"Error in is_hook_disabled: {e}", file=sys.stderr)
         return False
+
+def get_sound_volume():
+    """
+    Get the sound volume from config files (0.0=silent, 1.0=full).
+    Uses fallback logic: hooks-config.local.json -> hooks-config.json -> 1.0 (default).
+
+    Currently honored only by macOS afplay. Other platforms (Linux paplay/aplay/ffplay,
+    Windows winsound) ignore this and play at system volume.
+
+    Returns:
+        Float volume value, defaulting to 1.0 if config missing or invalid.
+    """
+    try:
+        script_dir = Path(__file__).parent
+        hooks_dir = script_dir.parent
+        config_dir = hooks_dir / "config"
+
+        local_config_path = config_dir / "hooks-config.local.json"
+        default_config_path = config_dir / "hooks-config.json"
+
+        local_config = None
+        if local_config_path.exists():
+            try:
+                with open(local_config_path, "r", encoding="utf-8") as config_file:
+                    local_config = json.load(config_file)
+            except Exception:
+                pass
+
+        default_config = None
+        if default_config_path.exists():
+            try:
+                with open(default_config_path, "r", encoding="utf-8") as config_file:
+                    default_config = json.load(config_file)
+            except Exception:
+                pass
+
+        if local_config is not None and "soundVolume" in local_config:
+            return float(local_config["soundVolume"])
+        elif default_config is not None and "soundVolume" in default_config:
+            return float(default_config["soundVolume"])
+        else:
+            return 1.0
+    except Exception:
+        return 1.0
+
 
 def is_logging_disabled():
     """

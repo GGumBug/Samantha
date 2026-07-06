@@ -3,7 +3,7 @@
 ## 문서 표준
 
 - 파일은 하나의 주제에 집중하고 간결하게 유지합니다
-- 절대 GitHub URL이 아닌 상대 링크를 사용합니다 (예: `../best-practice/claude-memory.md`)
+- 절대 GitHub URL이 아닌 상대 링크를 사용합니다 (예: `../best-practice/solid-unity-principles.md`)
 - best-practice 및 reports 문서 상단에 뒤로 가기 링크를 포함합니다 (기존 파일 패턴 참고)
 - 새로운 개념이나 보고서를 추가할 때 README.md의 해당 표(CONCEPTS 또는 REPORTS)를 업데이트합니다
 

@@ -254,10 +254,6 @@ Your agent instructions here...
    - `agent_stop/agent_stop.wav`
    - `agent_subagentstop/agent_subagentstop.wav`
 
-### Example: Weather Fetcher Agent
-
-See `.claude/agents/claude-code-hook-agent.md` for a complete example of an agent with hooks configured.
-
 ### Hook Option: `once: true`
 
 The `once: true` option ensures a hook only runs once per session:

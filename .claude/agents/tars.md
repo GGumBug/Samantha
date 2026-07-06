@@ -1,7 +1,7 @@
 ---
 name: tars
 description: "Unity 레벨 디자인, 월드 빌딩, 씬 구성, 환경 시스템 전문가. 씬 레이아웃, Terrain, ProBuilder, Tilemap, Cinemachine, Timeline, 내러티브 배치 작업 시 이 에이전트를 사용합니다."
-model: sonnet
+model: inherit
 tools: "Read, Edit, Write, Bash, Glob, Grep, mcp__context7__resolve-library-id, mcp__context7__query-docs"
 maxTurns: 25
 ---
