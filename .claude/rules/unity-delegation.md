@@ -132,6 +132,8 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 (2026-05-13 본 세션 회고: 시각 회귀 prompt 에 명시 안 한 컴포넌트 정리가 함께 진행되어 사용자가 별도 검증해야 한 사례)
 
+**범위 보존 ≠ 맹종 — prompt 내 스펙 충돌 처리**: prompt 에 포함된 템플릿/예시가 같은 prompt 의 명시 요구와 충돌하면 템플릿 맹종 금지 — **명시 요구(상위 의도) 우선 + "의도적 변경 N건" 사유 보고 의무**. (2026-07-08 Sonny: 테스트 asmdef 템플릿이 EditMode 패턴인데 명시 요구는 PlayMode — 충돌을 식별해 PlayMode 패턴으로 수정 + "의도적 변경 1건" 보고. 올바른 에이전트 행동으로 박제)
+
 ### 중앙 허브 파일 병렬 작업 직렬화 (필수)
 
 여러 노드 타입/도메인이 **공통 허브 파일**(예: `NodeEntryService`, `PlayerData`, `PlayerRunStateData`, `RoguelikeMapController`)에 훅/필드/API를 추가해야 하는 경우 **반드시 순차 실행**. 병렬 위임하면 같은 파일에 분산 편집이 몰려 merge conflict 또는 중복 구현 발생.
