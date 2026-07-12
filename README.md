@@ -32,6 +32,9 @@ GameCore Unity 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, �
 | [ui-visibility-two-layer-srp.md](best-practice/ui-visibility-two-layer-srp.md) | 사전 생성 UI 의 가시성 SSOT 2-layer (panel root vs content child) 분리 |
 | [multi-axis-fast-path-guard.md](best-practice/multi-axis-fast-path-guard.md) | 시간축 다른 invariant 합성 가드 + caller-callee enabler 협업 |
 | [cancel-cleanup-bypass.md](best-practice/cancel-cleanup-bypass.md) | try/catch OperationCanceled cleanup 우회 + 강제 토글 4-state 멱등 |
+| [unity-test-mode-selection.md](best-practice/unity-test-mode-selection.md) | EditMode/PlayMode 판정은 "POCO 여부"가 아닌 내부 Unity API grep 기준 |
+| [unity-editor-only-guards.md](best-practice/unity-editor-only-guards.md) | 에디터 전용 검증(collectionCheck/Debug.Assert)은 런타임 가드 아님 |
+| [generation-token-reset.md](best-practice/generation-token-reset.md) | 일괄 리셋 세대 토큰 — CTS 교체 후 Cancel (swap-before-cancel) |
 
 ## RULES — .claude/rules/
 
@@ -39,6 +42,6 @@ GameCore Unity 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, �
 |----|------|
 | [engineering-constitution.md](.claude/rules/engineering-constitution.md) | SOLID/SSOT/디자인 패턴 헌법 |
 | [unity-delegation.md](.claude/rules/unity-delegation.md) | Unity 작업 위임 규칙 |
-| [unitask-async.md](.claude/rules/unitask-async.md) | UniTask 비동기 9개 룰 |
+| [unitask-async.md](.claude/rules/unitask-async.md) | UniTask 비동기 10개 룰 |
 | [evaluation.md](.claude/rules/evaluation.md) | 평가 주도 검증 |
 | [markdown-docs.md](.claude/rules/markdown-docs.md) | 문서 표준 |
