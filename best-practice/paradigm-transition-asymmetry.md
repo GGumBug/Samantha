@@ -101,6 +101,6 @@ await op.ToUniTask(progress: Progress.Create<float>(OnProgress), cancellationTok
 
 ## 참고
 
-- [.claude/rules/unitask-async.md](../.claude/rules/unitask-async.md) — UniTask 9개 룰 (§3 frame-budget batching 직접 연계)
+- [.claude/rules/unitask-async.md](../.claude/rules/unitask-async.md) — UniTask 10개 룰 (§3 frame-budget batching 직접 연계)
 - [unitask-async-patterns.md](unitask-async-patterns.md) — UniTask 인시던트 카탈로그
 - [overload-semantic-equivalence.md](overload-semantic-equivalence.md) — 오버로드 의미론 등가성
