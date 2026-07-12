@@ -2,7 +2,7 @@
 
 ## UniTask 비동기 헌법 (사용자 명시 없이 항상 적용)
 
-Unity 프로젝트의 모든 비동기 코드는 **UniTask 기반**으로 작성한다. `Task`/`async void`/`Coroutine` 혼용은 GC, 캡처, 취소 누락, 라이프사이클 누수의 주범. 다음 9개 룰은 **타협 불가 기본값** — 매번 프롬프트에서 상기시키지 않아도 모든 Unity 에이전트에 박제된다.
+Unity 프로젝트의 모든 비동기 코드는 **UniTask 기반**으로 작성한다. `Task`/`async void`/`Coroutine` 혼용은 GC, 캡처, 취소 누락, 라이프사이클 누수의 주범. 다음 10개 룰은 **타협 불가 기본값** — 매번 프롬프트에서 상기시키지 않아도 모든 Unity 에이전트에 박제된다.
 
 상세 인시던트 분석과 Before/After 코드는 [best-practice/unitask-async-patterns.md](../../best-practice/unitask-async-patterns.md) 참조. 코루틴→UniTask 마이그레이션 비대칭(작성자 깜빡 패턴)은 [best-practice/paradigm-transition-asymmetry.md](../../best-practice/paradigm-transition-asymmetry.md).
 
@@ -139,6 +139,20 @@ public async UniTask LoadAsync(CancellationToken token)
 
 호출 사슬의 **최상단까지 token이 흘러야** 안전. 중간에 끊기면 그 지점부터 누수.
 
+### 룰 10 — 일괄 리셋은 "교체 후 Cancel" (세대 토큰)
+
+`ReleaseAll`/`Clear` 같은 **일괄 리셋 + 진행 중 비동기 작업** 조합에서, 리셋용 CTS는 **새 CTS로 교체(+세대 증가)를 Cancel보다 먼저** 수행한다. `Cancel()`의 동기 continuation이 재진입해도 새 세대·빈 상태 위에서 동작해 옛 상태를 오염시킬 수 없다. 완료 직후 취소 edge는 **작업 시작 시 세대 캡처 → 커밋 직전 비교**로 방어.
+
+```csharp
+_generation++;
+var old = _resetCts;
+_resetCts = new CancellationTokenSource();   // 1. 교체 먼저
+ClearEntries();                              // 2. 상태 비우기
+old.Cancel(); old.Dispose();                 // 3. Cancel은 마지막
+```
+
+상세 Before/After와 세대 비교 코드: [best-practice/generation-token-reset.md](../../best-practice/generation-token-reset.md). (2026-07-08 GameCore PoolService ReleaseAll race)
+
 ## 자가 검증 체크리스트
 
 코드 작성/수정 후 보고 직전:
@@ -152,9 +166,11 @@ public async UniTask LoadAsync(CancellationToken token)
 - [ ] `DOTween.ToUniTask` 호출에 token이 전달되는가?
 - [ ] `UniTask.Yield`/`DelayFrame`에 PlayerLoopTiming이 명시되어 있는가?
 - [ ] 비동기 메서드 시그니처가 CancellationToken을 받는가?
+- [ ] 일괄 리셋 메서드에서 CTS 교체(+세대 증가)가 Cancel보다 먼저인가?
 
 ## 관련 문서
 
 - [best-practice/unitask-async-patterns.md](../../best-practice/unitask-async-patterns.md) — 인시던트 + Before/After 상세
+- [best-practice/generation-token-reset.md](../../best-practice/generation-token-reset.md) — 세대 토큰 패턴 상세
 - [.claude/rules/engineering-constitution.md](engineering-constitution.md) — SOLID/SSOT 원칙
 - [.claude/rules/evaluation.md](evaluation.md) — 평가 주도 검증
