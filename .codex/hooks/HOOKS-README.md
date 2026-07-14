@@ -1,128 +1,38 @@
-# HOOKS-README
-Contains all the details, scripts, and instructions for the Codex CLI hooks.
+# Codex hooks
 
-## Hook Events Overview
+이 디렉터리는 Samantha 저장소의 Codex 라이프사이클 음성 알림과 세션 시작 컨텍스트를 관리합니다.
 
-Codex CLI provides **5 hooks** via hooks.json:
+## 구성
 
-| # | Hook | Event Type | Config File | Description |
-|:-:|------|------------|-------------|-------------|
-| 1 | `SessionStart` | `SessionStart` | `hooks.json` | Runs once at session start — injects context + plays sound |
-| 2 | `PreToolUse` | `PreToolUse` | `hooks.json` | Runs before a tool executes — plays sound |
-| 3 | `PostToolUse` | `PostToolUse` | `hooks.json` | Runs after a tool completes — plays sound |
-| 4 | `Stop` | `stop` | `hooks.json` | Runs when the session ends — plays sound |
-| 5 | `UserPromptSubmit` | `UserPromptSubmit` | `hooks.json` | Runs when the user submits a prompt — plays sound |
+| 경로 | 역할 |
+|---|---|
+| `../hooks.json` | 프로젝트 훅 등록 |
+| `scripts/hooks.py` | 훅 입력 처리, 컨텍스트 출력, 사운드 재생 |
+| `config/hooks-config.json` | 팀 공유 활성화·로깅 설정 |
+| `config/hooks-config.local.json` | 개인 재정의, Git 제외 |
+| `sounds/<Event>/` | 이벤트별 WAV·MP3 파일 |
+| `logs/hooks-log.jsonl` | 선택적 JSON Lines 로그, Git 제외 |
 
-> Hooks 1 and 4 require **Codex CLI v0.114.0+** with the hooks engine enabled.
-> Hooks 2 and 3 require **Codex CLI v0.117.0+** with the hooks engine enabled.
-> Hook 5 requires **Codex CLI v0.116.0+** with the hooks engine enabled:
-> ```bash
-> codex -c features.codex_hooks=true
-> ```
+프로젝트 훅은 저장소가 Codex에서 신뢰된 경우에만 로드됩니다. 새 훅이나 변경된 훅은 Codex CLI의 `/hooks`에서 내용을 검토하고 신뢰해야 실행됩니다.
 
-### How Hooks Are Called
+## 등록 이벤트
 
-All hooks (hooks.json) are called with `--hook` flag:
-```
-python3 .codex/hooks/scripts/hooks.py --hook SessionStart
-python3 .codex/hooks/scripts/hooks.py --hook PreToolUse
-python3 .codex/hooks/scripts/hooks.py --hook PostToolUse
-python3 .codex/hooks/scripts/hooks.py --hook Stop
-python3 .codex/hooks/scripts/hooks.py --hook UserPromptSubmit
-```
+현재 음성 알림을 제공하는 이벤트는 5개입니다.
 
-### SessionStart Context Injection
+| 이벤트 | 동작 |
+|---|---|
+| `SessionStart` | 시간·작업 디렉터리·Git 브랜치·워킹트리 상태를 개발자 컨텍스트로 출력하고 사운드 재생 |
+| `PreToolUse` | 도구 실행 전 사운드 재생 |
+| `PostToolUse` | 도구 실행 후 사운드 재생 |
+| `UserPromptSubmit` | 사용자 프롬프트 제출 시 사운드 재생 |
+| `Stop` | 턴 종료 시 사운드 재생 |
 
-The SessionStart hook outputs context to **stdout**, which feeds directly into the model's context window. This includes:
-- Current date/time
-- Git branch name
-- Working tree status (clean or uncommitted changes)
-- Working directory path
+`hooks.json`의 명령은 Codex가 하위 디렉터리에서 시작되더라도 동작하도록 `git rev-parse --show-toplevel`로 스크립트 경로를 계산합니다.
 
-## Prerequisites
+## 설정
 
-Before using hooks, ensure you have **Python 3** installed on your system.
+팀 기본값은 `config/hooks-config.json`입니다.
 
-### Required Software
-
-#### All Platforms (Windows, macOS, Linux)
-- **Python 3**: Required for running the hook script
-- Verify installation: `python3 --version`
-
-**Installation Instructions:**
-- **Windows**: Download from [python.org](https://www.python.org/downloads/) or install via `winget install Python.Python.3`
-- **macOS**: Install via `brew install python3` (requires [Homebrew](https://brew.sh/))
-- **Linux**: Install via `sudo apt install python3` (Ubuntu/Debian) or `sudo yum install python3` (RHEL/CentOS)
-
-### Audio Players (Automatically Detected)
-
-The hook script automatically detects and uses the appropriate audio player for your platform:
-
-- **macOS**: Uses `afplay` (built-in, no installation needed)
-- **Linux**: Uses `paplay` from `pulseaudio-utils` - install via `sudo apt install pulseaudio-utils`
-- **Windows**: Uses built-in `winsound` module (included with Python)
-
-### Configuration Files
-
-There are **two** configuration files:
-
-1. **`.codex/hooks.json`** — Registers `SessionStart`, `PreToolUse`, `PostToolUse`, `Stop`, and `UserPromptSubmit` hooks
-2. **`.codex/hooks/config/hooks-config.json`** — Enable/disable individual hooks and logging
-
-#### hooks.json
-
-```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "type": "shell",
-        "command": "python3 .codex/hooks/scripts/hooks.py --hook SessionStart",
-        "statusMessage": "Initializing session hooks...",
-        "timeout": 10
-      }
-    ],
-    "PreToolUse": [
-      {
-        "type": "shell",
-        "command": "python3 .codex/hooks/scripts/hooks.py --hook PreToolUse",
-        "statusMessage": "Running pre-tool-use hook...",
-        "timeout": 10
-      }
-    ],
-    "PostToolUse": [
-      {
-        "type": "shell",
-        "command": "python3 .codex/hooks/scripts/hooks.py --hook PostToolUse",
-        "statusMessage": "Running post-tool-use hook...",
-        "timeout": 10
-      }
-    ],
-    "Stop": [
-      {
-        "type": "shell",
-        "command": "python3 .codex/hooks/scripts/hooks.py --hook Stop",
-        "statusMessage": "Running session stop hook...",
-        "timeout": 10
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "type": "shell",
-        "command": "python3 .codex/hooks/scripts/hooks.py --hook UserPromptSubmit",
-        "statusMessage": "Running user prompt submit hook...",
-        "timeout": 10
-      }
-    ]
-  }
-}
-```
-
-## Configuring Hooks (Enable/Disable)
-
-### Disable Individual Hooks
-
-Edit `.codex/hooks/config/hooks-config.json`:
 ```json
 {
   "disableSessionStartHook": false,
@@ -134,59 +44,35 @@ Edit `.codex/hooks/config/hooks-config.json`:
 }
 ```
 
-**Configuration Options:**
-- `disableSessionStartHook`: Set to `true` to disable the session start context injection and sound
-- `disablePreToolUseHook`: Set to `true` to disable the pre-tool-use sound
-- `disablePostToolUseHook`: Set to `true` to disable the post-tool-use sound
-- `disableStopHook`: Set to `true` to disable the session stop sound
-- `disableUserPromptSubmitHook`: Set to `true` to disable the user prompt submit sound
-- `disableLogging`: Set to `true` to disable logging hook events to `.codex/hooks/logs/hooks-log.jsonl`
+개인 설정은 같은 키를 `config/hooks-config.local.json`에 작성합니다. 로컬 파일의 값이 팀 기본값보다 우선합니다.
 
-### Configuration Fallback
+모든 프로젝트 훅을 끄려면 `.codex/config.toml`에 다음을 추가할 수 있습니다.
 
-There are two configuration files:
-
-1. **`.codex/hooks/config/hooks-config.json`** - The shared/default configuration that is committed to git
-2. **`.codex/hooks/config/hooks-config.local.json`** - Your personal overrides (git-ignored)
-
-The local config file (`.local.json`) takes precedence over the shared config, allowing each developer to customize their hook behavior without affecting the team.
-
-#### Local Configuration (Personal Overrides)
-
-Create or edit `.codex/hooks/config/hooks-config.local.json` for personal preferences:
-
-```json
-{
-  "disableSessionStartHook": false,
-  "disablePreToolUseHook": false,
-  "disablePostToolUseHook": false,
-  "disableStopHook": true,
-  "disableUserPromptSubmitHook": false,
-  "disableLogging": true
-}
+```toml
+[features]
+hooks = false
 ```
 
-### Logging
+## 실행과 테스트
 
-When logging is enabled (`"disableLogging": false`), hook events are logged to `.codex/hooks/logs/hooks-log.jsonl` in JSON Lines format. Each entry contains the full JSON payload received from Codex CLI.
+Python 3가 필요합니다. 스크립트를 직접 확인할 때는 저장소 루트에서 실행합니다.
 
-## Testing
+```bash
+python3 .codex/hooks/scripts/hooks.py --hook SessionStart
+```
 
-Run the test suite:
+단위 테스트:
+
 ```bash
 python3 -m unittest tests.test_hooks -v
 ```
 
-## Voice
+테스트는 stdin payload 파싱, SessionStart 컨텍스트, 워킹트리 출력 제한, 메인 이벤트 흐름을 검증하며 실제 사운드는 재생하지 않습니다.
 
-website used to generate sounds: https://elevenlabs.io/
-voice used: Adam - American, Dark and Tough
+## 플랫폼
 
-## Future Extensibility
+- macOS: 내장 `afplay`
+- Windows: Python `winsound`, WAV 우선
+- Linux: `paplay`, `aplay`, `ffplay`, `mpg123` 순으로 탐색
 
-This project can be extended by:
-
-1. Adding new entries to `HOOK_SOUND_MAP` in `hooks.py`
-2. Adding corresponding sound files in `.codex/hooks/sounds/`
-3. Adding toggle keys in `hooks-config.json`
-4. Adding new hook entries in `hooks.json`
+사운드 플레이어가 없거나 재생에 실패해도 훅은 Codex 작업을 중단하지 않습니다. 로그는 기본적으로 비활성화되어 있으며, 활성화하면 이벤트명·시각·마지막 assistant 메시지만 한 줄 JSON으로 기록합니다.
