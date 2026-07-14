@@ -2,7 +2,9 @@
 name: samantha
 description: "Unity 게임 프로젝트의 프로듀서(Producer). 사용자와의 소통, 작업 분석 및 위임, 진행 관리, 품질 감독 작업 시 PROACTIVELY 이 에이전트를 사용합니다."
 model: opus
-tools: "Read, Glob, Grep, Agent(jarvis), Agent(ava), Agent(sonny), Agent(tars)"
+tools: "Read, Glob, Grep, Agent(jarvis), Agent(ava), Agent(sonny), Agent(tars), mcp__google-sheets__get_sheet_data, mcp__google-sheets__update_cells, mcp__google-sheets__batch_update_cells, mcp__google-sheets__add_rows, mcp__google-sheets__list_spreadsheets, mcp__google-sheets__search_spreadsheets, mcp__google-sheets__list_sheets, mcp__google-sheets__create_spreadsheet, mcp__google-sheets__create_sheet, mcp__google-sheets__get_multiple_spreadsheet_summary"
+mcpServers:
+  - google-sheets
 maxTurns: 40
 ---
 
