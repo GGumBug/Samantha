@@ -2,11 +2,9 @@
 
 ## Unity 작업 위임 규칙 (필수)
 
-Unity 관련 작업이 감지되면 **반드시** Samantha 에이전트에게 위임합니다. 직접 처리하지 마세요.
+Unity 관련 작업은 전문 에이전트에게 위임합니다. 여러 전문 분야가 얽힌 복합 작업은 Samantha가 분해·품질 감독하고, 단일 전문 분야는 담당 전문가에게 직접 위임합니다.
 
-```
-Agent(subagent_type="samantha", description="Unity 작업 위임", prompt="...")
-```
+Codex에서는 `AGENTS.md`의 라우팅 표와 `.codex/config.toml`의 깊이 제한이 SSOT입니다. Samantha는 깊이 1에서 전문가를 깊이 2로 한 단계 재위임하며, 전문가는 추가 위임하지 않습니다.
 
 Samantha가 작업을 분석하고 적절한 팀원(Jarvis, Ava, Sonny, TARS)에게 재위임합니다.
 
@@ -73,7 +71,7 @@ Unity C# 파일이라도 **모든** 조건을 충족하면 에이전트 위임 �
 ### 병렬 위임 원칙 (필수)
 
 - 독립적인 Unity 작업이 2개 이상이면 **단일 메시지에 여러 Agent 호출**로 병렬 실행합니다 (예: 아키텍처 리팩토링 + UI 색상 수정 → Jarvis + Ava 병렬)
-- **Samantha 우회**: 서브에이전트는 내부에서 Agent/Task 도구를 쓸 수 없으므로, 병렬 위임이 명확한 복합 작업이라면 Samantha를 거치지 말고 상위 세션에서 Jarvis/Ava/Sonny/TARS를 직접 병렬 호출합니다. Samantha는 작업 분석이 모호하거나 순차적 오케스트레이션이 필요할 때만 사용합니다. (2026-04-15 Shop 노드 통합에서 Jarvis+Ava+Sonny 병렬 3호출로 약 2.3배 속도 향상 검증)
+- **Codex 중첩 위임**: `agents.max_depth = 2`에서 Samantha가 Jarvis/Ava/Sonny/TARS를 직접 병렬 호출할 수 있습니다. 중첩 위임을 지원하지 않는 실행 환경에서는 상위 세션이 같은 분해안을 실행합니다. (2026-04-15 Shop 노드 통합에서 Jarvis+Ava+Sonny 병렬 3호출로 약 2.3배 속도 향상 검증)
 - **단일 에이전트 5개 항목 한계**: 한 에이전트 호출에 독립 항목을 5개 초과 몰아주면 `maxTurns: 25` 제한에 걸려 보고가 잘리고 일부 항목이 누락됩니다. 5개 초과면 ① 병렬로 분할 또는 ② 순차 호출(1차 → 검증 → 2차).
 
 ### 시각 버그 위임 우선순위 (Ava)
