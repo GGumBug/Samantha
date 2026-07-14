@@ -21,3 +21,31 @@ enabled = false
 command = "npx"
 args = ["-y", "@playwright/mcp@0.0.78"]
 enabled = false
+
+# Samantha production tracking and Google Sheets data operations.
+[mcp_servers.google-sheets]
+command = "/Users/minki/.local/bin/uv"
+args = [
+  "run",
+  "--directory",
+  "/Users/minki/Downloads/mcp-google-sheets-main",
+  "mcp-google-sheets",
+]
+enabled = true
+enabled_tools = [
+  "get_sheet_data",
+  "update_cells",
+  "batch_update_cells",
+  "add_rows",
+  "list_spreadsheets",
+  "search_spreadsheets",
+  "list_sheets",
+  "create_spreadsheet",
+  "create_sheet",
+  "get_multiple_spreadsheet_summary",
+]
+default_tools_approval_mode = "writes"
+
+[mcp_servers.google-sheets.env]
+SERVICE_ACCOUNT_PATH = "/Users/minki/Desktop/MINKI/Projects/2026/Double Down/doubledown-502402-249132b65a33.json"
+ENABLED_TOOLS = "get_sheet_data,update_cells,batch_update_cells,add_rows,list_spreadsheets,search_spreadsheets,list_sheets,create_spreadsheet,create_sheet,get_multiple_spreadsheet_summary"
