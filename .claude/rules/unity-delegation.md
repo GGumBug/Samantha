@@ -73,6 +73,7 @@ Unity C# 파일이라도 **모든** 조건을 충족하면 에이전트 위임 �
 - 독립적인 Unity 작업이 2개 이상이면 **단일 메시지에 여러 Agent 호출**로 병렬 실행합니다 (예: 아키텍처 리팩토링 + UI 색상 수정 → Jarvis + Ava 병렬)
 - **Codex 중첩 위임**: `agents.max_depth = 2`에서 Samantha가 Jarvis/Ava/Sonny/TARS를 직접 병렬 호출할 수 있습니다. 중첩 위임을 지원하지 않는 실행 환경에서는 상위 세션이 같은 분해안을 실행합니다. (2026-04-15 Shop 노드 통합에서 Jarvis+Ava+Sonny 병렬 3호출로 약 2.3배 속도 향상 검증)
 - **단일 에이전트 5개 항목 한계**: 한 에이전트 호출에 독립 항목을 5개 초과 몰아주면 `maxTurns: 25` 제한에 걸려 보고가 잘리고 일부 항목이 누락됩니다. 5개 초과면 ① 병렬로 분할 또는 ② 순차 호출(1차 → 검증 → 2차).
+- **동일 도메인 연속 카드는 신규 인스턴스 대신 같은 에이전트 SendMessage 재개**로 컨텍스트 재사용 — 판단 기준·운영 규칙: [best-practice/sequential-delegation-context-reuse.md](../../best-practice/sequential-delegation-context-reuse.md)
 
 ### 시각 버그 위임 우선순위 (Ava)
 

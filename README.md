@@ -45,6 +45,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 |---|---|
 | [asset-migration-sort-consistency.md](best-practice/asset-migration-sort-consistency.md) | 자산 마이그레이션 정렬·대소문자 일관성 |
 | [bgdatabase-asset-reference.md](best-practice/bgdatabase-asset-reference.md) | BGDatabase 에셋 참조 관리 |
+| [bgdatabase-enum-binding.md](best-practice/bgdatabase-enum-binding.md) | BGDatabase enum 필드 3종·시트 어휘 계약·다형 컬럼 파싱 |
 | [caller-driven-assumption-anti-pattern.md](best-practice/caller-driven-assumption-anti-pattern.md) | 호출자 상태를 암묵적으로 가정하는 설계 제거 |
 | [cancel-cleanup-bypass.md](best-practice/cancel-cleanup-bypass.md) | 취소 예외의 cleanup 우회와 멱등 토글 |
 | [dead-stub-pattern.md](best-practice/dead-stub-pattern.md) | 결과가 무시되는 비동기 stub 제거 |
@@ -54,6 +55,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [evidence-based-debugging.md](best-practice/evidence-based-debugging.md) | 증거 기반 디버깅 4단계 프로토콜 |
 | [external-critique-simulation.md](best-practice/external-critique-simulation.md) | 외부 시니어 비판자 시뮬레이션 |
 | [generation-token-reset.md](best-practice/generation-token-reset.md) | 일괄 리셋의 swap-before-cancel 세대 토큰 |
+| [golden-case-gate.md](best-practice/golden-case-gate.md) | 파이프라인 종단값 손계산 동결 게이트 |
 | [locale-aware-subclass-extension.md](best-practice/locale-aware-subclass-extension.md) | locale-aware 상속 확장과 base 호출 |
 | [measurement-driven-debug.md](best-practice/measurement-driven-debug.md) | 반복 추측 실패 후 측정 도구 전환 |
 | [multi-axis-fast-path-guard.md](best-practice/multi-axis-fast-path-guard.md) | 서로 다른 시간축 invariant 합성 가드 |
@@ -69,6 +71,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [refactoring-lessons.md](best-practice/refactoring-lessons.md) | 대규모 리팩터링 실전 체크리스트 |
 | [runstate-preserve-block-grep.md](best-practice/runstate-preserve-block-grep.md) | 런 상태 보존 블록의 grep 검증 |
 | [sentinel-anti-pattern.md](best-practice/sentinel-anti-pattern.md) | sentinel 값 기반 상태 표현의 위험 |
+| [sequential-delegation-context-reuse.md](best-practice/sequential-delegation-context-reuse.md) | 동일 에이전트 연속 위임 컨텍스트 재사용 |
 | [sheet-batch-readback.md](best-practice/sheet-batch-readback.md) | Google Sheets batch update 후 read-back 검증 |
 | [solid-unity-principles.md](best-practice/solid-unity-principles.md) | SOLID의 Unity 적용 카탈로그 |
 | [ui-transition-prefab-convention.md](best-practice/ui-transition-prefab-convention.md) | UI transition prefab 시작 상태 SSOT |

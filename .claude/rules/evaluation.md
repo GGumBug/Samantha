@@ -15,6 +15,16 @@
 
 (2026-07-08 GameCore PoolService 실증: 구현 Jarvis / 테스트 작성 Sonny 분리 → Sonny가 "Dispose 후 체크아웃된 인스턴스는 누가 치우나?" 시나리오 역추적 중 실결함 발견 — Dispose가 풀 대기 인스턴스만 파괴하고 체크아웃 인스턴스는 entry만 폐기, Release는 ObjectDisposedException → 회수 경로 소멸. 루트 수명에선 잠복, 씬-스코프 컨테이너에선 실누수)
 
+### 검증자는 기대 시나리오도 의심한다 (코디네이터 명세 오류 검출)
+
+코디네이터가 위임 프롬프트에 제시한 **기대 시나리오 자체가 틀릴 수 있다**. 검증자는 실동작이 기대와 다를 때 맹종 수정 금지 — ① 실동작을 동결 케이스로 확보 ② 룰/스펙 원문 대조 ③ 코디네이터/사용자에게 스펙 확인 요청 ④ 원래 의도 검증용 깨끗한 케이스 별도 구성. [unity-delegation.md](unity-delegation.md) "범위 보존 ≠ 맹종"의 검증자 측 확장.
+
+(2026-07-20 실증: 코디네이터 기대 "홍단+청단+피10 → 3라인"이 룰상 틀림 — 띠 6장이라 hand_tti 동시 성립 → 4라인. Sonny 가 실동작 동결 + 스펙 확인 요청 + 깨끗한 3라인 케이스 별도 구성)
+
+## 단계 게이트 종단 동결 (Golden Case)
+
+다단계 계산 파이프라인의 단계 게이트에는 단위 테스트와 별도로 **종단값 손계산 동결 케이스**를 둔다 — 커버리지 감사 표 선행·대칭성·재계산 결정론 포함. 상세: [best-practice/golden-case-gate.md](../../best-practice/golden-case-gate.md)
+
 ## Unity 테스트 모드 판정 (EditMode vs PlayMode)
 
 "동기/POCO 여부"가 아니라 **내부에서 사용하는 Unity API**가 판정 기준 — 판정 전 `Object.Destroy` / `DontDestroyOnLoad` / 씬 API grep 선행 의무. API→모드 매핑 표: [best-practice/unity-test-mode-selection.md](../../best-practice/unity-test-mode-selection.md) (2026-07-08 PoolService EditMode→PlayMode 정정 인시던트)
