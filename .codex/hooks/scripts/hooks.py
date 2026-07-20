@@ -230,7 +230,8 @@ def is_logging_disabled():
     Returns:
         True if logging is disabled, False otherwise
     """
-    return get_config_value("disableLogging", default=False)
+    # Privacy-safe default: missing or malformed config must never enable logs.
+    return get_config_value("disableLogging", default=True)
 
 
 def log_hook_data(hook_data):
@@ -245,7 +246,7 @@ def log_hook_data(hook_data):
 
     try:
         log_entry = {
-            "hook": hook_data.get("type", ""),
+            "hook": hook_data.get("hook_event_name", hook_data.get("type", "")),
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "last_assistant_message": hook_data.get("last_assistant_message", ""),
         }
@@ -258,12 +259,30 @@ def log_hook_data(hook_data):
 
         log_path = logs_dir / "hooks-log.jsonl"
         with open(log_path, "a", encoding="utf-8") as log_file:
-            log_file.write(json.dumps(log_entry, ensure_ascii=False, indent=2) + "\n")
+            log_file.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
     except Exception as e:
         print(f"Failed to log hook_data: {e}", file=sys.stderr)
 
 
-def get_session_context():
+def _run_git(args, cwd):
+    """Run a read-only git query and return stripped stdout."""
+    try:
+        result = subprocess.run(
+            ["git"] + args,
+            cwd=cwd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            timeout=3,
+            check=True,
+        )
+        return result.stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError,
+            subprocess.TimeoutExpired):
+        return ""
+
+
+def get_session_context(hook_data=None):
     """
     Gather context information for SessionStart hook.
     This output goes to stdout and feeds into the model's context.
@@ -271,7 +290,28 @@ def get_session_context():
     Returns:
         String of context information
     """
-    return "hooks context: run"
+    hook_data = hook_data or {}
+    cwd = Path(hook_data.get("cwd") or Path.cwd()).resolve()
+    branch = _run_git(["rev-parse", "--abbrev-ref", "HEAD"], cwd) or "unknown"
+    status = _run_git(["status", "--short"], cwd)
+    status_lines = status.splitlines()
+
+    if not status_lines:
+        worktree = "clean"
+    elif len(status_lines) <= 20:
+        worktree = "dirty\n" + "\n".join(status_lines)
+    else:
+        visible = "\n".join(status_lines[:20])
+        worktree = f"dirty ({len(status_lines)} paths; first 20)\n{visible}"
+
+    timestamp = datetime.now().astimezone().isoformat(timespec="seconds")
+    return "\n".join([
+        "Samantha repository session context:",
+        f"- time: {timestamp}",
+        f"- cwd: {cwd}",
+        f"- git branch: {branch}",
+        f"- working tree: {worktree}",
+    ])
 
 
 def parse_args(argv):
@@ -334,7 +374,7 @@ def main():
 
         # SessionStart: Output context to stdout (feeds into model context)
         if event_type == "SessionStart":
-            context = get_session_context()
+            context = get_session_context(input_data)
             if context:
                 print(context)
 

@@ -1,1 +1,51 @@
-notify = ["python3", ".codex/hooks/scripts/hooks.py"]
+[shell_environment_policy]
+inherit = "core"
+
+[agents]
+max_threads = 6
+max_depth = 2
+
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@3.2.3"]
+enabled = true
+
+# Opt-in only: enable for repository-level external documentation lookup.
+[mcp_servers.deepwiki]
+command = "npx"
+args = ["-y", "deepwiki-mcp@0.0.6"]
+enabled = false
+
+# Opt-in only: this repository has no local web application to test by default.
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@0.0.78"]
+enabled = false
+
+# Samantha production tracking and Google Sheets data operations.
+[mcp_servers.google-sheets]
+command = "/Users/minki/.local/bin/uv"
+args = [
+  "run",
+  "--directory",
+  "/Users/minki/Downloads/mcp-google-sheets-main",
+  "mcp-google-sheets",
+]
+enabled = true
+enabled_tools = [
+  "get_sheet_data",
+  "update_cells",
+  "batch_update_cells",
+  "add_rows",
+  "list_spreadsheets",
+  "search_spreadsheets",
+  "list_sheets",
+  "create_spreadsheet",
+  "create_sheet",
+  "get_multiple_spreadsheet_summary",
+]
+default_tools_approval_mode = "writes"
+
+[mcp_servers.google-sheets.env]
+SERVICE_ACCOUNT_PATH = "/Users/minki/Desktop/MINKI/Projects/2026/Double Down/doubledown-502402-249132b65a33.json"
+ENABLED_TOOLS = "get_sheet_data,update_cells,batch_update_cells,add_rows,list_spreadsheets,search_spreadsheets,list_sheets,create_spreadsheet,create_sheet,get_multiple_spreadsheet_summary"

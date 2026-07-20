@@ -2,3 +2,7 @@ plan/
 .vscode/
 .DS_Store
 .claude/hooks/.reflection-reminder-last
+__pycache__/
+*.pyc
+.codex/hooks/config/hooks-config.local.json
+.codex/hooks/logs/hooks-log.jsonl
