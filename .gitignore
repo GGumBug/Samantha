@@ -1,5 +1,4 @@
 plan/
 .vscode/
 .DS_Store
-**/.DS_Store
 .claude/hooks/.reflection-reminder-last

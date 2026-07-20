@@ -171,7 +171,7 @@ private async UniTaskVoid FlushAsync(CancellationToken token)
 
 ## 관련 문서
 
-- [.claude/rules/unitask-async.md](../.claude/rules/unitask-async.md) — 9개 룰 단축본
+- [.claude/rules/unitask-async.md](../.claude/rules/unitask-async.md) — 10개 룰 단축본
 - [.claude/rules/engineering-constitution.md](../.claude/rules/engineering-constitution.md) — SOLID/SSOT
 - [refactoring-lessons.md](refactoring-lessons.md) §6 — 방어 분기 로깅
 - [evidence-based-debugging.md](evidence-based-debugging.md) — 비동기 race 진단

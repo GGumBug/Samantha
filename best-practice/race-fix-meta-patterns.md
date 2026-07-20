@@ -128,4 +128,4 @@ public static T Instance {
 
 - [external-critique-simulation.md](external-critique-simulation.md) — 외부 비판 시뮬레이션
 - [unitask-async-patterns.md](unitask-async-patterns.md) — UniTask 비동기 인시던트
-- [.claude/rules/unitask-async.md](../.claude/rules/unitask-async.md) — UniTask 9개 룰
+- [.claude/rules/unitask-async.md](../.claude/rules/unitask-async.md) — UniTask 10개 룰

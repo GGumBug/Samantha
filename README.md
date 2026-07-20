@@ -1,20 +1,11 @@
 # Samantha
 
-Hwaseo 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, 룰, 모범 사례) 저장소. 개요와 워크플로우는 [CLAUDE.md](CLAUDE.md)를 참고하세요.
+GameCore Unity 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, 룰, 모범 사례) 저장소. 개요와 워크플로우는 [CLAUDE.md](CLAUDE.md)를 참고하세요.
 
 ## CONCEPTS — best-practice/
 
 | 문서 | 설명 |
 |------|------|
-| [claude-subagents.md](best-practice/claude-subagents.md) | 서브에이전트 프론트매터, 훅, 저장소 에이전트 |
-| [claude-commands.md](best-practice/claude-commands.md) | 슬래시 명령어 패턴 및 내장 명령어 |
-| [claude-skills.md](best-practice/claude-skills.md) | 스킬 정의 구조와 호출 패턴 |
-| [claude-mcp.md](best-practice/claude-mcp.md) | MCP 서버 통합 가이드 |
-| [claude-memory.md](best-practice/claude-memory.md) | 영구 메모리 범위 및 사용 |
-| [claude-settings.md](best-practice/claude-settings.md) | 설정 계층 구조 |
-| [claude-cli-startup-flags.md](best-practice/claude-cli-startup-flags.md) | CLI 시작 플래그 |
-| [claude-power-ups.md](best-practice/claude-power-ups.md) | Claude Code 파워업 팁 |
-| [harness-engineering.md](best-practice/harness-engineering.md) | 하네스 엔지니어링 3축 프레임워크 |
 | [evidence-based-debugging.md](best-practice/evidence-based-debugging.md) | 증거 기반 디버깅 4단계 프로토콜 + 데이터 layer 격리 |
 | [refactoring-lessons.md](best-practice/refactoring-lessons.md) | 대규모 리팩토링 실전 체크리스트 |
 | [overload-semantic-equivalence.md](best-practice/overload-semantic-equivalence.md) | 오버로드 의미론 등가성 검증 |
@@ -41,6 +32,9 @@ Hwaseo 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, 룰, 모�
 | [ui-visibility-two-layer-srp.md](best-practice/ui-visibility-two-layer-srp.md) | 사전 생성 UI 의 가시성 SSOT 2-layer (panel root vs content child) 분리 |
 | [multi-axis-fast-path-guard.md](best-practice/multi-axis-fast-path-guard.md) | 시간축 다른 invariant 합성 가드 + caller-callee enabler 협업 |
 | [cancel-cleanup-bypass.md](best-practice/cancel-cleanup-bypass.md) | try/catch OperationCanceled cleanup 우회 + 강제 토글 4-state 멱등 |
+| [unity-test-mode-selection.md](best-practice/unity-test-mode-selection.md) | EditMode/PlayMode 판정은 "POCO 여부"가 아닌 내부 Unity API grep 기준 |
+| [unity-editor-only-guards.md](best-practice/unity-editor-only-guards.md) | 에디터 전용 검증(collectionCheck/Debug.Assert)은 런타임 가드 아님 |
+| [generation-token-reset.md](best-practice/generation-token-reset.md) | 일괄 리셋 세대 토큰 — CTS 교체 후 Cancel (swap-before-cancel) |
 
 ## RULES — .claude/rules/
 
@@ -48,7 +42,6 @@ Hwaseo 프로젝트의 Claude Code 작업 자산(에이전트, 스킬, 룰, 모�
 |----|------|
 | [engineering-constitution.md](.claude/rules/engineering-constitution.md) | SOLID/SSOT/디자인 패턴 헌법 |
 | [unity-delegation.md](.claude/rules/unity-delegation.md) | Unity 작업 위임 규칙 |
-| [unitask-async.md](.claude/rules/unitask-async.md) | UniTask 비동기 9개 룰 |
+| [unitask-async.md](.claude/rules/unitask-async.md) | UniTask 비동기 10개 룰 |
 | [evaluation.md](.claude/rules/evaluation.md) | 평가 주도 검증 |
 | [markdown-docs.md](.claude/rules/markdown-docs.md) | 문서 표준 |
-| [presentation.md](.claude/rules/presentation.md) | 프레젠테이션 위임 |

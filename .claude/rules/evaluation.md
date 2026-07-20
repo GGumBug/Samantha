@@ -9,6 +9,16 @@
 3. **자기 평가 금지**: 코드를 작성한 직후 "잘 되었다"고 선언하지 않습니다 — 실행 결과로 증명합니다
 4. **교차 검증 권장**: 복잡한 변경은 `/simplify`나 별도 서브에이전트로 독립 리뷰합니다
 
+## 테스트 작성자 / 구현자 분리 (기본값)
+
+테스트 작성은 **구현자와 다른 에이전트에 위임**한다. 메커니즘: 테스트 작성자는 소비자 시점으로 코드를 역추적하므로 구현자의 사각지대를 구조적으로 통과한다.
+
+(2026-07-08 GameCore PoolService 실증: 구현 Jarvis / 테스트 작성 Sonny 분리 → Sonny가 "Dispose 후 체크아웃된 인스턴스는 누가 치우나?" 시나리오 역추적 중 실결함 발견 — Dispose가 풀 대기 인스턴스만 파괴하고 체크아웃 인스턴스는 entry만 폐기, Release는 ObjectDisposedException → 회수 경로 소멸. 루트 수명에선 잠복, 씬-스코프 컨테이너에선 실누수)
+
+## Unity 테스트 모드 판정 (EditMode vs PlayMode)
+
+"동기/POCO 여부"가 아니라 **내부에서 사용하는 Unity API**가 판정 기준 — 판정 전 `Object.Destroy` / `DontDestroyOnLoad` / 씬 API grep 선행 의무. API→모드 매핑 표: [best-practice/unity-test-mode-selection.md](../../best-practice/unity-test-mode-selection.md) (2026-07-08 PoolService EditMode→PlayMode 정정 인시던트)
+
 ## 시각 검증 단위 명세 의무
 
 UI/시각 변경(prefab/색상/위치/scale/sprite/anchor/sorting) 보고 시, **사용자가 검증할 수 있는 단위**를 사전 명시한다. "확인 부탁" / "잘 보이는지 봐줘" 같은 모호한 위임 금지.
