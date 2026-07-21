@@ -6,6 +6,8 @@ Unity 프로젝트의 비동기 코드에서 **반복적으로 발생한 누수�
 
 이 문서는 권위 가이드다. 단정형 어조 항목은 **타협하지 말 것** — Hwaseo 프로젝트의 실제 사고 비용으로 도출됐다.
 
+> **트윈 API 주의**: 아래 인시던트 사례의 `DOTween`(`DG.Tweening`)은 **Hwaseo 당시 코드 그대로**다 — 이력이므로 고치지 않는다. **Double Down은 LitMotion을 쓰며 DOTween은 미설치**다. 원리(취소 토큰 전파·파괴 시 콜백 잔존 방지)는 동일하고 API만 다르니, 신규 코드는 [.claude/rules/unitask-async.md](../.claude/rules/unitask-async.md) 룰 7의 LitMotion 패턴(`MotionHandle` 보관 → `TryCancel()`)을 따를 것.
+
 ## 1. `async void` 무가드 누수 — UILoading.cs
 
 ### 인시던트 (`Assets/Scripts/UI/UILoading.cs:22, 49`)
@@ -164,7 +166,7 @@ private async UniTaskVoid FlushAsync(CancellationToken token)
 - [ ] `async void`가 Unity 라이프사이클 메서드 외 어디에도 없는가?
 - [ ] CTS Awake/OnDestroy 라이프사이클 완비됐는가?
 - [ ] 50+ 루프에 frame-budget yield가 있는가?
-- [ ] DOTween 사용 시 `ToUniTask` token 전달됐는가?
+- [ ] 트윈(LitMotion) 사용 시 `MotionHandle`을 보관하고 `OnDestroy`·재실행 전에 `TryCancel()` 하는가? (`DG.Tweening` 사용 0건인가?)
 - [ ] `OperationCanceledException` 분리 catch됐는가?
 - [ ] `CancellationToken`이 비동기 시그니처 전체에 흐르는가?
 - [ ] 재진입 가능 작업에 `_isApplying` 또는 token 재발급 패턴이 있는가?

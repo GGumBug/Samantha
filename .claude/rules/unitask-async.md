@@ -95,19 +95,35 @@ private async UniTaskVoid FlushAsync(CancellationToken token)
 
 가드 없이 재진입하면 컬렉션 수정 중 enumeration 변경 예외, 부분 적용, race 발생.
 
-### 룰 7 — `DOTween.ToUniTask`는 token 전달 필수
+### 룰 7 — 트윈은 **LitMotion**, `MotionHandle` 보관 + 취소 의무
 
-DOTween Tween을 await할 때 cancellation token 미전달 시 OnDestroy 후에도 콜백이 살아남는다.
+이 프로젝트의 트윈 라이브러리는 **LitMotion**이다(`com.annulusgames.lit-motion`). **DOTween은 설치돼 있지 않다** — `DG.Tweening` 사용·설치 금지(트윈 라이브러리 이중화).
+
+모션을 띄우고 버리면 파괴된 대상에 `Bind` 콜백이 잔존한다. 다음 3가지가 세트다:
+
+1. **`MotionHandle`을 필드로 보관** — 재실행·정리 시 취소하려면 핸들이 있어야 한다
+2. **재실행 전·`OnDestroy`에서 `TryCancel()`**
+3. **`destroyCancellationToken`과 호출자 token을 링크** — 수동 CTS 신설보다 우선(룰 2·9)
 
 ```csharp
-// 안티패턴
-await canvasGroup.DOFade(1, 1f).ToUniTask();
+private MotionHandle _handle;
 
-// 권장
-await canvasGroup.DOFade(1, 1f).ToUniTask(cancellationToken: _cts.Token);
+private void OnDestroy() => _handle.TryCancel();   // 파괴 대상에 Bind 콜백 잔존 방지
+
+private async UniTask FadeToAsync(float target, CancellationToken token)
+{
+    _handle.TryCancel();                            // 이전 모션 먼저 정리 — 두 모션이 같은 값을 다투지 않게
+    using var linked = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken, token);
+
+    _handle = LMotion.Create(_canvasGroup.alpha, target, _duration)
+        // Bind는 static 람다 + 상태 인자 — 클로저 할당 회피(매 모션마다 GC 발생 방지)
+        .Bind(_canvasGroup, static (alpha, group) => group.alpha = alpha);
+
+    await _handle.ToUniTask(linked.Token);
+}
 ```
 
-또는 `OnDisable`/`OnDestroy`에서 `DOTween.Kill(target)` 명시.
+실사용 선례: `Packages/com.ggumbug.gamecore/Runtime/UI/UIScreenFader.cs`.
 
 ### 룰 8 — `PlayerLoopTiming` 명시
 
@@ -163,7 +179,7 @@ old.Cancel(); old.Dispose();                 // 3. Cancel은 마지막
 - [ ] `.Forget()` 호출 대상 메서드 본문에 try/catch가 있는가?
 - [ ] `OperationCanceledException`이 일반 Exception과 분리 처리되는가?
 - [ ] 재진입 가능 작업에 `_isApplying` 가드가 있는가?
-- [ ] `DOTween.ToUniTask` 호출에 token이 전달되는가?
+- [ ] LitMotion 모션의 `MotionHandle`을 보관하고 `OnDestroy`·재실행 전에 `TryCancel()` 하는가? (`DG.Tweening` 사용 0건인가?)
 - [ ] `UniTask.Yield`/`DelayFrame`에 PlayerLoopTiming이 명시되어 있는가?
 - [ ] 비동기 메서드 시그니처가 CancellationToken을 받는가?
 - [ ] 일괄 리셋 메서드에서 CTS 교체(+세대 증가)가 Cancel보다 먼저인가?
