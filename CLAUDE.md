@@ -110,14 +110,15 @@ Agent(subagent_type="agent-name", description="...", prompt="...", model="haiku"
 
 ## Git 커밋 규칙
 
-변경 사항을 커밋할 때 **파일별로 개별 커밋을 생성하세요**. 여러 파일 변경 사항을 하나의 커밋으로 묶지 마세요. 각 파일은 해당 파일 변경 사항에 특화된 설명 메시지와 함께 자체 커밋을 가져야 합니다.
+다음 커밋부터 파일 수가 아니라 **논리적·원자적 작업 단위**로 커밋합니다. 이미 생성된 커밋은 사용자의 별도 요청 없이 amend·rebase·squash 등으로 이력을 재작성하지 않습니다.
 
-예를 들어, `README.md`, `best-practice/solid-unity-principles.md`, 룰 파일이 모두 변경된 경우:
-- 커밋 1: `git add README.md` → README 관련 메시지로 커밋
-- 커밋 2: `git add best-practice/solid-unity-principles.md` → best-practice 문서 관련 메시지로 커밋
-- 커밋 3: `git add .claude/rules/unity-delegation.md` → 룰 관련 메시지로 커밋
-
-이렇게 하면 git 기록이 더 깔끔해지고 개별 변경 사항을 검토, 되돌리기, 체리픽하기 쉬워집니다.
+- 하나의 기능·수정·마이그레이션을 완성하는 파일은 같은 커밋에 포함하고, 관련 없는 변경은 별도 커밋으로 분리합니다. 한 파일 안의 독립 변경도 가능하면 hunk 단위로 분리합니다.
+- 각 커밋은 가능하면 독립적으로 cherry-pick·revert·bisect할 수 있고 컴파일 가능한 상태여야 합니다. 분리하면 컴파일이 깨지는 상호 의존 변경은 한 커밋으로 묶습니다.
+- Unity 에셋과 대응 `.meta`는 생성·수정·삭제·이름 변경을 같은 커밋에 포함합니다. 에이전트가 생성한 `.cs`의 `.meta`는 사용자가 Unity를 연 뒤에야 생성되므로, Unity 세션이 낀 커밋 직전 `git status`에서 신규 `.cs`의 `.meta` 짝 존재를 확인합니다.
+- 서드파티 패키지의 동일 버전 업데이트·설치·통합을 구성하는 파일은 하나의 패키지 작업 단위로 묶습니다.
+- 생성 코드와 그 변경을 유발한 생성 설정 또는 원본 스키마는 같은 커밋에 포함합니다.
+- `git add .`와 `git add -A`는 금지합니다. 파일 경로나 필요한 hunk를 명시해 스테이징하고 `git diff --cached`로 범위를 검증합니다.
+- 커밋 체인 실행 전 `git log -1`과 `git status`로 사용자 병행 커밋을 감지합니다 — 이미 커밋된 파일을 재커밋 시도하면 중복·빈 커밋 위험이 있습니다.
 
 ### AI 귀속 금지 (필수, `includeCoAuthoredBy = false`)
 
