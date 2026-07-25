@@ -55,7 +55,7 @@
     ]
   },
   
-  "plansDirectory": "./reports",
+  "plansDirectory": "C:/AI_Projects/Samantha/reports",
   "outputStyle": "Explanatory",
   "includeCoAuthoredBy": false,
   "spinnerTipsEnabled": true,
