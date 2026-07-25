@@ -52,13 +52,18 @@ allowed-tools: Bash, Read
 ### 2. 로그 추출
 
 ```bash
-LOG_PATH="$HOME/Library/Logs/Unity/Editor.log"
-PREFIX="<사용자 prefix>"
-
-if [ ! -f "$LOG_PATH" ]; then
-  echo "Editor.log 없음 — 경로: $LOG_PATH"
+# OS별 Editor.log 경로 자동 탐지 (Windows → macOS → Linux 순)
+if [ -n "$LOCALAPPDATA" ] && [ -f "$LOCALAPPDATA/Unity/Editor/Editor.log" ]; then
+  LOG_PATH="$LOCALAPPDATA/Unity/Editor/Editor.log"      # Windows
+elif [ -f "$HOME/Library/Logs/Unity/Editor.log" ]; then
+  LOG_PATH="$HOME/Library/Logs/Unity/Editor.log"        # macOS
+elif [ -f "$HOME/.config/unity3d/Editor.log" ]; then
+  LOG_PATH="$HOME/.config/unity3d/Editor.log"           # Linux
+else
+  echo "Editor.log 없음 — Windows: %LOCALAPPDATA%\\Unity\\Editor / macOS: ~/Library/Logs/Unity / Linux: ~/.config/unity3d"
   exit 1
 fi
+PREFIX="<사용자 prefix>"
 
 grep -n "\[$PREFIX\]" "$LOG_PATH"
 ```
@@ -150,7 +155,7 @@ Unity Editor 재생 → 시나리오 재현 → 정지 → "테스트 끝"
 
 ## 참고사항
 
-- **macOS 만 지원** (`~/Library/Logs/Unity/Editor.log`). Windows/Linux 는 경로 다름 — 추후 `$LOG_PATH` 인자화 필요.
+- **Windows/macOS/Linux 지원** — Editor.log 경로 자동 탐지 (Windows `%LOCALAPPDATA%\Unity\Editor`, macOS `~/Library/Logs/Unity`, Linux `~/.config/unity3d`). 비표준 설치는 경로 직접 확인 필요.
 - 추출 로그 1000줄 초과 시 Before/After 핵심 시그널 위주 요약. 전체 dump 는 명시 요청 시.
 - `[Prefix][Layer]` 컨벤션 미준수 시 본 스킬 가치 발현 안 됨 — 픽스 단계에서 Layer 태깅 필수.
 - **읽기 전용**: 코드/로그 파일 수정하지 않음. 픽스/제거는 Claude의 별도 위임.
