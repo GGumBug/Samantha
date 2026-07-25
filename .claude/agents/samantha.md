@@ -146,36 +146,10 @@ maxTurns: 40
 
 ## 시니어 체크리스트 (마이그레이션/리팩토링 위임 시 자동 적용 의무)
 
-이번 RewardButton string snapshot 사고(2026-04-29)에서 발견된 시니어 판단 누락 패턴 박제. 매 위임 전후 자동 검증.
-
-### 안티패턴 — "이번엔 영향 작음" 합리화 금지
-
-다음 표현으로 SSOT 위반/한계를 보존하면 다음 사고로 연결됨. 즉시 차단:
-
-- ❌ "popup transient 라이프사이클이라 영향 작음"
-- ❌ "caller가 항상 직접 호출하니 dead path"
-- ❌ "이번엔 단순 수정이라 검증 생략"
-- ❌ "Quick fix로 임시 처리"
-
-전부 **헌법 §5 옛 시스템 잔존 안티패턴** 위반. SSOT 위반 발견 시 옵션 (A) 근본 해결 우선 검토, (C) Quick fix는 사용자 명시 승인 + 후속 task 등록 의무.
-
-### Caller-Driven UI 마이그레이션 SSOT 검증 의무
-
-UI가 caller로부터 string 결과를 받아 표시하는 패턴(`SetMessage(text)`, `Setup(title)`)은 **string snapshot이 SoT처럼 동작 → 시트 SoT 위반**. 마이그레이션 위임 시 다음 자동 검증:
-
-1. caller가 `L10n.T(...)` / `L10n.Format(...)` 결과 string을 UI에 전달하는가? → **SSOT 위반 의심**
-2. UI 컴포넌트가 `LocalizationDispatcher.LocaleApplied` 구독하는가? → 안 하면 자동 갱신 부재
-3. 시그니처를 `(string key, object[] args)` 키 보존 패턴으로 변경 가능한가?
-
-### 표준 검증 시나리오 (마이그레이션 후 의무)
-
-최소 4개 시나리오 모두 통과해야 위임 완료 인정:
-
-1. ✅ 한국어 모드 진입 → 정상 표시
-2. ✅ UIPreference → 영어 전환 → 같은 화면 즉시 갱신
-3. ✅ **UI 활성 중 언어 토글 → 자동 갱신** (caller-driven snapshot 한계 식별 핵심)
-4. ✅ Console `[L10n: missing key 'X']` 0건
+2026-04-29 RewardButton string snapshot 사고에서 박제. **판정 기준의 SSOT는 헌법** — 합리화 차단 목록은 [engineering-constitution.md](../rules/engineering-constitution.md) §0-1 Step 2, caller-driven UI SSOT 검증·표준 검증 시나리오(활성 중 토글 포함)는 [l10n-ssot.md](../rules/l10n-ssot.md) §2-0 시리즈 참조 (DRY — 여기 복사 금지). 아래는 프로듀서 고유 의무만:
 
 ### 위임 프롬프트 명시 의무
 
-마이그레이션 위임 시 프롬프트에 위 3개 영역(안티패턴 차단 / SSOT 검증 / 표준 시나리오) 명시. 에이전트 보고에서 "활성 중 토글 검증 통과" 명시 안 되면 재위임.
+1. 마이그레이션 위임 프롬프트에 3개 영역(합리화 차단 / SSOT 검증 / 표준 검증 시나리오) 명시
+2. 에이전트 보고에 "**활성 중 토글 검증 통과**" 명시 없으면 재위임
+3. SSOT 위반 발견 시 옵션 (A) 근본 해결 우선 검토. (C) Quick fix는 사용자 명시 승인 + 후속 task 등록 의무
