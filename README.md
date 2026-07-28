@@ -76,6 +76,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [sequential-delegation-context-reuse.md](best-practice/sequential-delegation-context-reuse.md) | 동일 에이전트 연속 위임 컨텍스트 재사용 |
 | [sheet-batch-readback.md](best-practice/sheet-batch-readback.md) | Google Sheets batch update 후 read-back 검증 |
 | [solid-unity-principles.md](best-practice/solid-unity-principles.md) | SOLID의 Unity 적용 카탈로그 |
+| [test-intent-repurposing.md](best-practice/test-intent-repurposing.md) | 전제가 소멸한 테스트의 불변식 계약 전환 |
 | [ui-transition-prefab-convention.md](best-practice/ui-transition-prefab-convention.md) | UI transition prefab 시작 상태 SSOT |
 | [ui-visibility-two-layer-srp.md](best-practice/ui-visibility-two-layer-srp.md) | panel root와 content 가시성 책임 분리 |
 | [unitask-async-patterns.md](best-practice/unitask-async-patterns.md) | UniTask 비동기 인시던트 카탈로그 |
