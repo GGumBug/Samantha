@@ -50,6 +50,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [cancel-cleanup-bypass.md](best-practice/cancel-cleanup-bypass.md) | 취소 예외의 cleanup 우회와 멱등 토글 |
 | [dead-stub-pattern.md](best-practice/dead-stub-pattern.md) | 결과가 무시되는 비동기 stub 제거 |
 | [deferred-commit-pattern.md](best-practice/deferred-commit-pattern.md) | Backup → Mutate → Commit/Rollback 패턴 |
+| [delegation-truncation-triage.md](best-practice/delegation-truncation-triage.md) | 에이전트 절단 3상태 분류와 재위임 처방 |
 | [determinism-hooks.md](best-practice/determinism-hooks.md) | 결정론 RNG 보존 훅 |
 | [deterministic-reentry-cache.md](best-practice/deterministic-reentry-cache.md) | 재진입 시 결정론 캐시 |
 | [evidence-based-debugging.md](best-practice/evidence-based-debugging.md) | 증거 기반 디버깅 4단계 프로토콜 |

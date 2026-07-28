@@ -31,7 +31,20 @@
 - 독립 감사는 반드시 별도 인스턴스 — 구현 컨텍스트를 이어받은 검증은 자기 평가에 가까워짐 ([evaluation.md](../.claude/rules/evaluation.md) 작성자/검증자 분리)
 - 재개 프롬프트에도 작업 범위·범위 외 금지는 매번 명시 — 범위 보존 의무는 재개라고 면제되지 않음
 
+## 위반 비용 실측 (2026-07-28 Slice A 카드 27 Part C)
+
+재개 대상인데 **신규 인스턴스를 띄웠을 때** 실제로 지불한 비용:
+
+- 카드 27 Part C 를 기존 Jarvis 인스턴스(SendMessage) 대신 신규 Agent 로 위임
+- 신규 인스턴스가 Part A/B 산출물을 처음부터 재탐색 — **36 tool use 소모, 편집 0건 상태로 절단**
+- 절단 3상태 중 ⓑ(탐색 소진)의 전형: 재개했다면 편집에 썼을 예산을 재탐색이 전부 소진
+
+**핵심**: 판단표 위반의 비용은 "토큰이 조금 더 든다"가 아니라 **탐색이 절단 임계를 먼저 소진해 산출물이 0 이 되는 것**. 룰이 문서에 있다는 것만으로는 지켜지지 않았다 — 위임 직전 **"이 작업이 직전 카드 산출물을 소비·확장하는가?"** 를 1회 자문하고, 예이면 재개를 기본값으로 둔다.
+
+절단 상태 판별과 재위임 처방: [delegation-truncation-triage.md](delegation-truncation-triage.md)
+
 ## 관련 문서
 
 - [.claude/rules/unity-delegation.md](../.claude/rules/unity-delegation.md) — 위임 규칙 전반
 - [.claude/rules/evaluation.md](../.claude/rules/evaluation.md) — 작성자/검증자 분리
+- [delegation-truncation-triage.md](delegation-truncation-triage.md) — 절단 3상태 트리아지
