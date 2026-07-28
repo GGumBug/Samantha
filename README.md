@@ -71,6 +71,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [reflection-protocol.md](best-practice/reflection-protocol.md) | 세션 교훈의 장기 지식 반영 프로토콜 |
 | [refactoring-lessons.md](best-practice/refactoring-lessons.md) | 대규모 리팩터링 실전 체크리스트 |
 | [runstate-preserve-block-grep.md](best-practice/runstate-preserve-block-grep.md) | 런 상태 보존 블록의 grep 검증 |
+| [runtime-contrast-assertion.md](best-practice/runtime-contrast-assertion.md) | 파생 표현 vs 권위 상태 런타임 자기 대조 |
 | [sentinel-anti-pattern.md](best-practice/sentinel-anti-pattern.md) | sentinel 값 기반 상태 표현의 위험 |
 | [sequential-delegation-context-reuse.md](best-practice/sequential-delegation-context-reuse.md) | 동일 에이전트 연속 위임 컨텍스트 재사용 |
 | [sheet-batch-readback.md](best-practice/sheet-batch-readback.md) | Google Sheets batch update 후 read-back 검증 |
