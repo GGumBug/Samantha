@@ -34,6 +34,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | 문서 | 설명 |
 |---|---|
 | [engineering-constitution.md](.claude/rules/engineering-constitution.md) | SOLID·SSOT·패턴 적용 헌법 |
+| [l10n-ssot.md](.claude/rules/l10n-ssot.md) | L10n string snapshot 금지 헌법 (§2-0 시리즈 분리본) |
 | [unity-delegation.md](.claude/rules/unity-delegation.md) | Unity 작업 위임과 범위 보존 |
 | [unitask-async.md](.claude/rules/unitask-async.md) | UniTask 비동기 10개 규칙 |
 | [evaluation.md](.claude/rules/evaluation.md) | 평가 주도 검증과 작성자·검증자 분리 |
