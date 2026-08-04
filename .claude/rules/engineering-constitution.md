@@ -21,6 +21,7 @@ Unity 코드 작업 시 **사용자가 매번 요구하지 않아도** 다음 �
 
 **Step 1 — 변경 전 영향 분석 (Before 자동)**:
 - grep으로 변경 대상 심볼/패턴의 **모든 호출처/의존처** 식별, 영향 범위를 분류 테이블로 명시 (자동 위임/수동 처리/외부 시스템). "SSOT 어느 축에 영향?" 검증 (코드 식별자 / 사용자 노출 / 메타)
+- **상태·플래그·접합부 제거 시 grep 방향은 쓰기 지점이 아니라 읽기 지점 전수**. 제거 대상이 원래 목적 외 독자(정렬·순서·가시성 판정 등)를 달고 있는지 **독자별 의미 분류표**(읽는 곳 / 무엇을 판정하려고 읽는가 / 이관 후 대체 채널)를 작성하고, "대체 채널 없음" 행이 0이 될 때까지 이관 미완료로 취급. 제거 대상이 나르던 것이 값이 아니라 **보장(순서·배타·정지)** 이면 컴파일·테스트·정적 grep 어디에도 안 걸리고 시각 회귀로만 드러난다. 상세 [best-practice/implicit-proxy-state-removal.md](../../best-practice/implicit-proxy-state-removal.md). (2026-08-04 카드 연출 채널 이관: 같은 계급 누락 3회, 그중 2회가 사용자 재현에서야 발견)
 - **상속 계층 분석 시 `: BaseClass\b` grep + 결과 표 작성 의무**. 사전 조사를 일부 종에 제한 금지 — grep 결과 모두 포함 (2026-04-30 Category 18건 + TooltipTarget 발견)
 - **사용자 의도 모호 질문(예: "~는 어떻게 된거지?")은 부분 마이그레이션 누락 노출 신호** — 답변 전 grep 전수 검사 의무
 - **자산 마이그레이션 script 작성 시 파일명 정렬 vs 시트 Code Name 정렬의 case sensitivity 일관성 사전 검증 의무** — 상세 [best-practice/asset-migration-sort-consistency.md](../../best-practice/asset-migration-sort-consistency.md)

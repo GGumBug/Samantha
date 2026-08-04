@@ -53,6 +53,8 @@ Unity **부트 첫 씬은 매니저 외부에서 활성화**된다 — `SceneMan
 
 **누락 위험 High** 책임은 새 패턴에 명시적 컴포넌트 배치 또는 매니저 책임 인계.
 
+책임이 아니라 **상태·플래그**를 제거하는 경우의 대응 절차(읽기 지점 전수 + 독자 의미 분류표)는 [implicit-proxy-state-removal.md](implicit-proxy-state-removal.md).
+
 ## 5. Unity Additive 씬 Multi-Active 시점 매트릭스
 
 additive 씬 multi-active는 race 다발 영역. 다음 컴포넌트는 **씬당 하나만 active**가 강제 — 두 개 이상 active 시 Unity 경고/오작동:
