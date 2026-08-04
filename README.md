@@ -58,6 +58,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [external-critique-simulation.md](best-practice/external-critique-simulation.md) | 외부 시니어 비판자 시뮬레이션 |
 | [generation-token-reset.md](best-practice/generation-token-reset.md) | 일괄 리셋의 swap-before-cancel 세대 토큰 |
 | [golden-case-gate.md](best-practice/golden-case-gate.md) | 파이프라인 종단값 손계산 동결 게이트 |
+| [implicit-proxy-state-removal.md](best-practice/implicit-proxy-state-removal.md) | 상태·접합부 제거 시 읽기 지점 전수 조사 |
 | [locale-aware-subclass-extension.md](best-practice/locale-aware-subclass-extension.md) | locale-aware 상속 확장과 base 호출 |
 | [measurement-driven-debug.md](best-practice/measurement-driven-debug.md) | 반복 추측 실패 후 측정 도구 전환 |
 | [multi-axis-fast-path-guard.md](best-practice/multi-axis-fast-path-guard.md) | 서로 다른 시간축 invariant 합성 가드 |
@@ -76,7 +77,9 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [sentinel-anti-pattern.md](best-practice/sentinel-anti-pattern.md) | sentinel 값 기반 상태 표현의 위험 |
 | [sequential-delegation-context-reuse.md](best-practice/sequential-delegation-context-reuse.md) | 동일 에이전트 연속 위임 컨텍스트 재사용 |
 | [sheet-batch-readback.md](best-practice/sheet-batch-readback.md) | Google Sheets batch update 후 read-back 검증 |
+| [single-composition-point.md](best-practice/single-composition-point.md) | 소유권 교대 제거와 단일 합성 지점 |
 | [solid-unity-principles.md](best-practice/solid-unity-principles.md) | SOLID의 Unity 적용 카탈로그 |
+| [stale-artifact-false-signal.md](best-practice/stale-artifact-false-signal.md) | 부산물 잔재를 판정자로 쓰는 게이트의 거짓 양성 |
 | [test-intent-repurposing.md](best-practice/test-intent-repurposing.md) | 전제가 소멸한 테스트의 불변식 계약 전환 |
 | [ui-transition-prefab-convention.md](best-practice/ui-transition-prefab-convention.md) | UI transition prefab 시작 상태 SSOT |
 | [ui-visibility-two-layer-srp.md](best-practice/ui-visibility-two-layer-srp.md) | panel root와 content 가시성 책임 분리 |
