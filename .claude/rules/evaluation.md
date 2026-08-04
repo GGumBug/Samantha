@@ -34,6 +34,8 @@
 
 (2026-07-28 Slice A 카드 28 실증: HUD 테스트가 scratchpad 실행 불가(uGUI/TMP shim 한계) 상태로 작성만 되어 `DeterministicRandomFactory` 를 참조 — 실재하지 않는 타입이고 실제 구현은 `Pcg32RandomFactory`)
 
+**미실재 참조에는 두 종류가 있다** — 남의 심볼(위 grep 으로 잡힘)과 **자기가 나중에 정의할 예정이던 심볼**(작성 시점에 grep 해도 없는 것이 정상이라 위 룰이 발화하지 않음). 후자는 위임 절단 시 "본문은 있는데 헬퍼가 없는" 컴파일 불가 상태로 남는다. 처방은 grep 이 아니라 **작성 순서 역전** — 헬퍼·상수·픽스처를 먼저 정의하고 사용부를 나중에 쓰면 어디서 끊겨도 컴파일된다. 상세: [best-practice/delegation-truncation-triage.md](../../best-practice/delegation-truncation-triage.md) §6
+
 ## 단계 게이트 종단 동결 (Golden Case)
 
 다단계 계산 파이프라인의 단계 게이트에는 단위 테스트와 별도로 **종단값 손계산 동결 케이스**를 둔다 — 커버리지 감사 표 선행·대칭성·재계산 결정론 포함. 상세: [best-practice/golden-case-gate.md](../../best-practice/golden-case-gate.md)
