@@ -73,6 +73,7 @@ Double Down 카드 연출 채널 이관(2026-08-04) 한 세션에서 **같은 �
 ## 관련 문서
 
 - [single-composition-point.md](single-composition-point.md) — 접합부를 걷어낸 자리에 무엇을 두는가(본 문서의 짝)
+- [second-producer-axis-drift.md](second-producer-axis-drift.md) — 반대 방향: 타입에 축을 **추가**할 때 세는 것은 생산 지점이고, 세는 주체는 컴파일러다
 - [race-fix-meta-patterns.md](race-fix-meta-patterns.md) §4 — 옛 패턴의 암묵 책임 이전 매트릭스(책임 축)
 - [overload-semantic-equivalence.md](overload-semantic-equivalence.md) — 부수효과 1:1 복제 매트릭스(부수효과 축)
 - [refactoring-lessons.md](refactoring-lessons.md) §13 — 추출 시 책임 매핑, "리팩토링 직후 더 단순해 보인다"는 위험 신호
