@@ -1,97 +1,102 @@
 [← README로 돌아가기](../README.md)
 
-# MatchView → IUIService 마이그레이션 핸드오프
+# MatchView UI 마이그레이션 핸드오프
 
-2026-08-13. 다른 데스크톱에서 이어서 작업하기 위한 인수인계 문서. 대상 저장소는 **Double Down**(`feature/ui` 브랜치)이며, 이 문서가 가리키는 커밋 3개가 푸시되어 있어야 한다.
+2026-08-18 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down**(`feature/ui`), 이 문서가 가리키는 커밋이 푸시되어 있어야 한다.
 
-## 0. 목표 (사용자 확정 결정)
+> 2026-08-13 초판(Part A/B — `IUIService` 경로 신설)은 완료되어 §5 이력으로 접었다. 지금 살아 있는 작업은 §3 이후다.
 
-MainScene의 UI를 사용자가 저작한 `MatchView.prefab`으로 교체하고, **게임의 모든 UI를 UIManager가 관리**하게 한다. 결정 사항:
+## 1. 확정 결정 (재논의 금지)
 
 | 결정 | 내용 |
 |------|------|
-| UIManager 실체 | **새 클래스를 만들지 않는다.** GameCore의 `IUIService`/`UIService`가 UIManager다 (신설 시 관리자 2개 = SSOT 위반) |
-| 로드 경로 | **Addressables** — 주소 컨벤션은 `typeof(T).Name` (IUIService 계약) |
-| 배선 범위 | **단계적** — 1단계 경로(완료) → 2단계 패널 데이터 이식 → 3단계 고/스톱 모달 이식 후 MatchHudView 폐기 |
+| UIManager 실체 | GameCore의 `IUIService`/`UIService`가 UIManager다. **새 관리자 클래스 신설 금지**(SSOT 위반) |
+| UI 로드 경로 | Addressables, 주소 = `typeof(T).Name` |
+| 화면 스펙 SSOT | Notion 「인게임 화면 구성 (확정)」 — **유추 금지, 원문을 먼저 연다**(헌법 §0-1) |
+| 좌 컬럼(나) | 족보 게이지 → 칩×배수 → 보너스 슬롯 → 내 판돈 바 |
+| 우 패널(상대) | 문양·이름·등급 → 남은 판돈 바 → 라운드·최소 판돈 → 고 선언 → 족보 게이지(위협 순) |
 
-## 1. 완료된 커밋 (Double Down, feature/ui)
+## 2. ⚠️ 새 PC에서 첫 3분
+
+1. **양쪽 저장소 pull** — Double Down `feature/ui`, Samantha `master`
+2. **Unity 열고 컴파일 확인** — 에러 0건이어야 한다
+3. **Inspector 배선 1건 (미완)**:
+   ```
+   Assets/Prefabs/UI/MatchView.prefab → 루트 MatchView → Match View 컴포넌트
+     Opponent Panel > Score  ←  Panel_RunStatus>Panel_GoScale>Panel_OpponentSide>Panel_Score>Text_ScoreThreshold
+   ```
+   지금 실행하면 상대 점수 칸이 저작 문구 `"0 | 9"`로 고정돼 보인다 — 그럴듯해서 버그로 안 보이는 종류다. 실행 시 `ReportMissingWiringOnce`가 콘솔에 좌석까지 붙여 찍는다.
+4. **재생 검증** — 두 좌석 점수 칸이 `"현재 | 필요"`로 갱신되는가. 이게 `ffb57e1`의 미검증분이다.
+
+## 3. 지금 하던 일 — MatchView 기능 연동
+
+프리팹 TMP를 기획 확정본과 대조해 배선하는 작업. **다음 차례는 `Panel_Breakdown`(칩 × 배수)** — 사용자가 "복잡하니 마지막에" 이월한 항목이다.
+
+### 배선 상태
+
+| 프리팹 오브젝트 | 기획 항목 | 상태 |
+|---|---|---|
+| `Panel_JokboTracker` | 족보 게이지 | ✅ `_jokboTracker` |
+| `Panel_PlayerChips>Text_Chips` | 좌 ④ 내 판돈 | ✅ `_selfPanel._chips` |
+| `Panel_OpponentStatus>Panel_Chips>Text_ChipAmount` | 우 ② 상대 판돈(체력바) | ✅ `_opponentPanel._chips` |
+| `Panel_GoCountTracker>Text_GoCount` | 우 ④ 고 선언 | ✅ `_goCountText` |
+| `Panel_Round>Text_Round` | 우 ③ 라운드 | ✅ `_roundText` |
+| `Panel_SelfSide>Text_ScoreThreshold` | 내 점수\|필요 | ✅ `_selfPanel._score` |
+| `Panel_OpponentSide>Text_ScoreThreshold` | 상대 점수\|필요 | ⚠️ **Inspector 배선 미완** (§2-3) |
+| `Panel_Breakdown>Text_ChipValue`·`Text_MultiplierValue` | 좌 ② 칩×배수 | ❌ **다음 작업** |
+| `Panel_MatchStatus` | 매치 상태 한 줄 | ❌ 프리팹에 쓸 TMP 자식이 없음 |
+
+### 코드 배선이 필요 없는 것 (사용자 확정)
+
+- `Image_Ref` — 시안 참조 이미지. 디자인 완료 후 사용자가 직접 제거
+- `Panel_BonusCardList` — 보너스 카드 개발 시점으로 이월(현재 자식 0개)
+- `Text_Rank` — 우선 "피쉬" 등급 고정. 프리팹 문구가 정본
+- `Text_Act` — 우선 "1막" 고정. 프리팹 문구가 정본
+- `Text_OpponentName` — 별명 기획 대기(타짜 원작 "작두"류). placeholder 유지
+- 정적 라벨 7종(`Text_SeatLabel`×2 · `Text_GoCountTitle` · `Text_Chip` · `Text_MultiplierTitle` · `Text_PlayerChipsTitle` · `Text_ActLabel` · `Text_RoundLabel`) — 프리팹 문구가 정본
+
+## 4. 다음 작업의 선행 조사 결과
+
+`Panel_Breakdown`(칩 × 배수)에 착수하기 전에 알아야 할 것:
+
+- **배수는 스냅샷에 없다.** 도메인에는 `GoStopState.GoMultiplier(balance)`·`OpponentProfile.DeckChipMultiplierBp`가 있고, 정산식은 `Σ칩 × 점 × 배수`(카드 49 완료).
+- **축을 더하면 생산 지점 전수 갱신이 강제된다.** `SeatSnapshot` 생산 지점은 **13곳** — `BoardSnapshotBuilder` 2(실값) / `PresentationBoardModel` 2(**재생 모델 — 보존 전달, 재계산 금지**) / `AnimationGym` 2 / 테스트 7. 새 축은 **필수 인자**로 넣어 컴파일러가 명부를 만들게 한다(`= default` 금지 — 재생 모델이 조용히 0을 흘린다).
+- **선례가 바로 앞 커밋에 있다.** `2ebaf84`가 "다음 고까지 필요 점수" 축을 같은 절차로 올렸다 — 도메인 파생 함수(SSOT) → `MatchFlow` 통과 노출 → 스냅샷 필수 인자 → 13곳 갱신 → `GoStopTests` 합류. **그 커밋을 그대로 따라 하면 된다.**
+
+## 5. 커밋 이력 (Double Down, feature/ui)
 
 | 커밋 | 내용 |
-|------|------|
-| `223e569` | MatchView.prefab 좌 컬럼 재구성 + Panel_JokboTracker CSF 버그 수정 (LayoutGroup 없는 단독 CSF는 자식을 못 잰다 — VLG 추가 + Deco 라인 IgnoreLayout) |
-| `fcee59f` | **Part A — 기반 구축.** `MatchView.cs`(IUIView 구현, 표시/숨김만) + `UIAddressableRegistrar.cs`(메뉴 `Double Down > Register UI Addressables`) + Addressables 최초 구성(주소 `MatchView` 등록 완료) + 프리팹에 컴포넌트 부착. **기존 동작 무변경** |
-| `2d5210f` | **Part B — 스위치 넘기기.** MainScene에 `[Inject] IUIService` + 로드 스텝 4단계("UI 준비" 10, 판 준비 50→40, 합 100) + `OnUnloadingAsync`에서 `Close<MatchView>()` + prefab sortingOrder 0→200 |
+|---|---|
+| `223e569` | MatchView.prefab 좌 컬럼 재구성 + JokboTracker CSF 버그 수정 |
+| `fcee59f` | Part A — `MatchView : IUIView` + Addressables 주소 등록 도구 |
+| `2d5210f` | Part B — MainScene이 `IUIService` 경유로 MatchView를 세운다 |
+| `3d2410d` | 슬롯 배지·라운드 요약을 MatchView로 이관 |
+| `5d155f2` | 배너 사건 채널 → `EventBannerMotion`(얇은 `IStepMotion` 어댑터) |
+| `b418d04` | 거부 피드백·고스톱 키 힌트 이관 |
+| `2ca0540` | **옛 `MatchHudView` 계열 제거** — UI 생성이 `IUIService` 하나로 수렴(−8,572줄) |
+| `2ebaf84` | "다음 고까지 필요 점수" 도메인 파생 + 스냅샷 축 |
+| `ffb57e1` | 좌석 점수 칸 두 값 렌더 + `_capturedTally` dead 필드 제거 |
 
-Samantha 저장소(이 repo)에는 미커밋 `reports/balatro-animation-improvement-plan.md`가 별도로 남아 있다 — 이번 작업과 무관, 카드 29 juice 개선 계획.
+## 6. 도달한 구조
 
-## 2. ⚠️ 즉시 해야 할 일 — Part B는 Unity 미검증 상태로 커밋됐다
+```
+IUIService (= UIManager)
+ ├─ MatchView    계기판 — Render · UpdateScoreLines · ResetForNewMatch
+ │   ├─ EventBannerMotion    사건 채널 (IStepMotion) — 선언 배너
+ │   ├─ HudRoundSummary      라운드 요약
+ │   └─ HudRejectionFeedback 거부 흔들기
+ └─ GoStopView   고/스톱 모달 + 키 힌트
+```
 
-외부 Roslyn 컴파일(exit 0)만 통과했고 **Unity 쪽 검증이 남아 있다**. stale `.csproj` 탓에 `GameCore.UI.dll`을 수동 주입한 검사라 asmdef 해석은 별개 축이다.
+## 7. 함정 (이미 밟은 것 — 반복 금지)
 
-체크리스트 (새 데스크톱에서 pull 후):
+- **생명주기 승격**: `MatchView`는 `DontDestroyOnLoad`라 **판보다 오래 산다**. `MatchRuntime.Dispose`(판 파괴)가 이 뷰를 치우지 않으므로 재시작 잔재 0은 **파괴가 아니라 `ResetForNewMatch`**로 얻는다. 판 수명 객체(라우터·커서)를 구독할 때는 씬 수명 쪽에서 걸고 판을 캡처하지 말 것.
+- **`ReleaseAll` 금지**: 전 뷰 파기라 그 전환이 띄운 로딩 커튼까지 죽인다. 씬 이탈은 `Close<T>()`.
+- **EventSystem 순서**: `MainScene.unity`에 저작물로 배치해 해결됨. 로드 스텝을 재정렬하지 말 것(`PrepareUiAsync` 주석 참조).
+- **stale `.csproj`**: asmdef 수정 후 Unity 재import 전까지 `.csproj`는 옛 참조다. 외부 컴파일 검사가 CS0234로 실패하면 코드가 아니라 이걸 의심하라.
+- **컴파일 검증의 결정적 증거**: `Library/ScriptAssemblies/*.dll` mtime이 편집 소스보다 최신인지 대조. Editor.log의 `error CS`는 옛 컴파일 잔상일 수 있다.
+- **`Text_ScoreThreshold` 저작 문구**가 `"0 | 9"`라 미배선이어도 그럴듯해 보인다 — 배선 검사는 콘솔 경고로 한다.
 
-1. Unity 열고 컴파일 확인 — 에러 시 1순위 의심: `DoubleDown.Boot.Scenes.asmdef`의 `"GameCore.UI"` 참조 해석
-2. Play 진입 후 콘솔에 `[MainScene] IUIService가 주입되지 않아…` **없어야** 함 (Reflex 주입 성공)
-3. 로딩 커튼 걷힌 뒤 MatchView가 **이미 떠 있어야** 함 (커튼 뒤 생성 — "UI 준비" 스텝)
-4. 옛 HUD 기능 무회귀: 고/스톱 모달·거부 피드백·키 힌트 동작 (Part B는 옛 HUD를 건드리지 않았다)
-5. 재시작(스톱→정산→재시작) 시 MatchView가 사라지거나 중복 생성되지 않는지
+## 8. 유실 기록
 
-## 3. 핵심 아키텍처 사실 (재조사 방지용 실측 결과)
-
-### 두 UI의 실체
-
-| | `MatchHudView` (옛, 동작 중) | `MatchView` (신규, 사용자 저작) |
-|---|---|---|
-| 스크립트 | MatchHudView + HudSelfPanel/HudOpponentPanel/HudRejectionFeedback | `MatchView.cs` (IUIView, 표시/숨김만) |
-| 생성 경로 | `MatchRuntime.ResolveHudView` → `Object.Instantiate` (씬 할당 `MainScene._hudPrefab`) | `IUIService.OpenAsync<MatchView>` (주소 `MatchView`) |
-| 역할 | 표시 + **연출 채널(IStepMotion, CompositeStepMotion의 두 번째 채널)** + **입력 배선(Bind(router, gate, cursor))** | 아직 표시뿐 — 패널 데이터 없음 |
-| sortingOrder | 100 (코드 지정) | 200 (프리팹 정본 — 코드로 덮지 않는다) |
-
-**MatchHudView를 지금 걷어내면 안 되는 이유**: 화면이 아니라 연출·입력의 삼중 역할이다. 고/스톱 배너·키 힌트가 함께 사라진다. 3단계에서 이식 후 폐기.
-
-### 생명주기 승격 (가장 중요한 설계 축)
-
-- `UIService`는 뷰를 **DontDestroyOnLoad `UIRoot`** 아래 만들고 `Close`해도 파괴하지 않는다 (get-or-create 레지스트리).
-- 반면 `MatchRuntime.Dispose()`는 판 루트 통째 Destroy가 "재시작 잔재 0의 유일한 기구"다.
-- **MatchView는 이제 그 기구 밖이다** — 판을 갈아엎어도 살아남는다. 버그가 아니라 의도: UI는 판 수명이 아니라 씬 수명.
-- 따라서 **2단계에서 판 데이터가 붙는 순간, 재시작 경로(`StartNewMatchAsync`)에서 뷰 상태 리셋을 함께 배선해야 한다** (잔재 0 = 파괴가 아니라 상태 초기화). 이 부채는 `MainScene.PrepareUiAsync` 주석에도 박제돼 있다.
-
-### 함정 3종 (이미 밟았거나 코드에 박제된 것)
-
-1. **EventSystem 순서 제약**: "UI 준비"가 "판 준비"보다 먼저 돌면 `UIService.EnsureEventSystem`이 **DDOL** EventSystem을 만들어 씬 포인터 기구가 씬을 넘는다. 현 순서(판 준비 먼저)는 `MatchInputRig`가 만든 씬 자식 EventSystem을 서비스가 재사용. 스텝 재정렬 금지 — `PrepareUiAsync` 주석 참조.
-2. **`ReleaseAll` 금지**: 전 뷰 파기라 그 전환이 띄운 로딩 커튼까지 죽인다. 씬 이탈은 `Close<T>()` 숨김만.
-3. **stale .csproj**: asmdef 수정 후 Unity 재import 전까지 `.csproj`는 옛 참조다. 외부 컴파일 검사가 CS0234로 실패하면 코드가 아니라 이걸 의심하라.
-
-## 4. 다음 단계 (미착수)
-
-### 2단계 — 패널 데이터 이식
-
-`MatchView`에 `Render(BoardSnapshot)`을 만들고 패널별로 채운다. 프리팹 패널 인벤토리(실측): `Panel_JokboTracker`(+ 내부 `Panel_List` = VLG+CSF 정상 동작), `Panel_GoScale`, `Panel_GoCountTracker`, `Panel_BonusCardList`, `Panel_Multiplier`, `Panel_Breakdown`, `Panel_MatchStatus`, `Panel_SelfSide`/`Panel_OpponentSide`, `Panel_Act`, `Panel_Round`, `Panel_PlayerChips`, `Panel_RunStatus`.
-
-- 값은 전부 `BoardSnapshot` 경유 (UI 자체 계산 금지 — SSOT)
-- 옛 HUD의 대응 구현을 참고: `HudSelfPanel`/`HudOpponentPanel`(칩·점수), `MatchHudView.Render`
-- SerializeField는 **쓰는 것만** 추가 (Part A에서 미리 안 판 이유와 동일)
-- **재시작 리셋 배선** — 위 생명주기 승격 부채 해소를 이 단계 합격 기준에 포함할 것
-
-### 3단계 — 연출·입력 이식 + 옛 HUD 폐기
-
-- `IStepMotion` 구현(또는 별도 채널 분리)으로 고/스톱 배너·이벤트 오버레이 이식
-- `Bind(router, gate, cursor)` 상당의 입력 배선 (제출 경로는 `MatchInputRouter.Submit` 단일 초크포인트 유지)
-- 완료 후 `MatchRuntime.ResolveHudView`·`_hudPrefab`·`MatchHudView` 계열 제거 — **레거시 진입점 제거까지가 SSOT 통합** (헌법 §2)
-
-### 병행 가능 (Slice A 크리티컬 패스)
-
-Notion 「Slice A 개발 보드」 기준 29.6(시작 플로우)·29.7(고/스톱 모달 정착)·29.8(종료 화면)이 대기 중. 29.7/29.8의 표현 작업은 3단계와 겹치므로 **MatchView 이식과 통합 설계**하는 편이 이중 작업을 막는다.
-
-## 5. 관련 파일 맵
-
-| 경로 | 역할 |
-|------|------|
-| `Assets/Scripts/Presentation/Hud/MatchView.cs` | 신규 IUIView 뷰 (Part A) |
-| `Assets/Scripts/Editor/Hud/UIAddressableRegistrar.cs` | 주소 등록 메뉴 (Part A) |
-| `Assets/Scripts/Boot/Scenes/MainScene.cs` | 로드 스텝·PrepareUiAsync·OnUnloadingAsync (Part B) |
-| `Assets/Scripts/Boot/Scenes/MatchRuntime.cs` | 판 조립·ResolveHudView(옛 경로, 3단계 제거 대상) |
-| `Assets/Scripts/Presentation/Hud/MatchHudView.cs` | 옛 HUD (연출+입력 겸, 3단계 폐기 대상) |
-| `Assets/Scripts/Boot/ProjectInstaller.cs` | Reflex 합성 루트 (`IUIService → UIService` 등록) |
-| `Packages/com.ggumbug.gamecore/Runtime/UI/` | IUIService/UIService/IUIView 계약 (수정 금지 — 공유 패키지) |
-| `Assets/Prefabs/UI/MatchView.prefab` | 사용자 저작 비주얼 (Editor에서만 수정 권장) |
+`reports/balatro-animation-improvement-plan.md`(카드 29 juice 개선 계획, 2026-07-29)가 커밋되지 않은 채 사라졌다. git에 없어 복구 불가. 내용 요지: 발라트로의 매력은 이동이 아니라 **반응 채널**(juice 펄스·아이들 워블·포커스 반응·점수 롤링·화면 흔들림)에서 나오고, 현 구현은 이동 채널만 있다. 재작성이 필요하면 카드 29 재개 시점에 다시 분석할 것.
