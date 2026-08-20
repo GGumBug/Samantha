@@ -2,7 +2,7 @@
 
 # MatchView·GoStopView·Item_Jokbo 적용 계획
 
-2026-08-13. [matchview-uiservice-migration-handoff.md](matchview-uiservice-migration-handoff.md)의 후속 — 핸드오프가 정의한 2·3단계를 사용자 저작 프리팹 3종의 실측 결과로 구체화한 실행 계획이다. 대상 저장소는 **Double Down**(`C:\Unity_Projects\Double-Down`, `feature/ui`).
+2026-08-13. [double-down-ingame-handoff.md](double-down-ingame-handoff.md)의 후속 — 핸드오프가 정의한 2·3단계를 사용자 저작 프리팹 3종의 실측 결과로 구체화한 실행 계획이다. 대상 저장소는 **Double Down**(`C:\Unity_Projects\Double-Down`, `feature/ui`).
 
 ## 0. 목표
 
