@@ -2,9 +2,9 @@
 
 # Double Down 인게임 핸드오프
 
-2026-08-19 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down**, 기준 브랜치는 **`master`**(`646826f`까지 푸시 완료).
+2026-08-24 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down** — `master`에 `f90ccbb`까지 푸시 완료, 현재 작업 브랜치는 **`feature/floor-stack`**.
 
-> **브랜치 변경**: `feature/ui`는 전량 `master`에 병합됐다. 이제 `master`에서 작업한다.
+> **검증 범위가 넓어졌다**: Unity 배치 모드 도입으로 `Presentation.Tests` 192건까지 실제 실행된다(총 **779건, 13초**). 그 전까지 이 어셈블리는 컴파일만 확인해 낡은 기대값 13건이 잠복했다 — §4가 이 도구의 사용법과 함정이다.
 >
 > MatchView `IUIService` 마이그레이션과 계기판 배선은 **완료**되어 이 문서의 주제가 아니다(§7 이력). 살아 있는 작업은 §3이다.
 
@@ -30,9 +30,10 @@
 
 ## 2. ⚠️ 새 PC에서 첫 3분
 
-1. **양쪽 저장소 pull** — Double Down **`master`**, Samantha `master`
+1. **양쪽 저장소 pull** — Double Down **`master`**(작업 브랜치는 `feature/floor-stack`), Samantha `master`
 2. **Unity 열고 컴파일 확인** — 에러 0건
-3. **재생 검증 3종** — 이번 세션 수정분이 살아 있는지:
+3. **`tools/ddtest.sh` 경로 3줄 수정** — `SRC`·`DST`·`UNITY`. 그러면 779건이 13초에 돈다(§4)
+4. **재생 검증 3종** — 이번 세션 수정분이 살아 있는지:
    - 다음 판으로 넘어갔을 때 더미·상대 손패가 **전부 뒷면**인가
    - 쪽/따닥/싹쓸이/뻑해소 시 **상대 획득패에서 피 한 장이 날아오는가**
    - 카드가 UI 패널에 **물리지 않는가** (콘솔에 `판을 N%로 축소해 창에 맞춘다` 정보 로그)
@@ -54,19 +55,60 @@ MatchView 배선은 끝났다. 작업 축이 **룰 정합 → 연출 품질 → 
 - **턴 전환 연출** — 이번에 만든 200ms 쉼이 그 자리다. "상대 차례" 표시, 상대 점수가 문턱에 가까워지는 긴장 고지, 스톱 선언의 타격감
 - **설정 화면 ↔ 빠른 전투** — `TurnBeatBudget.SetFastBattle(bool)` 하나만 부르면 된다
 - **등급·막·상대 이름 데이터화** — 현재 프리팹 문구 고정
+- **GitHub Actions** — `ddtest.sh` 와 **같은 검증**을 푸시마다 자동 실행. 실익은 "내가 없는 자리"에 한정된다(이번에 낡은 테스트가 나흘간 잠복한 사례). 걸림돌: Personal 라이선스는 CI 활성화가 까다롭고(데모는 Pro 시리얼 전제), 에디터 매번 설치로 회당 10~20분 — 캐시 필수. 참고 자료는 `unity-cli-ci-demo` 의 워크플로 한 장뿐이고 `unity` CLI 자체는 불필요하다
 
-## 4. 검증 도구 (세션 스코프 — 재생성 필요)
+## 4. 검증 도구
 
-Unity Test Runner 없이 도메인을 헤드리스로 검증하는 도구를 이 세션에서 만들어 썼다. **scratchpad에 있어 새 PC에는 없다.** 재작성 가치가 높다.
+배치 실행 스크립트는 **[`tools/ddtest.sh`](../tools/ddtest.sh)로 저장소에 커밋했다** — scratchpad는 세션과 함께 사라지므로(같은 PC에서도 사라졌다) 도구 자체를 남긴다. 경로 상수(`SRC`·`DST`·`UNITY`)는 이 PC 기준이라 **새 PC에서 그 세 줄만 고치면 된다**.
 
-### 리플렉션 테스트 러너
+아래 함정 목록은 스크립트 주석에도 박혀 있다. 스크립트를 잃었을 때 재작성 비용의 대부분이 이 함정들이다.
 
-`Temp/bin/Debug/*.Tests.dll`을 리플렉션으로 열어 NUnit 테스트를 직접 호출한다. **573건이 약 40초**에 돈다.
+### ⭐ Unity 배치 모드 실행 (주 도구 — `tools/ddtest.sh`)
 
-- 대상: `DoubleDown.Domain.Tests` · `Application.Tests` · `Infrastructure.Tests` (UnityEngine 비의존 3종)
-- `Presentation.Tests`·`Integration.Tests`는 `UnityEngine.CoreModule`·`UniTask` 의존이라 **실행 불가** — 컴파일까지만 보장하고 Unity Test Runner로 넘긴다
-- **핵심 함정**: 프로젝트 어셈블리를 `<Reference>`로 참조하면 빌드가 사본을 러너 폴더에 복사하고 `Assembly.LoadFrom`이 그 **낡은 사본**을 먼저 해석한다. `<Private>false</Private>` + `AssemblyResolve` 훅으로 `Temp/bin/Debug`에서 찾게 할 것
-- 클래스별 실행 건수를 찍게 해 두면 "그 테스트가 정말 돌았나"를 매번 증명할 수 있다(통과는 출력되지 않으므로)
+**EditMode 779건이 13초.** `Presentation.Tests` 192건을 포함해 **모든 테스트를 실제로 실행**한다. Personal 라이선스로 동작하며 `unity` CLI 설치가 필요 없다.
+
+```bash
+bash ddtest.sh                    # 전량 779건
+bash ddtest.sh --filter DoubleDown.Presentation.Tests    # 부분
+bash ddtest.sh --full-sync        # 사본 재생성 (Library 캐시 버림, 수 분)
+```
+
+**구조** — 원본이 아니라 **사본**(`scratchpad/dd-batch`)에서 돈다:
+
+```
+SRC=C:/Unity_Projects/Double-Down
+DST=<scratchpad>/dd-batch
+UNITY="/c/Program Files/Unity/Hub/Editor/6000.3.19f1/Editor/Unity.exe"
+
+# 1) Assets·Packages·ProjectSettings 만 증분 동기화 (Library 는 제외)
+MSYS_NO_PATHCONV=1 robocopy "$(cygpath -w "$SRC/$d")" "$(cygpath -w "$DST/$d")" \
+  /MIR /NFL /NDL /NJH /NJS /NP /R:1 /W:1
+
+# 2) 실행 — -quit 을 주지 않는다
+"$UNITY" -batchmode -nographics -projectPath "$DST" \
+  -runTests -testPlatform EditMode \
+  -testResults "$DST/results-editmode.xml" -logFile "$DST/batch.log"
+
+# 3) results-editmode.xml 을 파싱해 어셈블리별 집계 + 실패 상세 출력
+```
+
+**재작성 시 반드시 지킬 것 — 다섯 함정을 전부 밟았다**
+
+1. **`-quit` 금지.** `-runTests` 는 끝나면 스스로 종료한다. `-quit` 을 함께 주면 임포트 직후 종료해 **테스트에 도달하지 못하고 그때도 종료 코드 0** 을 낸다(성공으로 오인).
+2. **사본에서 돌려야 한다.** Editor 가 원본을 `Temp/UnityLockfile` 로 잠그므로 같은 폴더를 배치 모드가 못 연다. 사본이면 작업 중 Editor 를 닫지 않아도 된다.
+3. **`Library` 를 동기화에서 제외한다.** 사본이 쌓아 둔 임포트 캐시(약 2.2G)가 재임포트를 건너뛰게 하는 **자산**이다. 이것 하나가 5~10분을 13초로 줄인다.
+4. **`MSYS_NO_PATHCONV=1` 필수.** Git Bash 가 `/MIR` 을 경로로 오인해 `C:/Program Files/Git/MIR` 로 바꿔 `robocopy 16` 이 난다. 슬래시 인자를 쓰는 네이티브 명령 전부에 해당한다.
+5. **출력 인코딩을 UTF-8 로 고정한다.** 콘솔 기본이 cp949 라 한글·em dash 가 `UnicodeEncodeError` 를 낸다. `PYTHONIOENCODING=utf-8` + `sys.stdout.reconfigure(encoding='utf-8')`.
+
+**라이선스는 문제가 아니다** — 초기 로그의 `Code 10 while verifying Licensing Client signature` 는 첫 핸드셰이크 실패일 뿐이고 재연결 후 `Successfully resolved entitlement details` 가 찍힌다. **첫 에러에서 읽기를 멈추면 "라이선스가 막는다"로 오판한다**(실제로 그렇게 오판했다).
+
+### 리플렉션 테스트 러너 (보조)
+
+배치 모드가 되므로 이제 보조 수단이다. Unity 없이 도메인만 빠르게 볼 때 쓴다 — `Temp/bin/Debug/*.Tests.dll` 을 리플렉션으로 열어 NUnit 테스트를 직접 호출한다(573건).
+
+- 대상은 UnityEngine 비의존 3종(`Domain`·`Application`·`Infrastructure`)뿐. `Presentation`·`Integration` 은 실행 불가 — **그 구멍이 배치 모드 도입의 이유였다**(낡은 테스트 13건이 나흘간 잠복했다).
+- **핵심 함정**: 프로젝트 어셈블리를 `<Reference>` 로 참조하면 빌드가 사본을 러너 폴더에 복사하고 `Assembly.LoadFrom` 이 그 **낡은 사본**을 먼저 해석한다. `<Private>false</Private>` + `AssemblyResolve` 훅으로 `Temp/bin/Debug` 에서 찾게 할 것.
+- 클래스별 실행 건수를 찍어 두면 "그 테스트가 정말 돌았나"를 증명할 수 있다(통과는 출력되지 않으므로).
 
 ### 시뮬레이션 프로브
 
@@ -86,6 +128,9 @@ Unity Test Runner 없이 도메인을 헤드리스로 검증하는 도구를 이
 - **겹침과 간격 0은 다르다**: "애니메이션이 동시 진행되는 느낌"을 겹침으로 읽고 두 번 고쳤으나 실측은 겹침 0건 + 간격 0.2ms였다. 처방이 정반대(순서 강제 vs 시간 생성)다. **시간축 버그는 밀리초를 찍기 전에는 갈리지 않는다.**
 - **없는 로그를 "그런 일이 없었다"로 읽지 말 것**: 상대 선언이 로그에 안 남아 "선언 없이 끝났다"고 오독했다. 실제로는 상대가 스톱을 불렀다.
 - **`Screen Space - Overlay`는 소팅으로 못 이긴다**: 월드 스프라이트가 UI 뒤로 가는 문제를 소팅 레이어로 풀려다 오진했다. 실제 요구는 "위에 그리기"가 아니라 "**벗어나지 않기**"였다.
+- **Mono `string.Format` 의 마지막 자리표시자**: 닫는 이스케이프 `}}` 에 인접한 자리표시자의 서식 지정자를 **리터럴로 흘린다**(`{1:F9}` → `"F9"`). `{0:F9}` 는 정상이라 서식 종류를 의심하게 되는데 원인은 **위치**다. JSON 을 조립할 때는 `string.Format` 대신 `ToString("F9", InvariantCulture)` + 문자열 연결을 쓴다. 이 진단에 두 번 실패했고, **실제 문자열을 로그로 찍은 한 줄이 끝냈다**.
+- **초록불이 검증을 뜻하지 않는다**: `OpponentHand_MirrorsPlayerFan_WithFlippedSign` 은 한 번도 실패한 적 없으면서 회전·아치가 0이라 `0 == -0` 을 비교하고 있었다. 설정값을 끄면 그 값을 재던 테스트가 **공허하게 통과**한다 — 값을 끌 때는 그것을 검증하던 테스트가 무의미해지지 않았는지 함께 본다.
+- **설정 기본값을 동결하는 테스트는 소리 없이 낡는다**: `ScriptableObject.CreateInstance<T>()` 를 쓰는 테스트는 `.asset` 이 아니라 **C# 필드 기본값**을 잰다. 자산과 코드 기본값을 함께 바꾸면 이 테스트만 남겨진다(획득패 배율 0.5 → 0.53 에서 2건이 그렇게 깨졌다).
 
 ### 기존
 
@@ -119,7 +164,7 @@ BoardLayout (배치)
 
 ## 7. 커밋 이력
 
-### 이번 세션 (2026-08-18~19, `master`)
+### 룰·연출 (2026-08-18~19)
 
 | 커밋 | 내용 |
 |---|---|
@@ -135,6 +180,17 @@ BoardLayout (배치)
 | `d35d14f` | 재생 속도를 기본(0.7)·빠른 전투(1) 두 축으로 |
 | `86af97c` | 특수상황 판정기 실게임 기본 배선 |
 | `646826f` | 판을 UI 가로 창에 맞춤(정렬 + 축소) |
+
+### 배치·레이아웃 (2026-08-20~24)
+
+| 커밋 | 내용 |
+|---|---|
+| `9512e78` | 카드 뷰를 구역별 루트로 묶는다 — 하이어라키에 판 상태 반영, 루트는 항등 불변식 |
+| `0d6e089` | 카드 재배치 — 바닥·더미 0.8 / 획득패 0.53, 손패 아치·부채 **0으로 끔** |
+| `753c262` | 양측 손패를 구역 오프셋으로 판 바깥 0.7 밀기 |
+| `b8c9397` | 바닥 레일 고정 간격 모드(`FixedPitch`) — 균등 분할의 넘침 보장을 부트 검산으로 대체 |
+| `f90ccbb` | 바닥패 배치 — 같은 달 부채 회전을 **계단식 적층**으로(X 확산 + Y 들림), 레일 배수 1.2293 |
+| `69f974d` | 배치 실행으로 드러난 낡은 배치 기대값 갱신 (13건 → 0건) |
 
 ### 이전 (MatchView 마이그레이션 — 완료)
 
