@@ -10,6 +10,8 @@
 - 중간값 동결은 해당 단계까지만 감지 — **종단값 동결은 어느 축이 회귀해도 한 케이스가 감지**
 - 기대값은 코드 재실행이 아니라 **손계산**으로 산출 — 구현을 기대값의 원천으로 쓰면 회귀 감지 불가 (자기 평가)
 
+**적용 경계**: 이 결론은 **값 파이프라인**(단계마다 값을 변환하는 흐름)에 한한다. 소유권·위치 **이동**은 종점이 같으면 종단 상태가 비트 단위로 동일해 경로 오류가 종단에 흔적을 남기지 않는다 — 그쪽은 경유 경로를 단언한다([transit-path-assertion.md](transit-path-assertion.md)).
+
 ## 구성 원칙 4가지
 
 1. **커버리지 감사 표 선행** — 케이스 선정 전에 축×판정 표(본 사례: 7축×판정)를 만들어 각 Golden Case 가 어느 축을 통과하는지 명시. 감사 표 없이 케이스를 고르면 축 누락.
@@ -42,3 +44,4 @@ Golden Case 작성 중 검증자가 **룰 자체의 모호점**을 발견하면(
 - [.claude/rules/evaluation.md](../.claude/rules/evaluation.md) — 평가 주도 검증·작성자/검증자 분리
 - [.claude/rules/engineering-constitution.md](../.claude/rules/engineering-constitution.md) — Step 2 "코드 형태로 디자인 의도 단정 금지"
 - [determinism-hooks.md](determinism-hooks.md) — 결정론 RNG 보존
+- [transit-path-assertion.md](transit-path-assertion.md) — 소유권·위치 이동의 경유 경로 단언(적용 영역이 갈리는 짝)

@@ -128,3 +128,4 @@ grep -rnE "(HsPotionType|PotionType)\b" Assets/Scripts
 - [multilayer-locale-snapshot.md](multilayer-locale-snapshot.md) — Layer-by-layer 일관성 강제 (동일 패턴)
 - [asset-migration-sort-consistency.md](asset-migration-sort-consistency.md) — 자산 ID 마이그레이션 case sensitivity
 - [determinism-hooks.md](determinism-hooks.md) — RNG 결정론 라벨 SSOT
+- [dual-meaning-field-split.md](dual-meaning-field-split.md) — 값 공간이 아니라 **의미**가 한 필드에 겹치는 경우

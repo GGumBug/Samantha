@@ -67,4 +67,5 @@ public SeatSnapshot(..., CapturedTally tally)
 - [implicit-proxy-state-removal.md](implicit-proxy-state-removal.md) — 제거 시 읽기 지점 전수(본 문서의 대칭 짝)
 - [runstate-preserve-block-grep.md](runstate-preserve-block-grep.md) — 생산 지점이 **하나로 알려진** 경우의 하위 사례(preserve block 한 줄 누락)
 - [overload-semantic-equivalence.md](overload-semantic-equivalence.md) — 같은 결과를 만드는 두 경로의 부수효과 등가성
+- [dual-meaning-field-split.md](dual-meaning-field-split.md) — 축을 더하지도 빼지도 않는 세 번째 경우: 한 필드가 두 의미를 겸직
 - [.claude/rules/engineering-constitution.md](../.claude/rules/engineering-constitution.md) — §0-1 Step 1 변경 전 영향 분석

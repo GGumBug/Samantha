@@ -54,6 +54,8 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [delegation-truncation-triage.md](best-practice/delegation-truncation-triage.md) | 에이전트 절단 3상태 분류와 재위임 처방 |
 | [determinism-hooks.md](best-practice/determinism-hooks.md) | 결정론 RNG 보존 훅 |
 | [deterministic-reentry-cache.md](best-practice/deterministic-reentry-cache.md) | 재진입 시 결정론 캐시 |
+| [distribution-parity-regression.md](best-practice/distribution-parity-regression.md) | 출력이 정당하게 달라지는 리팩터링의 분포·불변식 회귀 게이트 |
+| [dual-meaning-field-split.md](best-practice/dual-meaning-field-split.md) | 사실과 계획을 겸직한 필드의 축 분리 |
 | [evidence-based-debugging.md](best-practice/evidence-based-debugging.md) | 증거 기반 디버깅 4단계 프로토콜 |
 | [external-critique-simulation.md](best-practice/external-critique-simulation.md) | 외부 시니어 비판자 시뮬레이션 |
 | [generation-token-reset.md](best-practice/generation-token-reset.md) | 일괄 리셋의 swap-before-cancel 세대 토큰 |
@@ -82,6 +84,8 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [solid-unity-principles.md](best-practice/solid-unity-principles.md) | SOLID의 Unity 적용 카탈로그 |
 | [stale-artifact-false-signal.md](best-practice/stale-artifact-false-signal.md) | 부산물 잔재를 판정자로 쓰는 게이트의 거짓 양성 |
 | [test-intent-repurposing.md](best-practice/test-intent-repurposing.md) | 전제가 소멸한 테스트의 불변식 계약 전환 |
+| [transform-channel-layering.md](best-practice/transform-channel-layering.md) | 변위 크기·동반자 기준 트랜스폼 층 배치 |
+| [transit-path-assertion.md](best-practice/transit-path-assertion.md) | 종단 상태가 같은 이동의 경유 경로 단언 |
 | [ui-transition-prefab-convention.md](best-practice/ui-transition-prefab-convention.md) | UI transition prefab 시작 상태 SSOT |
 | [ui-visibility-two-layer-srp.md](best-practice/ui-visibility-two-layer-srp.md) | panel root와 content 가시성 책임 분리 |
 | [unitask-async-patterns.md](best-practice/unitask-async-patterns.md) | UniTask 비동기 인시던트 카탈로그 |
