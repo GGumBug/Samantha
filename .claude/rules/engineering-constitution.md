@@ -127,6 +127,7 @@ SSOT는 SOLID보다 양보 폭이 좁습니다. "두 곳에 같은 상태"는 �
 - [ ] **결정론**: RNG/시간/씬 로딩은 `RunRngService.ForSubsystem(label)` 같은 라벨 기반 SSOT 경유
 - [ ] **삭제 용이성**: 기능 제거 시 영향 파일이 5개 이하로 국소화되는지
 - [ ] **MonoBehaviour 비대화 방지**: `MonoBehaviour`는 Unity 라이프사이클 어댑터, 도메인 로직은 POCO 분리
+- [ ] **직렬화 필드 초기값**: 신규 `[SerializeField]` 는 **반드시 C# 초기값과 함께** 추가. Unity 는 초기값을 먼저 실행하고 **YAML 에 있는 키만** 덮으므로, 기존 `.asset`/prefab 에 키가 없으면 초기값이 유일한 값이다. 없으면 `0`/검정이 되어 **컴파일·테스트는 통과하고 화면에서만 사라진다**
 - [ ] **POCO 단위 테스트 검토**: `MonoBehaviour` 의존성 없는 POCO(예: `MapNode.IsSelectable` setter, `ResolveFromNodeOutgoingEdgesAfterSelection` 같은 순수 메서드)는 NUnit 단위 테스트 작성 검토. 강제는 아니지만, 클래스 불변식이나 상태 전이를 다루는 코드는 테스트가 회귀 방지 비용 대비 가치가 큼. 테스트 작성을 생략하기로 결정한 경우 보고에 한 줄 사유 명시.
 
 ### 5. 오버엔지니어링 안티패턴 (적극 회피)
