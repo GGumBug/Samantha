@@ -13,15 +13,16 @@
       "args": ["-y", "deepwiki-mcp"]
     },
     "google-sheets": {
-      "command": "/Users/minki/.local/bin/uv",
+      "command": "uvx",
       "args": [
-        "run",
-        "--directory",
-        "/Users/minki/Downloads/mcp-google-sheets-main",
+        "--from",
+        "mcp-google-sheets",
+        "--with",
+        "mcp<2",
         "mcp-google-sheets"
       ],
       "env": {
-        "SERVICE_ACCOUNT_PATH": "/Users/minki/Desktop/MINKI/Projects/2026/Double Down/doubledown-502402-249132b65a33.json",
+        "SERVICE_ACCOUNT_PATH": "${DOUBLEDOWN_SHEETS_KEY}",
         "ENABLED_TOOLS": "get_sheet_data,update_cells,batch_update_cells,add_rows,list_spreadsheets,search_spreadsheets,list_sheets,create_spreadsheet,create_sheet,get_multiple_spreadsheet_summary"
       }
     }
