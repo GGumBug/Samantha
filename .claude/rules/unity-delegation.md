@@ -151,6 +151,7 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 - Ava/Jarvis 위임 시 `.meta` 파일 직접 생성이 포함되면 프롬프트 보고 항목에 **"사용자 Unity Editor에서 Missing 참조 확인 필수"** 를 명시하도록 지시
 - 가능하면 `.meta` 생성은 Unity Editor의 자동 생성에 맡기고, 에이전트는 `.cs`/`.asset` 본문만 작성
+- 프리팹 대량 저작(오브젝트 5개 이상 + 상호 배선)은 YAML 손편집 대신 **멱등 굽기 도구**(`[MenuItem]`)로 — GUID 를 사람이 적는 자리 0. 상세 [best-practice/idempotent-prefab-baker.md](../../best-practice/idempotent-prefab-baker.md)
 
 ### Unity 자동 prefab mutation 함정 (공유 asset 추가 시)
 

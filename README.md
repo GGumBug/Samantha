@@ -44,6 +44,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 
 | 문서 | 설명 |
 |---|---|
+| [assembly-boundary-api-design.md](best-practice/assembly-boundary-api-design.md) | asmdef 경계와 API 반환 타입 사전 대조 |
 | [asset-migration-sort-consistency.md](best-practice/asset-migration-sort-consistency.md) | 자산 마이그레이션 정렬·대소문자 일관성 |
 | [bgdatabase-asset-reference.md](best-practice/bgdatabase-asset-reference.md) | BGDatabase 에셋 참조 관리 |
 | [bgdatabase-enum-binding.md](best-practice/bgdatabase-enum-binding.md) | BGDatabase enum 필드 3종·시트 어휘 계약·다형 컬럼 파싱 |
@@ -60,6 +61,8 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [external-critique-simulation.md](best-practice/external-critique-simulation.md) | 외부 시니어 비판자 시뮬레이션 |
 | [generation-token-reset.md](best-practice/generation-token-reset.md) | 일괄 리셋의 swap-before-cancel 세대 토큰 |
 | [golden-case-gate.md](best-practice/golden-case-gate.md) | 파이프라인 종단값 손계산 동결 게이트 |
+| [hand-listed-roster-decay.md](best-practice/hand-listed-roster-decay.md) | 완전성 장치의 손 명부를 검사 대상에서 파생 |
+| [idempotent-prefab-baker.md](best-practice/idempotent-prefab-baker.md) | 프리팹 대량 저작의 멱등 에디터 굽기 도구 |
 | [implicit-proxy-state-removal.md](best-practice/implicit-proxy-state-removal.md) | 상태·접합부 제거 시 읽기 지점 전수 조사 |
 | [locale-aware-subclass-extension.md](best-practice/locale-aware-subclass-extension.md) | locale-aware 상속 확장과 base 호출 |
 | [measurement-driven-debug.md](best-practice/measurement-driven-debug.md) | 반복 추측 실패 후 측정 도구 전환 |

@@ -28,6 +28,7 @@ Unity 코드 작업 시 **사용자가 매번 요구하지 않아도** 다음 �
 - **사용자 의도 모호 질문(예: "~는 어떻게 된거지?")은 부분 마이그레이션 누락 노출 신호** — 답변 전 grep 전수 검사 의무
 - **자산 마이그레이션 script 작성 시 파일명 정렬 vs 시트 Code Name 정렬의 case sensitivity 일관성 사전 검증 의무** — 상세 [best-practice/asset-migration-sort-consistency.md](../../best-practice/asset-migration-sort-consistency.md)
 - **Unity 라이프사이클 메시지(`Awake`/`Start`/`OnEnable`/`OnDestroy`) 신설 시 부모 클래스 grep 의무** — Unity 메시지는 reflection 기반이라 자식 정의 시 부모 호출 누락 위험 (`override` 강제 없음, 컴파일러/IDE 경고 없음). 상세 [best-practice/unity-lifecycle-message-override.md](../../best-practice/unity-lifecycle-message-override.md). (2026-05-12 UIShop Awake 가로채기 회귀 인시던트)
+- **표현 계층이 호출할 API 시그니처 확정 전 반환·인자 타입의 어셈블리 확인** — asmdef references 는 컴파일러가 강제하는 계층 경계. 경계를 넘는 선례를 먼저 grep 하고, 참조 추가보다 표시용 struct 이동 우선. 상세 [best-practice/assembly-boundary-api-design.md](../../best-practice/assembly-boundary-api-design.md). (2026-09-01 `BuyPackAndDraw` 도메인 타입 반환 — Presentation 이 Domain 미참조로 호출 불가, asmdef 사전 확인으로 배선 전 발견)
 
 **Step 2 — 합리화 회피 (During 자동)**:
 다음 표현이 머릿속에 떠오르면 **즉시 SSOT 위반/책임 회피 신호**로 판정:
