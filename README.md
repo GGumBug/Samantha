@@ -73,6 +73,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [node-lifecycle-patterns.md](best-practice/node-lifecycle-patterns.md) | 노드 생명주기와 Deferred Commit State Machine |
 | [node-persistence-matrix.md](best-practice/node-persistence-matrix.md) | 노드별 저장 타이밍 계약 |
 | [overload-semantic-equivalence.md](best-practice/overload-semantic-equivalence.md) | 오버로드 부수효과 의미론 등가성 |
+| [open-ended-range.md](best-practice/open-ended-range.md) | 성장하는 값의 구간·배수를 표가 아니라 열린 식으로 |
 | [paradigm-transition-asymmetry.md](best-practice/paradigm-transition-asymmetry.md) | 코루틴→UniTask 전환 비대칭 안전성 |
 | [race-fix-meta-patterns.md](best-practice/race-fix-meta-patterns.md) | Unity 부트·씬 전환 race 메타 패턴 |
 | [reflection-protocol.md](best-practice/reflection-protocol.md) | 세션 교훈의 장기 지식 반영 프로토콜 |
