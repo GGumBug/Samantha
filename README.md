@@ -99,6 +99,24 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [unity-lifecycle-message-override.md](best-practice/unity-lifecycle-message-override.md) | Unity lifecycle 메시지 가로채기 위험 |
 | [unity-test-mode-selection.md](best-practice/unity-test-mode-selection.md) | EditMode·PlayMode 판정 기준 |
 
+## Reports
+
+| 문서 | 설명 |
+|---|---|
+| [claude-agent-architecture.md](reports/claude-agent-architecture.md) | Claude Agent 아키텍처 결정 규칙 |
+| [claude-browser-decision.md](reports/claude-browser-decision.md) | 브라우저 자동화 도구 선택 결정 규칙 |
+| [claude-memory-and-settings.md](reports/claude-memory-and-settings.md) | Claude Memory·Settings 결정 규칙 |
+| [claude-operational-limits.md](reports/claude-operational-limits.md) | Claude 운영 한계와 도구 결정 규칙 |
+| [double-down-card-upgrade-visual-plan.md](reports/double-down-card-upgrade-visual-plan.md) | 작업패(패 칩 강화) 표시 시안 — 자리 넷·두 렌더 경로 |
+| [double-down-handoff-archive.md](reports/double-down-handoff-archive.md) | Double Down 핸드오프 아카이브 |
+| [double-down-ingame-handoff.md](reports/double-down-ingame-handoff.md) | Double Down 인게임 핸드오프 |
+| [groovy-wobbling-puddle.md](reports/groovy-wobbling-puddle.md) | Samantha 저장소 업데이트 계획 |
+| [llm-day-to-day-degradation.md](reports/llm-day-to-day-degradation.md) | LLM 일상 성능 저하 검증 |
+| [matchview-gostop-jokbo-application-plan.md](reports/matchview-gostop-jokbo-application-plan.md) | MatchView·GoStopView·Item_Jokbo 적용 계획 |
+| [mossy-nibbling-dusk.md](reports/mossy-nibbling-dusk.md) | MainScene RNG 스모크 테스트 환경 구축 계획 |
+| [slice-a-hybrid-render-plan.md](reports/slice-a-hybrid-render-plan.md) | 카드(월드 스프라이트) × 패널(uGUI) 하이브리드 렌더 계획 |
+| [slice-a-sim-1000seed-v2.md](reports/slice-a-sim-1000seed-v2.md) | Slice A 자동 시뮬레이션 1,000 Seed 검증 |
+
 ## 검증
 
 Codex 훅과 저장소 자산 테스트는 Python 3.11 이상에서 실행합니다. Python 3.10 이하는 훅 테스트를 실행하지만 TOML 파서 검증은 건너뜁니다.
