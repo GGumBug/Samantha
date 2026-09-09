@@ -47,6 +47,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [assembly-boundary-api-design.md](best-practice/assembly-boundary-api-design.md) | asmdef 경계와 API 반환 타입 사전 대조 |
 | [asset-migration-sort-consistency.md](best-practice/asset-migration-sort-consistency.md) | 자산 마이그레이션 정렬·대소문자 일관성 |
 | [bgdatabase-asset-reference.md](best-practice/bgdatabase-asset-reference.md) | BGDatabase 에셋 참조 관리 |
+| [assertion-discriminating-power.md](best-practice/assertion-discriminating-power.md) | 부정형 단언의 공백과 대역 데이터의 판별력 |
 | [bgdatabase-enum-binding.md](best-practice/bgdatabase-enum-binding.md) | BGDatabase enum 필드 3종·시트 어휘 계약·다형 컬럼 파싱 |
 | [caller-driven-assumption-anti-pattern.md](best-practice/caller-driven-assumption-anti-pattern.md) | 호출자 상태를 암묵적으로 가정하는 설계 제거 |
 | [cancel-cleanup-bypass.md](best-practice/cancel-cleanup-bypass.md) | 취소 예외의 cleanup 우회와 멱등 토글 |
@@ -90,6 +91,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [test-intent-repurposing.md](best-practice/test-intent-repurposing.md) | 전제가 소멸한 테스트의 불변식 계약 전환 |
 | [transform-channel-layering.md](best-practice/transform-channel-layering.md) | 변위 크기·동반자 기준 트랜스폼 층 배치 |
 | [transit-path-assertion.md](best-practice/transit-path-assertion.md) | 종단 상태가 같은 이동의 경유 경로 단언 |
+| [ugui-graphic-dependency-traps.md](best-practice/ugui-graphic-dependency-traps.md) | uGUI 성분이 같은 오브젝트 Graphic 에 기생하는 두 함정 |
 | [ui-transition-prefab-convention.md](best-practice/ui-transition-prefab-convention.md) | UI transition prefab 시작 상태 SSOT |
 | [ui-visibility-two-layer-srp.md](best-practice/ui-visibility-two-layer-srp.md) | panel root와 content 가시성 책임 분리 |
 | [unitask-async-patterns.md](best-practice/unitask-async-patterns.md) | UniTask 비동기 인시던트 카탈로그 |
