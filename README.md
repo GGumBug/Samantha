@@ -109,6 +109,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [claude-browser-decision.md](reports/claude-browser-decision.md) | 브라우저 자동화 도구 선택 결정 규칙 |
 | [claude-memory-and-settings.md](reports/claude-memory-and-settings.md) | Claude Memory·Settings 결정 규칙 |
 | [claude-operational-limits.md](reports/claude-operational-limits.md) | Claude 운영 한계와 도구 결정 규칙 |
+| [double-down-bonus-card-effect-references.md](reports/double-down-bonus-card-effect-references.md) | 보너스 카드 구현 참고 — Balatro 조커·StS 파워/렐릭 효과 구현법 대조 |
 | [double-down-card-upgrade-visual-plan.md](reports/double-down-card-upgrade-visual-plan.md) | 작업패(패 칩 강화) 표시 시안 — 자리 넷·두 렌더 경로 |
 | [double-down-handoff-archive.md](reports/double-down-handoff-archive.md) | Double Down 핸드오프 아카이브 |
 | [double-down-ingame-handoff.md](reports/double-down-ingame-handoff.md) | Double Down 인게임 핸드오프 |
