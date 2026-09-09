@@ -4,7 +4,7 @@
 
 2026-09-09 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down** — 작업 브랜치는 **`master`**(`f7c6e6b`까지). **워킹트리 clean** — 사용자가 손보던 `Item_Jokbo.prefab` 도 `abb01f8` 로 들어갔다. **작업패(패 칩 강화)가 상점·판·정산창까지 닫혔다.** 프리팹도 구워 커밋됐고, 강화한 칩이 화면 네 자리에서 연속으로 드러난다(§3 「칩이 보이는 계보」).
 
-> **검증 루프가 코디네이터 안에서 닫힌다**: EditMode **1232**(+`[Explicit]` 스윕 1 건너뜀) + PlayMode **90**. 사용자 왕복 없이 수정→증명 사이클이 가능하고, "이 테스트가 정말 그 버그를 잡는가"까지 **뮤테이션 1줄 토글**로 기계 증명한다 — §4.
+> **검증 루프가 코디네이터 안에서 닫힌다**: EditMode **1233**(+`[Explicit]` 스윕 1 건너뜀) + PlayMode **90**. 사용자 왕복 없이 수정→증명 사이클이 가능하고, "이 테스트가 정말 그 버그를 잡는가"까지 **뮤테이션 1줄 토글**로 기계 증명한다 — §4.
 >
 > 지난 구간(MatchView 마이그레이션·택1·런 계층·상점 국면)의 커밋 서사와 당시 함정 원문은 [아카이브](double-down-handoff-archive.md)로 옮겼다. 이 문서는 현재 상태와 아직 살아 있는 함정만 든다.
 
@@ -128,7 +128,7 @@ ShopSession.BuyChipPackAndDraw  →  ChipPackDraw.Draw (가중·상한·작업 �
 
 **상점 카드는 실제 화투 패다** (2026-09-09). 이름 글자 대신 앞면 스프라이트를 세운다 — `CardSpriteTable` 이 정의 id(정수)로 열리는데 제안은 문자열 키만 날라, `CardUpgradeOffer` 에 `ushort DefinitionId` 를 **필수 인자**로 더했다. 카드 바닥에 깔려 있던 각서 쪽 `Jokbo_Card` 판때기는 걷었다(카드 안에 카드가 서 보였다) — 그림자·눌림 반응이 판때기가 아니라 **패 자체**에 걸린다. 값 줄(급·칩·무게)은 얼굴 아래 띠로 내려갔고 카드가 240×400 이 됐다.
 
-**⚠️ 굽기 도구가 자산 참조까지 꽂는다** — `ShopView._cardSpriteTable` 이 배선 명부에는 올랐는데 베이커가 안 채워, **다시 구워도 그 칸만 빈 채로** 남았다. 컴파일도 시험도 통과하고 화면에서만 얼굴이 없다. 지금은 `AssetDatabase.LoadAssetAtPath<CardSpriteTable>(CardSpriteTable.DefaultAssetPath)` 로 굽기가 꽂는다(자산이 없으면 던지지 않고 경고 한 줄 — 얼굴이 없어도 팩은 팔린다). **새 `[SerializeField]` 를 더할 때마다 베이커 배선 목록도 함께 보라** — 그 둘을 잇는 강제가 코드에 없다.
+**⚠️ 굽기 도구가 자산 참조까지 꽂는다** — `ShopView._cardSpriteTable` 이 배선 명부에는 올랐는데 베이커가 안 채워, **다시 구워도 그 칸만 빈 채로** 남았다. 컴파일도 시험도 통과하고 화면에서만 얼굴이 없다. 지금은 `AssetDatabase.LoadAssetAtPath<CardSpriteTable>(CardSpriteTable.DefaultAssetPath)` 로 굽기가 꽂는다(자산이 없으면 던지지 않고 경고 한 줄 — 얼굴이 없어도 팩은 팔린다). **새 `[SerializeField]` 를 더할 때마다 베이커 배선 목록도 함께 보라** — 컴파일러가 잇지 않는다. 대신 배치가 잡는다(아래 그물).
 
 **남은 것 (다음 카드)**: 상대 작업패(지금 상대 덱은 `PlayerDeck.Empty`) · 시트에 `card_pack_price` 키(지금은 각서 가격에서 bp 7000 파생) · 획득 존 툴팁(시안 §3-2 — 툴팁 시스템이 저장소에 0건이라 신설. **칩 숫자 쪽은 아래 계보로 닫혔다**).
 
@@ -206,7 +206,7 @@ ShopSession.BuyChipPackAndDraw  →  ChipPackDraw.Draw (가중·상한·작업 �
 
 ### ⭐ Unity 배치 모드 실행 (주 도구)
 
-**EditMode 전량(1232건, 2026-09-09)이 십수 초.** Personal 라이선스로 동작, `unity` CLI 불필요.
+**EditMode 전량(1233건, 2026-09-09)이 십수 초.** Personal 라이선스로 동작, `unity` CLI 불필요.
 
 ```bash
 bash tools/ddtest.sh                    # 전량
@@ -275,6 +275,21 @@ cd Tools/HeadlessSim && dotnet run -c Release --project . -- 200
 **남은 한계**: 카드에 의존하지 않는 항(발화 가산분·고 이력·연속 나가리)은 흐름 현재값이라
 배치 안에서 앞설 수 있다. 완전히 맞추려면 그 누적기도 스텝이 날라야 한다.
 
+### ⭐⭐ 러너는 경고를 실패시키지 않는다 (2026-09-09)
+
+Unity 테스트 러너가 자동으로 실패시키는 것은 `LogError`·`LogException` 뿐이다. **`LogWarning` 은 그냥 지나간다** — `LogAssert.NoUnexpectedReceived()` 도 기본은 에러만 본다. 그래서 "이 화면이 배선 누락을 호소하지 않는가"를 러너에 맡기면 그 시험은 **빈 칸이 있어도 영원히 초록**이다.
+
+경고를 판정에 쓰려면 직접 잡는다:
+
+```csharp
+[SetUp]    UnityEngine.Application.logMessageReceived += OnLog;   // Application 은 반드시 정규화 —
+[TearDown] UnityEngine.Application.logMessageReceived -= OnLog;   // DoubleDown.Application 네임스페이스와 충돌(CS0234)
+```
+
+**해지가 특히 중요하다** — 안 끊으면 뒤에 도는 시험들의 로그가 흘러들고, 이 저장소에는 **일부러** 경고를 내는 시험(`TheWarning_NamesEveryCardShelfSlot_…`)이 실재한다. 모은 경고 원문은 실패 메시지에 그대로 실어라: 어느 칸이 비었는지가 곧 처방이다.
+
+실사용: `Assets/Tests/Presentation/ShopViewPrefabWiringTests.cs` — 커밋된 프리팹을 그대로 세워 `ShopView.OnCreated()` 의 자가 점검을 통과시킨다. 뷰에 공개 수집기를 만들지 않은 것이 요점이다(그쪽 doc 이 "부르는 곳 없는 수집기는 dead code"라며 일부러 안 뒀다) — **이미 있는 문으로 묻는 편이 더 정직하다**: 명부가 요구하는 칸이 채워졌나가 아니라, 이 화면이 실제로 설 때 불평하나.
+
 ### ⭐ 뮤테이션은 계약을 깨야지 프로그램을 깨면 안 된다 (2026-09-03)
 
 넣는 한 줄이 **"그 기능이 없던 시절의 코드"** 여야 한다. 같은 세션에서 세 번 걸릴 뻔했다:
@@ -326,7 +341,7 @@ cd Tools/HeadlessSim && dotnet run -c Release --project . -- 200
 
 ### 2026-09-09 (작업패 표시 완결 · 칩 가시화)
 
-- **⭐⭐ 배선 명부에 올랐다고 채워지는 것은 아니다** — `ShopView._cardSpriteTable` 은 런타임 경고 명부(`HudWiring.Require`)에는 제대로 올랐는데 **굽기 도구가 안 꽂았다**. 컴파일도 시험도 초록이고 화면에서만 얼굴이 없다. 두 명부(런타임 경고 / 베이커 배선)를 잇는 강제가 코드에 없어, 새 `[SerializeField]` 마다 사람이 양쪽을 기억해야 한다. 발견 경로는 시험이 아니라 **내가 코드를 읽다가**였다 — 자동으로 잡으려면 "구운 프리팹에 명부의 칸이 다 차 있나"를 무는 시험이 필요한데 아직 없다
+- **⭐⭐ 배선 명부에 올랐다고 채워지는 것은 아니다** — `ShopView._cardSpriteTable` 은 런타임 경고 명부(`HudWiring.Require`)에는 제대로 올랐는데 **굽기 도구가 안 꽂았다**. 컴파일도 시험도 초록이고 화면에서만 얼굴이 없다. 두 명부(런타임 경고 / 베이커 배선)를 잇는 강제가 코드에 없어, 새 `[SerializeField]` 마다 사람이 양쪽을 기억해야 한다. 발견 경로는 시험이 아니라 **사람이 코드를 읽다가**였다. **그물은 그날 만들었다** — `Assets/Tests/Presentation/ShopViewPrefabWiringTests.cs` 가 커밋된 프리팹을 그대로 세워 `OnCreated()` 의 자가 점검을 통과시킨다(같은 배선 명부가 각서·작업패 두 카드 템플릿까지 이어 붙이므로 한 시험이 안쪽 칸도 훑는다). 이제 같은 사고는 **배치에서** 잡히고, 실패 메시지에 비어 있는 칸 이름이 그대로 실린다
 - **⭐ 반사로 파생한 명부와 손으로 적은 명부가 한 파일 안에 공존한다** — 카드 쪽 시험(`EveryCardSlot_IsOnTheWiringRoster_…`)은 `SerializedFieldNames(typeof(ShopChipOfferCard))` 로 파생해 칸이 늘면 자동으로 빨간불이지만, 뷰 쪽 시험(`TheWarning_NamesEveryCardShelfSlot_…`)은 **5개를 손으로 박아** 뒀다. `ShopView` 를 같은 방식으로 못 바꾸는 이유가 있다: `[SerializeField]` 16개 중 **3개는 일부러 명부에서 뺐다**(미끄럼 연출 칸 — 비어도 화면이 선다). 필수와 선택을 가르는 표시가 먼저 필요하다
 - **⭐ 시험이 값과 배선만 물고 좌표를 안 물면 순수 배치 변경은 시험을 깰 수 없다** — 카드 판때기를 걷고 얼굴을 키우고 성분을 옮기는 작업에서 런타임 `.cs` 는 한 줄도 안 바뀌었고 1224건이 그대로 초록이었다. **좋은 성질이지만 뒤집으면 시각 회귀를 시험이 못 잡는다**는 뜻이기도 하다 — 그쪽 판정은 사용자의 눈이 유일한 그물이다
 - **`Shadow` 는 같은 GameObject 의 Graphic 에만 듣는다** — `IMeshModifier` 라 투명해진 루트에 남겨 두면 자국이 얹힐 메시가 없어 그림자가 통째로 사라지는데, **인스펙터에는 성분이 켜져 보인다**. 진단이 제일 어려운 종류의 결손이라 성분 자체를 얼굴로 옮기고 옛 자리에서 뗐다
@@ -488,6 +503,7 @@ BoardLayout: 모든 X 가 PlayAreaHalfWidth 대칭에서 파생, 실제 크기�
 | `ac60215` | 테스트: 칩이 **어느 덱 렌즈**로 접히는지 — 좌석 고정 뮤테이션에 대비 케이스만 빨간불 |
 | `e16241d` | **정산창 `CHIP SUM`** — 도메인이 이미 내보내던 값을 4계층 옮겨 적기 |
 | `f7c6e6b` | 테스트: 그 전사 구간 두 자리 — 계산이 없어 조용히 0이 되던 구간 |
+| `985389f` | **구운 프리팹 배선 그물** — 이번 세션의 실제 사고를 자동으로 잡는다. 명부에 빈 칸 하나 심는 뮤테이션에 1233건 중 1건만 빨간불 |
 
 ### 지난 구간 (2026-09-03, 고/스톱 재설계 · 측정 · 편의 기능)
 
