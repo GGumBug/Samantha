@@ -2,9 +2,9 @@
 
 # Double Down 인게임 핸드오프
 
-2026-09-09 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down** — 작업 브랜치는 **`master`**(`f7c6e6b`까지). **워킹트리 clean** — 사용자가 손보던 `Item_Jokbo.prefab` 도 `abb01f8` 로 들어갔다. **작업패(패 칩 강화)가 상점·판·정산창까지 닫혔다.** 프리팹도 구워 커밋됐고, 강화한 칩이 화면 네 자리에서 연속으로 드러난다(§3 「칩이 보이는 계보」).
+2026-09-10 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down** — 작업 브랜치는 **`master`**(`f02775b`까지). **워킹트리 clean.** **보너스 카드가 도메인부터 화면까지 전 계층에서 닫혔다** — 상점 셋째 매대에서 사고, 공장이 판에 싣고, 낱장이 터지면 그 이름이 뜬다(§3 「보너스 카드」). 상점 프리팹은 헤드리스로 구워 커밋됐고, **판 HUD 슬롯만 코드 완결·프리팹 배선 한 걸음이 사용자 결정 대기**다(§3 다음 후보 첫 항목).
 
-> **검증 루프가 코디네이터 안에서 닫힌다**: EditMode **1233**(+`[Explicit]` 스윕 1 건너뜀) + PlayMode **90**. 사용자 왕복 없이 수정→증명 사이클이 가능하고, "이 테스트가 정말 그 버그를 잡는가"까지 **뮤테이션 1줄 토글**로 기계 증명한다 — §4.
+> **검증 루프가 코디네이터 안에서 닫힌다**: EditMode **1302**(+`[Explicit]` 스윕 1 건너뜀) + PlayMode **91**. 사용자 왕복 없이 수정→증명 사이클이 가능하고, "이 테스트가 정말 그 버그를 잡는가"까지 **뮤테이션 1줄 토글**로 기계 증명한다 — §4.
 >
 > 지난 구간(MatchView 마이그레이션·택1·런 계층·상점 국면)의 커밋 서사와 당시 함정 원문은 [아카이브](double-down-handoff-archive.md)로 옮겼다. 이 문서는 현재 상태와 아직 살아 있는 함정만 든다.
 
@@ -159,6 +159,42 @@ ShopSession.BuyChipPackAndDraw  →  ChipPackDraw.Draw (가중·상한·작업 �
 
 **⚠️ `_stake` 라벨이 길어졌다** — `CHIP SUM ...` 이 앞에 붙어 정산창에서 잘릴 수 있다. 프리팹은 손대지 않았으니 넘치면 칸을 늘려야 한다.
 
+### ⭐⭐ 보너스 카드 — 2026-09-10 완료 구간
+
+**패시브다.** 사용자가 못 박았다 — 발라트로의 조커처럼 슬롯에 지니고 있으면 조건이 맞을 때 스스로 터지고 소모되지 않는다. 1회성 아이템이 아니다. `EffectChargeScope.Round` 는 소모가 아니라 **재충전**(라운드마다 차오른다)이라 "판당 1회"가 그 뜻이다.
+
+**새 카드는 코드 0줄, 데이터 한 행이다.** `EffectInterpreter` 는 카드 id가 아니라 **어휘 열거**(시점 × 조건 × 연산)로만 분기한다. 이미 해석되는 조합을 쓰는 카드는 `EffectCatalog` 에 행 하나로 끝난다 — 두꺼비가 그 증명이다(까치호랑이와 같은 조합, 카테고리·가산량만 다름). grep 으로 확인: `KkachiHorangiId`·`GaepyeongkkunId` 는 카탈로그와 개발 체육관에만 있고 해석기에는 없다. 계약은 "표현 안 되면 연산을 늘리지 말고 낱장을 재설계".
+
+**화면도 그 성질을 잇는다.** 이름은 `HudWords.BonusWord`(id별 표 — 파생할 데가 없다)이지만 **설명은 어휘에서 생성**한다(`FormatBonusEffect`). id별 설명표를 두면 도메인엔 행만 더하면 되는데 화면 때문에 코드를 고쳐야 해서 그 성질이 UI 계층에서 깨진다. 조사(을/를)도 표가 아니라 음절 코드에서 판별한다. 소금(1/2)·거울(2/3)은 시점·조건·연산이 같고 비율만 달라 생성 문구로 갈린다.
+
+카탈로그 5행: 까치호랑이(광 획득 +3) · 개평꾼(진 판 이전액 9/10) · 두꺼비(피 획득 +1) · 소금(박 맞은 판 이전액 1/2, 판당 1회) · 거울(같은 조건 2/3, 판당 1회). **3택1 팩 + 3슬롯이면 카탈로그 ≥ 5** 가 산수다(카탈로그 − 장착 ≥ 3).
+
+| 계층 | 무엇 | 어디 |
+|---|---|---|
+| 런 저장소 | 순서 있는 3슬롯(순서 = 발화 순서 = 결과 순서) · 해제 없음(YAGNI) | `RunBonusCards` |
+| 추첨 | 장착 제외 풀에서 부분 Fisher-Yates, `NextInt` 정확히 3회 | `BonusPackDraw` (`Domain/Run`) |
+| 상점 셋째 SKU | 값 = 각서 동가(가설) · 슬롯 상한 + 후보 고갈이 구매 판정에 | `ShopSession.CanBuyBonusPack` |
+| 표시 사본 | 미러 열거 4 + 생 `ushort` — Presentation 은 Domain 미참조 | `BonusCardOffer` |
+| 공장 | `_bonusCards` 필드 · 표지 `"shop-bonus"`(영속) · 발급 시 `Snapshot()` 동결 | `MatchSessionFactory` |
+| 판 관측창 | 플레이어 장착 id를 슬롯 순서로 — 매번 사본 | `MatchSession.BonusSlotProbe` |
+| 상점 매대 | 카드 280×200(얼굴 없음), 배지 맨 아래 — **구워서 커밋됨** | `ShopBonusOfferCard` · 베이커 |
+| 판 HUD 슬롯 | 템플릿 복제, 양방향 접기 — **코드만, 프리팹 배선 대기** | `BonusSlotList` · `BonusSlotItem` |
+| 발화 연출 | 이름을 그 좌석 획득 행 머리에 — 수치(0초) 축 | `EffectTriggeredStep` · `FloatingTextMotion` |
+
+**셋째 SKU 만 구매 판정이 두 줄 길다.** 각서·작업패는 후보 풀이 안 마르지만 보너스는 꽂으면 후보에서 영구히 빠진다. 구매는 차감이 추첨보다 먼저라 후보 3장 미만인데 사면 칩만 내고 팩이 안 열린다. 슬롯 상한 줄은 지금 카탈로그 5행에서 후보 고갈 줄에 가려 도달 불가지만 **상수 하나에만 가려진 것**이라 남겼다 — 6행이 되는 날 되살아난다.
+
+**발화 연출은 사건 문구가 아니라 수치다.** 까치호랑이는 광 한 장마다 터져 광 2장이면 스텝 둘. 사건 문구(`ShowEventTextAsync`)로 하면 각각 하한을 밀어 **판의 박자가 장착한 낱장 수에 끌려간다**. `StepPlayer` 박자도 안 건드렸다(default 가 좌석 기본값이고, 그 매핑의 규율이 "전용 확정치를 지어내지 않는다"). 앵커는 이 채널에서 처음으로 "어디"가 아니라 "누구"를 말하는 좌표 — 지목할 카드가 없고(스텝이 카드 id 미탑재), 판 중앙은 좌석 축이 없어 "FOE 까치호랑이"가 성립 안 한다. 배지 앵커가 아니라 **그룹 첫 칸**인 근거는 그쪽이 장수 무관 고정 슬롯이라 획득 행이 빈 정산 시점 발화(소금·거울)에서도 자리를 잃지 않기 때문이다.
+
+**스텝은 결과 값을 싣지 않는다** — 도메인 이벤트가 그것을 싣지 않는 설계(결과를 페이로드에 실으면 낱장이 늘 때마다 스키마가 따라 자라 어휘 확장 게이트가 무력해진다)를 그대로 이었다. 리플렉션 시험이 그 축이 붙지 않았음을 문다. 턴 actor 도 갱신하지 않는다 — 발화가 싣는 좌석은 턴 actor 가 아니라 **보유** 좌석이라, 갱신하면 뒤따르는 actor 없는 이벤트가 보유자로 잘못 태깅된다(부작용: 상대 턴에 터진 내 낱장은 고속 재생에서 플레이어 배속 — 의도로 doc 에 명시).
+
+**이름표는 카탈로그 상수를 못 쓴다 — 시험이 그 그물을 복원한다.** `HudWords.BonusWord` 는 `case 1:` 숫자 리터럴 + 주석이다(Presentation 이 Domain 미참조). 컴파일러가 두 출처를 잇지 않으므로 id가 재배열되면 이름이 조용히 뒤바뀐다. `DoubleDown.Presentation.Tests` 는 양쪽을 다 참조하고 `InternalsVisibleTo` 도 걸려 있어 `BonusWord(EffectCatalog.SogeumId) == "소금"` 을 거기서 문다 — 소금↔거울 맞바꾸기 뮤테이션에 2건 빨간불. 이름 명부 완전성은 `EffectCatalog.All` 을 돌며 파생.
+
+**⚠️ 가설 둘** — `BonusPackPriceBp = 10000`(각서 동가, 근거는 "런 내내 발화하는 패시브가 1회성 칩 강화 70% 보다 쌀 수 없다"는 방향뿐) · 거울 2/3. 둘 다 측정 전이고 카탈로그 doc 이 그렇게 적어 뒀다. 표시 시험이 이 두 값을 **골든 동결**하므로 확정하는 날 그 줄이 함께 운다(의도).
+
+**⚠️ 잠복 결함 1건(보고만)** — `ChooseBonus` 는 꽂기가 먼저, 대기 해제가 나중이라 **슬롯이 가득 찬 채 팩이 열려 있으면** `Equip` 이 던지고 대기가 열린 채 남아 낸 값을 쓸 방법이 없다. 지금은 `CanBuyBonusPack` 이 그 상태의 구매를 막아 상점만으로는 도달 불가. 다른 경로로 장착이 생기는 날(디버그 문·보상 획득) 즉시 살아난다.
+
+**⚠️ `(BonusPhase)0` 은 아무도 안 문다** — `EffectTriggeredStep` 생성자는 `effectId == 0` 만 던지고 시점 축은 검증하지 않는다. 도메인도 phase 를 검증하지 않아 `default(EffectPhase)` 가 흘러오면 HUD 가 이름 없는 시점을 그린다. 지금 생산 경로가 없어 잠복.
+
 ### ⭐ 측정 결론 (2026-09-03) — 다이얼로는 1막 60~75%에 못 간다
 
 목표는 1막 클리어율 **60~75%**(사용자 확정, 라운드 상한 3). 다섯 번 쟀고 **네 축 전부 벽에 막혔다**.
@@ -176,14 +212,21 @@ ShopSession.BuyChipPackAndDraw  →  ChipPackDraw.Draw (가중·상한·작업 �
 
 ### 다음 후보
 
+- **⭐⭐ 판 HUD 슬롯 프리팹 배선 (사용자 결정 대기)** — `Panel_BonusCardList`(200×1050, 왼쪽 기둥, 배경·`VerticalLayoutGroup` 저작 완료)가 **이미 `MatchView.prefab` 최상위에 있다**. 남은 것: ① 그 노드에 `BonusSlotList` 부착 ② **직계 자식** `Item_BonusSlot`(비활성, `BonusSlotItem`) + `Text_Name`(TMP) ③ 참조 셋(`MatchView._bonusSlots` ← 패널 / `BonusSlotList._slotTemplate` ← 템플릿 / `BonusSlotItem._nameLabel` ← 라벨). 선택지 (A) 직접 저작 2분, 재직렬화 없음 / (B) `MatchViewPrefabWiringTests` 먼저 세우고 베이커 + 헤드리스 굽기(§4) — 그물이 남아 앞으로 칸이 늘 때마다 자동으로 잡힘. `MatchView` 는 손 저작 17칸이라 **그물 없이 굽지 마라**. 합격: 판 진입 시 `[MatchView]` 경고 0 · 산 낱장 이름이 왼쪽 기둥에
+- **보너스 팩 아트** — 상점 `Button_BuyBonusPack` 이 민 사각. 굽기 리포트가 그 자리를 경고로 부른다("보너스 팩 버튼에 아직 그림이 없다"). 아트가 들어오면 베이커 `BakeBonusShelf` 에서 앞의 두 팩처럼 `LoadFirstSprite` 로 문다
+- **보너스 축 측정** — `BonusPackPriceBp`·거울 2/3 확정. `RunLadderSweepScratch` 에 `CreateBonusStream`(표지 `"shop-bonus"`)은 있으나 **구매 정책·집계 열이 없다** — 대조군(보너스 0장)이 옛 수치를 재현하는 것까지만 확인됨
+- **한글 글리프 실물 확인** — 발화 이름이 □로 뜨지 않는지. 스포너 옛 주석("TMP 기본 폰트에 한글 없음")과 형식상 충돌하나 같은 스포너가 이미 `뻑`·`+3칩` 을 띄운다
+- **개발 체육관 이름표 접기** — `EffectGymFiring.NameOf` 가 임시 표기를 들고 있고 주석이 "그 축이 생기기 전까지"라 적었다. DevSandbox 가 Presentation 을 참조하므로 `HudWords.BonusWord` 로 파생 가능 — 지금은 같은 사실이 두 곳
+- **상대 보너스 카드** — `CreateFlow` 의 `opponentEffectSlots` 는 `Array.Empty` 그대로. 관측창도 플레이어 전용(좌석 축 없음). 들어오는 날 `BonusSlotProbe` 시그니처가 좌석을 요구한다
+- **`MainScene.cs` 줄바꿈 정규화** — 커밋된 형태가 `\r\r\n`. Edit 도구가 정규화하면 1335줄 전면 diff. 단독 커밋 카드로 spawn_task 등록됨(§5)
 - **⭐ 밸런스 (사용자 판단 — 아이템 구비 후로 연기)** — 다이얼 넷은 이미 다 돌렸고 벽을 봤다(위 측정 결론). 재개 시 남은 질문: 구매 기회 상한 3회가 맞는가 · 첫 슬롯 30.5% 탈락이 의도인가 · 수집형과 세트형에 같은 가격이 맞는가 · **단판 65% 패배의 원인은 아직 안 쟀다**(정책 품질인지 룰 비대칭인지)
 - **`OpponentProfile.Placeholder` 720 ↔ 시트 450 괴리** — 코드 자리채움과 시트 값이 다른데 **둘을 묶는 테스트가 없다**. 시트를 정본으로 볼지 자리채움을 지울지 결정 필요
 - **고배수 편향 (측정 후 결정)** — 고배수는 `3고 ×2 · 4고 ×4 · 5고 ×8` 로 **고 선언 횟수**의 함수인데, 그 횟수는 점수가 몇 조각으로 나뉘어 들어왔는지에 달렸다. 수집형은 매 턴 +1 이라 기회가 많고 **세트형은 완성 전까지 0점이라 문턱을 늦게 넘어 기회가 적다** — 최대 곱셈 축에서 빌드 타입이 갈린다. 완만화(지수→선형)는 **식 변경이라 시트 값으로 안 된다**. ③ 의 ⓒ·ⓓ 를 보고 결정
 - **수집형 구매 가치의 성격 차이** — 수집형은 문턱을 딱 채운 판에서 강화가 완전히 무효다(초과 0장이면 delta 가 0 에 곱해진다). 세트형과 근본적으로 다르므로 두 타입에 같은 가격을 매기면 수집형이 구조적 함정이 된다
 - **개명 카드** — `UpgradeOffer.Level`·`ScoreLineStage.UpgradeLevel`·`RunUpgrades.LevelOf` 가 이제 전부 **구매 횟수**를 뜻한다(표시만 +1). doc 으로 뜻을 고정해 뒀지만 이름은 여전히 "레벨"이라, `PurchaseCount` 계열로 옮기면 정직해진다. 저장·상점·표시 3계층 + 테스트 관통이라 파급이 크다
 - **~~다음 목표: 패 강화(작업패) 카드팩~~ — 2026-09-09 완료.** 아래는 착수 당시 기획 좌표(값이 측정으로 바뀐 항목은 §3 표가 정본이다): 기획서 v0(2026-09-03) · Notion 「패 강화 카드팩 — 작업패 (Card Chip Upgrade)」(기획문서 DB · 시스템 디자인 · 초안). 추천 = **지정형**(각서 팩 문법 동일, 화면 신설 0) · 규칙 = **1단 = 원형 칩 ×2**(`chipDelta = BaseChip`, 덧셈 누적, 3단 상한은 추첨이 판정) · 피 1단 = 쌍피화 `CardUpgrade(2, +1)` · 무게 축 피 전용 · 추첨 가중 광1:끗2:띠2:피4 + 동일 카테고리 3장 금지 · 가격 = 각서의 70%(가설). 도메인 `CardUpgrade`/`DeckEntry`/`PlayerDeck`은 이미 구현·테스트됨 — **획득 경로(상점 슬롯·팩 풀·저장 위치)만 없다**. 착수 전 결정 필요: 상대 칩 총량 정본(코드 720 / 시트 450 / GDD 300→900 세 값 괴리), 저장 위치(Jarvis), 표시 시안(Ava). 실측 도구는 `EffectGym`
-- **G1 잔여: 보너스 피 장착 축** — `CreateFlow` 의 `Empty` 4자리는 여전히 비어 있다(족보 업그레이드는 그 슬롯이 아니라 점수표 축). 효과 엔진(까치호랑이·개평꾼)은 완성돼 대기 중
-- **리롤 / 보너스 피 매대 / 소모품 / 사채** — 시트에 `loan_limit`·`loan_interest_bp` 가 이미 있고 미배선. 매대 슬롯 확장 시 `ShopSlotView` 부품화 논의 있었음(사용자 제안 — 슬롯 3~4개 확정이라 두 번째 슬롯부터 값)
+- **~~G1 잔여: 보너스 피 장착 축~~ — 2026-09-10 완료.** 플레이어 자리는 공장이 `RunBonusCards.Snapshot()` 으로 채운다. 상대 자리만 `Array.Empty` 로 남았다(위 「상대 보너스 카드」)
+- **리롤 / ~~보너스 피 매대~~(2026-09-10 완료) / 소모품 / 사채** — 시트에 `loan_limit`·`loan_interest_bp` 가 이미 있고 미배선. 매대 슬롯 확장 시 `ShopSlotView` 부품화 논의 있었음(사용자 제안 — 슬롯 3~4개 확정이라 두 번째 슬롯부터 값)
 - **런 종료 화면 / 막 표시 데이터화 / `special_steal_pi_count` 배선 / `pi_bak_loser_max < pi_bak_winner_min` 확인** — 이전 목록 유지
 - **연출 다듬기 소묶음** — 죽은 손잡이(`TurnBeatBudget._choiceLiftFactor`) 제거 · 그림자 각도 테스트 공백 · 택1/선언 수치 조정 · `FloorChoicePopupView` 개명(주소 동반) · 턴 전환 연출 · `SetFastBattle` 노출
 
@@ -195,6 +238,7 @@ ShopSession.BuyChipPackAndDraw  →  ChipPackDraw.Draw (가중·상한·작업 �
 | 마지막 턴 약탈 무효 범위 | 전통은 4종 전부 무효인데 현재는 **쪽만**. 의도된 편차 — 넓힐지 결정 필요 |
 | 폭탄·자뻑 | 흔들기가 미채용이라 폭탄도 보류 |
 | "다음 판 최소 밑천" 가드 | 현재 하한 1(`RunFlow.TrySpendChips` 상수 한 곳). 1보다 크게 잡는 것은 밸런스 결정 |
+| 판 HUD 슬롯 패널 저작 방식 | 직접 저작(2분, 재직렬화 없음) vs 베이커 + 배선 시험(그물이 남음). `MatchView` 는 손 저작 17칸이라 그물 없는 굽기는 위험 — §3 다음 후보 첫 항목 |
 
 ### 보류 결정 — GitHub Actions (2026-08-24, 재검토 금지)
 
@@ -206,7 +250,7 @@ ShopSession.BuyChipPackAndDraw  →  ChipPackDraw.Draw (가중·상한·작업 �
 
 ### ⭐ Unity 배치 모드 실행 (주 도구)
 
-**EditMode 전량(1233건, 2026-09-09)이 십수 초.** Personal 라이선스로 동작, `unity` CLI 불필요.
+**EditMode 전량(1302건, 2026-09-10)이 십수 초.** Personal 라이선스로 동작, `unity` CLI 불필요.
 
 ```bash
 bash tools/ddtest.sh                    # 전량
@@ -232,6 +276,24 @@ bash tools/ddtest.sh --full-sync        # 사본 재생성 (패키지 캐시 어
 **`-testFilter` 는 이 환경에서 빈 값으로 전달된다**(`Scan Filter Count: 0` → 무실행). **전량 실행 + 총계 대조**로 간다 — 새 테스트 N개면 총계가 정확히 +N 이어야 한다. 완료 판정은 프로세스 종료가 아니라 **XML 존재**로.
 
 **행 판정 3지표**: CPU ~0% + 로그 크기 정지 + 완주본 크기 미달. 처방은 `pkill` 후 `Temp/UnityLockfile` 제거.
+
+### ⭐ 헤드리스 굽기 — 사본에서 굽고 프리팹만 회수 (2026-09-10)
+
+굽기 도구(`[MenuItem]`)는 에디터가 원본을 잠그므로 배치 모드가 같은 폴더를 열 수 없다 — 그래서 사용자 왕복이 필요했다. 우회: `ddtest.sh` 가 이미 프로젝트를 `$DST` 사본에 `/MIR` 로 미러링해 두므로 **그 사본에서** 굽는다.
+
+```bash
+cp "$DST/Assets/Prefabs/UI/ShopView.prefab" "$SP/ShopView.prefab.before"   # 기준 시각
+"$UNITY" -batchmode -nographics -quit -projectPath "$DST" \
+  -executeMethod DoubleDown.Editor.Hud.ShopViewPrefabBaker.Bake -logFile "$SP/bake.log"
+find "$DST/Assets" -newer "$SP/ShopView.prefab.before" -type f              # 굽기가 건드린 파일 전수
+cp "$DST/Assets/Prefabs/UI/ShopView.prefab" "$SRC/Assets/Prefabs/UI/ShopView.prefab"
+```
+
+- `Bake()` 가 `private static` 이어도 `-executeMethod` 가 부른다(6000.3.19f1 확인). 종료 코드 0.
+- 사본은 `.meta` 까지 미러라 **GUID 가 같다** — 회수한 프리팹의 스크립트 참조가 그대로 맞는다.
+- 회수 전 `find -newer` 로 **건드린 파일을 전수 확인**한다(ShopView 는 `.prefab` 하나뿐이었다). 다음 `ddtest.sh` 가 `/MIR` 로 사본을 덮으므로 **회수를 먼저** 한다.
+- 프리팹 YAML 이 재직렬화돼 diff 가 크다(2326/1000) — 육안 판정 불가. **배선 시험이 초록인 것이 "잃은 것 없음"의 유일한 증거**다. 그 시험이 없는 프리팹(`MatchView`)에는 쓰지 마라 — 먼저 그물을 쳐라.
+- 로그의 URP `RenderPipelineGlobalSettingsUtils` LogError · visualscripting `DirectoryNotFoundException` 은 배치 모드 잡음 — 종료 코드 0이면 무시. 굽기 리포트(`배선(빈 칸을 채움)` / `배선 유지` / `계약 강제` / `경고`)는 그 아래 `Debug.Log` 에 있다.
 
 ### ⭐ 에디터를 닫지 않고 컴파일 검증 (2026-09-02 발견)
 
@@ -338,6 +400,19 @@ Unity 테스트 러너가 자동으로 실패시키는 것은 `LogError`·`LogEx
 계약·DI·테스트가 초록이어도 화면은 옛 기본값을 볼 수 있다. 판정법은 **두 경로가 다른 값을 내는 지점 하나**를 고르는 것(시트 450 vs Placeholder 720 — 화면 한 번에 갈린다). 값이 같은 지점은 아무것도 말하지 못한다.
 
 ## 5. 함정 (이미 밟은 것 — 반복 금지)
+
+### 2026-09-10 (보너스 카드 전 계층)
+
+- **⭐⭐ 미러링 지시의 참조 대상이 실재하는지 먼저 확인하라** — "이 파일의 작업패 시험을 미러링하라"고 했는데 `ShopViewLifecycleTests.cs` 에는 작업패 시험이 **0건**이었다. 에이전트가 37번 도구를 부르며 찾다가 편집 0건(ⓑ)으로 절단. 좌표 누락 규칙의 새 변종 — 좌표(파일명)를 줬는데 **그 좌표가 가리키는 것이 없었다**. 처방: 미러링을 지시하기 전 `grep -c` 한 번. 재위임에서는 미러링 원본 28줄을 프롬프트에 원문으로 붙이고 맨 앞에 "이 파일에는 작업패 시험이 없다 — 찾지 마라"를 박았다
+- **⭐⭐ 프리팹에 이미 저작된 노드가 있는지 보고 나서 이름을 정하라** — 두 갈래가 `Panel_BonusCardList` / `Panel_BonusSlots` 로 갈려 필드명 `_bonusSlots` 에 맞춰 `Panel_BonusSlots` 로 통일했는데, **프리팹에는 `Panel_BonusCardList` 가 이미 서 있었다**(200×1050, 배경·세로 배치 그룹까지 저작 완료). 툴팁이 없는 이름을 가리키면 저작자가 그 이름으로 노드를 새로 만들고 이미 있는 칸은 빈 채 남는다. `f02775b` 로 되돌림. **프리팹 계층은 `m_Name` grep 이 아니라 문서 분리 파서로 떠야 한다** — 정규식 한 줄 파싱이 다른 RectTransform 의 자식을 물어 칩·배수 패널을 보너스 패널 자식으로 오독했다
+- **⭐ `utf-8-sig` 로 쓰면 없던 BOM 이 붙는다** — 뮤테이션 원복에 `open(p,'w',encoding='utf-8-sig')` 를 썼더니 원본에 없던 BOM 이 붙어 `git diff` 에 `using System;` 한 줄이 가짜 변경으로 떴다. 같은 세션에 공장 배선 갈래도 같은 자리에서 걸렸다. 처방: 바이트로 읽어 BOM 유무를 기억하고 그대로 되돌린다 — `b=open(p,'rb').read(); bom=b.startswith(b'\xef\xbb\xbf'); …; open(p,'wb').write((BOM if bom else b'')+s.encode('utf-8'))`. 아래 09-09 의 CRLF 함정과 짝이다
+- **⭐ `MainScene.cs` 는 커밋된 형태가 `\r\r\n` 이다** — Edit 도구가 `\r\n` 으로 정규화하면 1335줄 전면 diff. 배선 갈래가 알아채고 커밋 바이트를 복원한 뒤 삽입만 재적용해 `+7/-0` 으로 마감했다. 정규화는 단독 커밋 카드(spawn_task 등록)
+- **⭐ 절단 두 건의 원인이 달랐다** — 베이커 갈래는 ⓒ이되 **깨끗한 경계**(상수 114줄 완결, 함수 미착수)에서 끊겼다 — "헬퍼·상수를 먼저 정의하고 사용부를 나중에"가 작동한 것. 수명 시험 갈래는 ⓑ(편집 0)였고 원인은 위 첫 항목. 상태 판별 없이 재위임하면 전자는 중복 편집, 후자는 같은 헛수고. 이 세션 절단 6건 중 ⓑ는 그 1건뿐이고 나머지는 전부 깨끗한 경계였다
+- **⭐ 배치가 새 어휘에 걸린 기존 시험은 고장이 아니라 지뢰선이다** — `NonMovementSteps_AllNineKinds_…` 가 "Expected: 16" 으로 붉어진 것은 그 시험이 스스로 적어 둔 계약("17번째 종류가 생기면 여기서 실패해 폴드 커버리지 갱신을 상기시킨다"). 갱신하러 간 갈래가 **옛 주석의 산수가 이미 틀려 있던 것**(조건부 이동 2종이라 적혔으나 폴드는 둘 다 무조건 무이동)과 이름의 수가 **두 번 썩은 것**(목록 10 ≠ 이름 9 ≠ 어휘 12)을 찾아 고쳤다. 커버리지 주장은 파생 명부(`Apply_EveryStepKind_IsMappedByTheFold`)에 넘기고 손 개수는 "분류 호출"로만 남김 — 이동/무이동은 열거형이 아니라 폴드 본문의 성질이라 파생 불가
+- **⭐ `Does.Not.Contain` 은 이 저장소에서 문자열 전용이다** — `Does.Not.Contain(ushort)` 가 문자열 오버로드로 잡혀 CS1503. 컬렉션 미포함은 `Has.No.Member`(`PresentationBoardModelTests.cs:1203` 선례)
+- **⭐ 검증자가 코디네이터 명세를 두 번 고쳤다** — ⓐ "배지가 꺼져도 라벨은 채워져 있어야 한다"는 무제한 낱장에서 성립 불가(`FormatBonusCharge(Unlimited)` 가 빈 문자열) → "매 `Bind` 마다 갱신돼 옛 값이 남지 않는다"로 정정. ⓑ `BonusPackDraw` 를 `Domain/Effects` 라 적었는데 실재는 `Domain/Run`. 둘 다 작성자·구현자 분리가 잡은 것
+- **패키지 캐시 함정 재발** — "'NUnit' could not be found" → `--full-sync`. 코드 오류가 아니다
+- **`SendMessage` 가 이 세션에 없다** — 절단된 에이전트를 같은 인스턴스로 잇지 못하고 새 갈래에 좌표를 다시 줘야 했다. 그래서 "상수 먼저"가 더 중요하다 — 새 갈래가 이어받을 경계가 파일 안에 있어야 한다
 
 ### 2026-09-09 (작업패 표시 완결 · 칩 가시화)
 
@@ -469,6 +544,18 @@ TurnEngine (도메인 — 9페이즈)
  표시 규약: 기본 레벨 1 — +1 은 HudWords.FormatUpgradeLevel 한 곳에서만 (저장은 구매 횟수)
  문턱은 이 그림에 없다 — 강화와 무관한 고정값이다(스케일링 폐기, §1)
 
+보너스 카드 한 바퀴 (사면 다음 판부터 터진다 — 패시브, 소모 없음)
+ EffectCatalog(5행) ── EffectDefinition = 시점·조건(+파라미터 2)·연산(+양·비율)·충전(스코프·횟수)
+  └ EffectInterpreter: 어휘 열거로만 분기 — 카드 id 없음. 새 행 = 코드 0줄 (두꺼비가 증명)
+ RunBonusCards(순서 있는 3슬롯) ─┬─ BonusPackDraw(장착 제외 풀, NextInt 정확히 3회)
+                                 ├─ ShopSession 셋째 SKU → BonusCardOffer(미러 열거 4 + ushort)
+                                 └─ MatchSessionFactory.CreateNext: Snapshot() 동결 → MatchFlow 슬롯
+ MatchFlow.FireCaptureEffects / FireSettlementEffectsFor → EffectTriggeredEvent(id·좌석·시점 — 결과 없음)
+  └ PresentationStepConverter → EffectTriggeredStep(17) → FloatingTextMotion(이름, 0초, 좌석 획득 행 머리)
+ MatchSession.BonusSlotProbe() → MainScene.ApplyMatchScope → MatchView.ShowBonusSlots → BonusSlotList
+ 이름 SSOT = HudWords.BonusWord (상점 카드·HUD 슬롯·발화 셋이 같은 표) · 설명은 어휘에서 생성
+ 표지 "shop" / "shop-card" / "shop-bonus" 셋 — 공유하면 구매 이력이 다른 SKU 추첨을 민다 (영속 계약)
+
 고/스톱 (강화 면역)
  제시 조건 = 기본점수 >= stop_threshold(7) ∧ 재선언 가드(마지막 고보다 증가)
  점(약탈 배율) = 기본점수 × (10000 + 고횟수 × go_score_bonus_bp) / 10000   ← 정수 내림·checked
@@ -476,10 +563,12 @@ TurnEngine (도메인 — 9페이즈)
  ⚠ 제시가 없으면 AwaitingGoStop 에 못 들어가고 DeclareStop 이 불법으로 남는다 — 스톱의 유일한 문
 
 IUIService (= UIManager)
- ├─ MatchView    계기판 — 라운드 `현재 | 상한` · 막 `현재 | 최종` · 요약 창(런 층위 문구)
+ ├─ MatchView    계기판 — 라운드 `현재 | 상한` · 막 `현재 | 최종` · 요약 창 · 족보 트래커
+ │                · 보너스 슬롯(Panel_BonusCardList 저작 완료 — BonusSlotList 부착·템플릿 배선 대기)
  ├─ GoStopView   고/스톱 모달
  ├─ FloorChoicePopupView 택1 딤(막 한 장, blocksRaycasts=false)
- └─ ShopView     매대(팩 슬롯) + 개봉 오버레이(ShopOfferCard 템플릿 복제 3장)
+ └─ ShopView     매대 셋(각서·작업패·보너스 — 서로 독립, 나가기 잠금만 셋을 다 문다)
+                  + 개봉 오버레이 셋(템플릿 복제 3장씩 — ShopOfferCard·ShopChipOfferCard·ShopBonusOfferCard)
                   프리팹은 ShopViewPrefabBaker 가 굽는다 (멱등·손본 값 보존·자가 치유)
 
 CardView 층 = 성격: 루트(참값) → Offset(지속 변위·콜라이더·그림자) → Shake(과도) → Tilt
@@ -488,7 +577,28 @@ BoardLayout: 모든 X 가 PlayAreaHalfWidth 대칭에서 파생, 실제 크기�
 
 ## 7. 커밋 이력
 
-### 이번 구간 (2026-09-09, 작업패 표시 완결 · 칩 가시화)
+### 이번 구간 (2026-09-10, 보너스 카드 전 계층)
+
+14커밋 · EditMode 1250 → **1302**(+52) · PlayMode 90 → **91** · 뮤테이션 6회 → 빨간불 11건.
+
+| 커밋 | 내용 |
+|---|---|
+| `4295882` | **보너스 카드가 런 안에 쌓이고 팩으로 뽑힌다** — `RunBonusCards`(순서 있는 3슬롯) · `BonusPackDraw`(부분 Fisher-Yates) · 두꺼비 행 추가(해석기 코드 0줄) |
+| `0004539` | 박을 맞은 좌석이 그 사실을 조건으로 읽는다 — `EffectContext.BakAgainstThisSeat` **필수 인자**(생산자 7곳 드러남) · 소금·거울 |
+| `ec04073` | 테스트: 세 축(저장소·추첨·박 조건) 17건 |
+| `98c4778` | **`BonusCardOffer`** — 미러 열거 4 + 생 `ushort`. Presentation 이 Domain 을 못 보는 경계 위의 통역 struct |
+| `44042f4` | **상점 셋째 SKU + 공장 배선** — 표지 `"shop-bonus"` · 슬롯 상한/후보 고갈이 구매 판정에 · 시험 호출처 13곳 적응 |
+| `4565780` | 테스트: 상점 상태 계약 13건 — 미러 등가는 방문을 이어 카탈로그 5행 전부 |
+| `2607b27` | **`BonusSlotProbe`** + 공장↔상점↔판 이음매 시험 — 공장이 사본을 넘기는 뮤테이션에 상점 시험 13건은 전부 초록, 이음매 시험만 빨간불 |
+| `d87be3c` | **상점 매대 셋째 칸** — `HudWords` 이름 5 + 어휘 생성 설명 · `ShopBonusOfferCard` · 베이커 · **헤드리스로 구운 프리팹 포함** |
+| `181ba3e` | 테스트: 낱말 13 + 여닫이 5 — 이름표를 카탈로그 상수에 못 박음(어셈블리 경계에서 사라진 그물을 시험이 복원) |
+| `4f0dfab` | **판 HUD 슬롯 목록** — `BonusSlotList`·`BonusSlotItem`·`MatchView.ShowBonusSlots`·`ApplyMatchScope` 한 줄 |
+| `265dfd6` | 테스트: 슬롯 목록 8건 — 관측은 풀이 아니라 하이어라키 형제 순서 |
+| `94d991b` | **발화 연출 개방** — `EffectTriggeredStep(17)` · 변환기 억제→방출 · 폴드 무해화 · 플로팅 이름(0초 축) |
+| `a2e068a` | 테스트: 변환 6 + 폴드 2 + 연출 5 — 시점 캐스팅을 이름으로 비교 · 결과 축 부재를 리플렉션으로 · 지뢰선 갱신 |
+| `f02775b` | 툴팁의 저작 경로를 프리팹 실물(`Panel_BonusCardList`)에 맞춤 |
+
+### 지난 구간 (2026-09-09, 작업패 표시 완결 · 칩 가시화)
 
 | 커밋 | 내용 |
 |---|---|
