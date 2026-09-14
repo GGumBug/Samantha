@@ -18,6 +18,9 @@ import subprocess
 import re
 import platform
 import argparse
+import array
+import io
+import wave
 from pathlib import Path
 
 # Windows-only module for playing WAV files
@@ -121,6 +124,70 @@ def get_audio_player():
         return None
 
 
+def scale_wav_to_memory(file_path, volume):
+    """
+    Read a 16-bit PCM WAV and return an equal WAV buffer with its samples scaled.
+
+    This exists because Windows has no volume knob at the playback call:
+    winsound.PlaySound plays at system volume, full stop. Scaling the samples
+    ourselves and handing PlaySound a SND_MEMORY buffer is the only way to make
+    the soundVolume config real on this platform without a third-party player.
+
+    The sound files on disk are never touched - they stay the masters, so raising
+    the volume back is a config edit, not a re-encode.
+
+    Args:
+        file_path: Path to the WAV file.
+        volume: Amplitude multiplier (0.0=silent, 1.0=unchanged).
+
+    Returns:
+        WAV file bytes, or None when the file is not 16-bit PCM (caller falls
+        back to playing the file from disk at system volume).
+    """
+    try:
+        with wave.open(str(file_path), "rb") as source:
+            # Only 16-bit uncompressed PCM is handled. Anything else is left alone
+            # rather than guessed at - a wrong guess is a burst of noise at full volume.
+            if source.getsampwidth() != 2 or source.getcomptype() != "NONE":
+                return None
+
+            params = source.getparams()
+            frames = source.readframes(source.getnframes())
+
+        samples = array.array("h")
+        samples.frombytes(frames)
+
+        # WAV is little-endian by definition; array uses native order.
+        swap = sys.byteorder == "big"
+        if swap:
+            samples.byteswap()
+
+        for index in range(len(samples)):
+            scaled = int(samples[index] * volume)
+
+            # Clamp so a volume above 1.0 wraps into distortion instead of silence.
+            if scaled > 32767:
+                scaled = 32767
+            elif scaled < -32768:
+                scaled = -32768
+
+            samples[index] = scaled
+
+        if swap:
+            samples.byteswap()
+
+        buffer = io.BytesIO()
+        with wave.open(buffer, "wb") as destination:
+            destination.setparams(params)
+            destination.writeframes(samples.tobytes())
+
+        return buffer.getvalue()
+    except Exception:
+        # Any decode problem falls back to disk playback - a hook must never
+        # break the session over a sound.
+        return None
+
+
 def play_sound(sound_name):
     """
     Play a sound file for the given sound name.
@@ -174,8 +241,18 @@ def play_sound(sound_name):
                         # SND_NODEFAULT: don't play default sound if file not found
                         # Note: Using SND_SYNC instead of SND_ASYNC because the script exits immediately
                         # after this call, which would terminate async playback before it completes
-                        winsound.PlaySound(str(file_path),
-                                         winsound.SND_FILENAME | winsound.SND_NODEFAULT)
+                        volume = get_sound_volume()
+
+                        # PlaySound itself has no volume argument, so below full volume
+                        # we scale the samples and hand it a buffer instead of a path.
+                        # SND_MEMORY and SND_FILENAME are mutually exclusive.
+                        scaled = scale_wav_to_memory(file_path, volume) if volume < 1.0 else None
+                        if scaled is not None:
+                            winsound.PlaySound(scaled,
+                                             winsound.SND_MEMORY | winsound.SND_NODEFAULT)
+                        else:
+                            winsound.PlaySound(str(file_path),
+                                             winsound.SND_FILENAME | winsound.SND_NODEFAULT)
                         return True
                     else:
                         # winsound not available, fail silently
@@ -269,8 +346,9 @@ def get_sound_volume():
     Get the sound volume from config files (0.0=silent, 1.0=full).
     Uses fallback logic: hooks-config.local.json -> hooks-config.json -> 1.0 (default).
 
-    Currently honored only by macOS afplay. Other platforms (Linux paplay/aplay/ffplay,
-    Windows winsound) ignore this and play at system volume.
+    Honored by macOS afplay (-v flag) and by Windows, where the samples are scaled
+    into a memory buffer before playback (see scale_wav_to_memory). Linux players
+    (paplay/aplay/ffplay/mpg123) still ignore this and play at system volume.
 
     Returns:
         Float volume value, defaulting to 1.0 if config missing or invalid.
