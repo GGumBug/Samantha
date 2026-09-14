@@ -106,3 +106,12 @@ UI 미표시, 반투명/dimming, 색상 이상, 비활성 효과 등 **시각 �
 - **같은 가설(예: "알파 조작")을 2회 이상 추적했는데 진전 없으면 중단하고 사용자에게 Inspector 확인 요청**: "Unity Editor에서 [컴포넌트명]의 [속성]이 어떻게 설정되어 있나요?"
 - **Fail Loud**: 코드 폴백(없으면 기본값 생성)은 **런타임 동적 생성이 필요한 경우만** 추가. 고정 프리팹 구조에는 Inspector 정정이 정석. 폴백은 버그를 숨길 뿐.
 - **.anim 파일을 함부로 수정하지 말 것**: 원인이 Inspector인데 .anim을 빈 클립으로 만들면 부수 피해 발생.
+
+### 라이브 Unity 에디터 (CLI)
+
+씬·프리팹·에셋을 만지기 전에 **`unity status` 를 먼저 묻는다.** `ready` 면 파일을 쓰지 말고 명령으로
+한다(`save_prefab_contents`·`add_component`·`set_serialized_field`·`run_script`), 시험은
+`unity command run_tests --mode editor --filter <픽스처>` 로 좁혀 돌린다. 그 전에
+`unity command set_autotick --enable true` 를 한 번 켠다 — 안 켜면 포커스를 잃은 에디터가 멎는다.
+연결이 없으면 **그 사실을 보고에 적고** 옛 경로(파일 편집·`ddtest.sh`)로 내려간다.
+규율 전문은 `.claude/rules/unity-delegation.md` 의 「라이브 에디터 우선」.

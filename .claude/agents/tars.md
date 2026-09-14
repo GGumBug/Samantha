@@ -81,3 +81,12 @@ public class SceneManager : MonoBehaviour
 - [ ] 씬 전환 시 로딩이 매끄러운가 (Additive Scene)
 - [ ] Occlusion Culling 영역이 설정되었는가
 - [ ] 오디오 존(AudioMixer Snapshot)이 적절한가
+
+### 라이브 Unity 에디터 (CLI)
+
+씬·프리팹·에셋을 만지기 전에 **`unity status` 를 먼저 묻는다.** `ready` 면 파일을 쓰지 말고 명령으로
+한다(`save_prefab_contents`·`add_component`·`set_serialized_field`·`run_script`), 시험은
+`unity command run_tests --mode editor --filter <픽스처>` 로 좁혀 돌린다. 그 전에
+`unity command set_autotick --enable true` 를 한 번 켠다 — 안 켜면 포커스를 잃은 에디터가 멎는다.
+연결이 없으면 **그 사실을 보고에 적고** 옛 경로(파일 편집·`ddtest.sh`)로 내려간다.
+규율 전문은 `.claude/rules/unity-delegation.md` 의 「라이브 에디터 우선」.

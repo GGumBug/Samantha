@@ -279,6 +279,11 @@ bash tools/ddtest.sh --full-sync        # 사본 재생성 (패키지 캐시 어
 
 ### ⭐ 헤드리스 굽기 — 사본에서 굽고 프리팹만 회수 (2026-09-10)
 
+> **2026-09-14 이후 이 절은 fallback 이다.** `com.unity.pipeline` 이 들어와 `unity` CLI 가 살아 있는
+> 에디터를 직접 조종한다 — 프리팹은 `save_prefab_contents`(격리 스테이지, **재직렬화 없음**)로,
+> 대량 저작은 `run_script` 로 한다. 아래 사본-굽기는 **에디터가 없거나 Safe Mode 일 때만** 쓴다.
+> 규율은 `.claude/rules/unity-delegation.md` 의 「라이브 에디터 우선」.
+
 굽기 도구(`[MenuItem]`)는 에디터가 원본을 잠그므로 배치 모드가 같은 폴더를 열 수 없다 — 그래서 사용자 왕복이 필요했다. 우회: `ddtest.sh` 가 이미 프로젝트를 `$DST` 사본에 `/MIR` 로 미러링해 두므로 **그 사본에서** 굽는다.
 
 ```bash

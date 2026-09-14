@@ -159,3 +159,12 @@ public class Selector : BTNode  // OR 노드 — 하나라도 성공하면 성�
 Unity 관련 최신 API나 패턴을 확인할 때 반드시 context7 MCP를 활용합니다:
 1. `mcp__context7__resolve-library-id`로 Unity 문서 ID 확인
 2. `mcp__context7__query-docs`로 최신 API 문서 조회
+
+### 라이브 Unity 에디터 (CLI)
+
+씬·프리팹·에셋을 만지기 전에 **`unity status` 를 먼저 묻는다.** `ready` 면 파일을 쓰지 말고 명령으로
+한다(`save_prefab_contents`·`add_component`·`set_serialized_field`·`run_script`), 시험은
+`unity command run_tests --mode editor --filter <픽스처>` 로 좁혀 돌린다. 그 전에
+`unity command set_autotick --enable true` 를 한 번 켠다 — 안 켜면 포커스를 잃은 에디터가 멎는다.
+연결이 없으면 **그 사실을 보고에 적고** 옛 경로(파일 편집·`ddtest.sh`)로 내려간다.
+규율 전문은 `.claude/rules/unity-delegation.md` 의 「라이브 에디터 우선」.

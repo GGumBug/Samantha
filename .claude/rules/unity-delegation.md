@@ -20,6 +20,46 @@ Samantha가 작업을 분석하고 적절한 팀원(Jarvis, Ava, Sonny, TARS)에
 | 레벨 디자인, 씬 구성, 환경, Cinemachine, 내러티브 | `tars` |
 | 복합 작업 (여러 분야에 걸친 오케스트레이션) | `samantha` |
 
+### 라이브 에디터 우선 (필수 — `unity` CLI 가 붙어 있을 때)
+
+프로젝트에 `com.unity.pipeline` 이 있고 에디터가 떠 있으면 **CLI 가 그 에디터를 직접 조종**한다.
+씬·프리팹·에셋을 만지는 작업은 **파일을 쓰기 전에 반드시** 연결을 먼저 묻는다.
+
+```bash
+unity status                              # state "ready" + Port 가 보이면 연결됨
+unity command set_autotick --enable true  # ← 안 하면 포커스를 잃은 에디터가 recompile·test 를 멎춘다
+unity command                             # 이 에디터가 노출하는 명령 목록(에디터가 정한다 — 이름을 추측하지 마라)
+```
+
+**연결돼 있으면 파일 대신 명령으로 한다.** `.unity`·`.prefab`·`.asset` YAML 손편집은 ⓐ fileID·GUID 를
+사람이 적어 틀리기 쉽고 ⓑ 재임포트 전까지 **떠 있는 에디터에 안 보여** 조용히 실패하며 ⓒ 활성 씬이
+아닌 엉뚱한 파일을 고치기 쉽다.
+
+| 하려는 일 | 명령 |
+|---|---|
+| 프리팹 노드 추가·배선 | `save_prefab_contents` (격리 스테이지 — 재직렬화 없음) · `add_component` · `attach_script` · `set_serialized_field` · `set_component_properties` |
+| 대량 저작 | `run_script --file AgentScripts/Build.cs --entry Build.All` (`Assets/` 밖 파일 → 인메모리 컴파일, 도메인 리로드 없음) |
+| 기존 `[MenuItem]` 굽기 도구 실행 | `unity command menu` |
+| 여러 편집을 한 Undo 로 | `batch` (실패 시 전체 롤백) |
+
+**"연결 안 됨"은 세 얼굴이 똑같다 — 파일 편집으로 새기 전에 갈라라**:
+
+| 증상 | 판별 | 처방 |
+|---|---|---|
+| 에디터가 정말 없음 | `unity editors running` 이 `count: 0` | 사용자에게 에디터를 열어 달라고 하거나 `unity open <path>` |
+| **Safe Mode** (컴파일 에러) | `unity pipeline list` 의 `Safe Mode` 칸 | **컴파일 에러를 고치는 것이 정답이다** — 우회가 아니다 |
+| 샌드박스가 가림 | 위 둘이 정상인데 `status` 만 빔 | "내 샌드박스가 가릴 수 있다"를 말하고 사용자에게 확인 요청 |
+
+`pipeline list` 와 `editors running` 이 **엇갈리면** 낡은 락파일이다(`Running: true` 인데 PID 칸이 빔)
+— 프로세스를 보는 `editors running` 쪽을 믿어라. (2026-09-14 실측: 에디터가 닫혔는데 락파일만 남아
+`Running: true` 로 보였다. 두 명령을 나란히 보지 않았으면 "포트가 왜 안 뜨지"로 헤맸다.)
+
+**끝내 파일을 직접 편집한다면 보고에 명시해라** — *"라이브 에디터 없음(사유), 파일 직접 편집"*.
+조용히 새는 것이 이 규칙이 막으려는 유일한 실패다.
+
+**모달 다이얼로그는 멈춤이 아니다** — 명령이 길어지면 `unity command editor_status`(막혀 있어도 즉답).
+`status: "blocked_by_dialog"` 면 재시도를 멈추고 **무엇이 막는지 사용자에게 말해라**(CLI 로 못 누른다).
+
 ### 금지 사항
 - Unity C# 파일을 에이전트 없이 직접 편집하지 마세요 (단, 아래 "위임 면제 기준" 충족 시 직접 편집 허용)
 - 에이전트를 Bash 명령어로 호출하지 마세요 — 반드시 Agent 도구를 사용하세요
@@ -43,7 +83,8 @@ Unity C# 파일이라도 **모든** 조건을 충족하면 에이전트 위임 �
 - 다파일 변경, 4줄 이상, 시그니처/public API 변경
 - 새 메서드/클래스/인터페이스 신설
 - SSOT 통합·리팩토링·아키텍처 변경
-- `.meta`/`.asset`/`.prefab` 등 Unity 직렬화 파일 수정
+- `.meta`/`.asset`/`.prefab` 등 Unity 직렬화 파일 수정 — **YAML 손편집은 라이브 에디터가 붙어
+  있든 없든 금지다.** 붙어 있으면 위 「라이브 에디터 우선」의 명령으로, 없으면 멱등 굽기 도구로 한다
 
 (2026-04-27 row-lock 작업 회고: Sonny 위임 6번 중 진단 로그 추가/제거 2번은 이 면제 기준에 해당. 위임 비용 약 30% 절감 가능 추산)
 
@@ -151,7 +192,9 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 - Ava/Jarvis 위임 시 `.meta` 파일 직접 생성이 포함되면 프롬프트 보고 항목에 **"사용자 Unity Editor에서 Missing 참조 확인 필수"** 를 명시하도록 지시
 - 가능하면 `.meta` 생성은 Unity Editor의 자동 생성에 맡기고, 에이전트는 `.cs`/`.asset` 본문만 작성
-- 프리팹 대량 저작(오브젝트 5개 이상 + 상호 배선)은 YAML 손편집 대신 **멱등 굽기 도구**(`[MenuItem]`)로 — GUID 를 사람이 적는 자리 0. 상세 [best-practice/idempotent-prefab-baker.md](../../best-practice/idempotent-prefab-baker.md)
+- 프리팹 대량 저작(오브젝트 5개 이상 + 상호 배선)은 YAML 손편집 대신 **멱등 굽기 도구**로 — GUID 를
+  사람이 적는 자리 0. 라이브 에디터가 붙어 있으면 `run_script` 가 같은 멱등성을 더 싸게 준다
+  (`[MenuItem]` 불필요 · 도메인 리로드 없음). 상세 [best-practice/idempotent-prefab-baker.md](../../best-practice/idempotent-prefab-baker.md)
 
 ### Unity 자동 prefab mutation 함정 (공유 asset 추가 시)
 

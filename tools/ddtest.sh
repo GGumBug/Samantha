@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Double Down EditMode 테스트를 Unity 배치 모드로 돌린다.
 #
+# 언제 이것을 쓰는가 (2026-09-14 CLI 도입 후): 이 스크립트는 **전량 게이트**다 —
+#   ① 커밋 직전 총계 확인   ② 뮤테이션 검증   ③ 에디터가 없거나 Safe Mode 일 때의 fallback
+# 편집 중 빠른 되먹임은 살아 있는 에디터 쪽이 싸다:
+#   unity command recompile && unity command run_tests --mode editor --filter <픽스처>
+# 총계를 비교하는 규율(예: 1302 → 1303)은 필터 실행으로 낼 수 없으므로 이 문은 남는다.
+#
 # 왜 사본에서 도는가: Editor 가 원본 프로젝트를 Temp/UnityLockfile 로 잠그므로 같은 폴더를
 # 배치 모드가 열 수 없다. 사본은 Library 캐시를 보존해 재임포트를 건너뛴다(첫 회만 느리다).
 #

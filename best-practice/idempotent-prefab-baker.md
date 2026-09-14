@@ -40,6 +40,30 @@
 - [ ] 결과 GUID 대조 + null 전수 검사를 보고에 포함했는가
 - [ ] 새 `[SerializeField]` 를 추가한 커밋에서 **굽기 도구의 배선 목록도 함께 봤는가** — 런타임 배선 경고 명부에만 올리면 다시 구워도 그 칸은 빈다 (2026-09-09 실측, [hand-listed-roster-decay.md](hand-listed-roster-decay.md) §5)
 
+## 5. 라이브 에디터가 붙어 있으면 — `run_script` (2026-09-14)
+
+`unity` CLI 가 에디터에 연결돼 있으면 **같은 멱등성을 더 싸게** 얻는다. 굽기 로직을 `Assets/` **밖**
+파일에 두고 정적 진입점을 부른다:
+
+```bash
+unity command run_script --file AgentScripts/BakeShopView.cs --entry BakeShopView.All
+unity command run_script --file AgentScripts/BakeShopView.cs --dry_run true   # 컴파일만
+```
+
+| | `[MenuItem]` 굽기 도구 | `run_script` |
+|---|---|---|
+| 실행 | 사람이 메뉴 클릭 (또는 헤드리스 왕복) | 에이전트가 직접 |
+| 비용 | 도메인 리로드 15~20초 | 인메모리 컴파일 < 2초 |
+| 자산 임포트 | `Assets/` 안이라 매 저장마다 | `Assets/` 밖이라 없음 |
+| 버전 관리 | 프로젝트에 커밋 | 같음(`AgentScripts/`) |
+
+**§2 의 세 속성(멱등·손본 값 보존·자가 치유)은 그대로 요구된다** — 실행 경로만 싸졌지, 두 번 돌려도
+같아야 한다는 계약은 변하지 않는다. 노드 서넛짜리 작은 배선은 스크립트도 필요 없다:
+`save_prefab_contents` 가 격리 스테이지에서 선언적으로 고쳐 **재직렬화 없이** 저장한다.
+
+**기존 베이커를 서둘러 옮기지 마라** — `unity command menu` 로 그대로 부를 수 있다. 손댈 일이 생긴
+도구부터 옮기는 것이 싸다.
+
 ## 관련 문서
 
 - [.claude/rules/unity-delegation.md](../.claude/rules/unity-delegation.md) — `.meta` GUID 수동 지정 리스크 (본 문서는 그 처방의 구체화)

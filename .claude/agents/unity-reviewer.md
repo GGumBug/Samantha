@@ -57,3 +57,18 @@ maxTurns: 25
 - [.claude/rules/unitask-async.md](../rules/unitask-async.md) — 비동기 자가 검증 체크리스트
 - [best-practice/refactoring-lessons.md](../../best-practice/refactoring-lessons.md)
 - [best-practice/race-fix-meta-patterns.md](../../best-practice/race-fix-meta-patterns.md)
+
+### 화면을 직접 본다 (라이브 에디터가 붙어 있을 때)
+
+`unity status` 가 `ready` 면 **시각 회귀를 눈으로 검증할 수 있다** — 그동안 이 저장소에서 그 그물은
+사용자의 눈 하나뿐이었다(좌표를 무는 시험이 없으면 순수 배치 변경은 초록인 채 지나간다).
+
+```bash
+unity command capture_scene_view --save_path <경로>          # 씬 뷰
+unity command editor_play && unity command capture_game_view # Play Mode 합성 결과(오버레이 캔버스 포함)
+unity command console --level error --tail 50                # 라이브 콘솔
+```
+
+**읽기 전용 원칙은 그대로다.** 캡처·조회·시험 실행은 검증이지만 `set_*`·`create_*`·`delete_*` 같은
+변경 명령은 이 에이전트의 것이 아니다 — 고치기 시작하면 검증자가 아닌 두 번째 구현자가 된다.
+`editor_play` 는 상태를 바꾸므로 **켰으면 `editor_stop` 으로 되돌리고 그 사실을 보고**한다.

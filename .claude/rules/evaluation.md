@@ -9,6 +9,34 @@
 3. **자기 평가 금지**: 코드를 작성한 직후 "잘 되었다"고 선언하지 않습니다 — 실행 결과로 증명합니다
 4. **교차 검증 권장**: 복잡한 변경은 `/simplify`나 별도 서브에이전트로 독립 리뷰합니다
 
+## 검증 루프 — 안쪽은 CLI, 바깥쪽은 배치 (2026-09-14)
+
+Unity 프로젝트의 검증은 **두 겹**이다. 안쪽을 건너뛰면 느리고, **바깥쪽을 건너뛰면 총계를 잃는다**.
+
+| 겹 | 도구 | 언제 | 무엇을 준다 |
+|---|---|---|---|
+| **안쪽** | `unity command recompile` → `recompile_status` → `run_tests --filter <픽스처>` | 편집할 때마다 | 초 단위. Unity **진짜** 컴파일러의 오류 배열. 좁혀 실행 |
+| **바깥쪽** | `bash tools/ddtest.sh` (+ PlayMode) | **커밋 직전** · 뮤테이션 검증 | 전량 총계. 에디터 없이도 돈다 |
+
+```bash
+unity status                                   # 없으면 안쪽은 건너뛰고 그 사실을 말한다
+unity command set_autotick --enable true       # 필수 — 포커스 잃은 에디터는 recompile 을 멎춘다
+# (.cs 편집)
+unity command recompile && unity command recompile_status   # failed=true 면 errors 배열을 읽는다
+unity command run_tests --mode editor --filter ShopBonusPackTests
+bash tools/ddtest.sh                           # 커밋 전 전량 — 총계 비교는 여기서만
+```
+
+**왜 바깥쪽을 못 버리는가** — 셋이다. ⓐ 우리 규율이 **총계 비교**(예: 1302 → 1303)인데 `--filter` 는
+총계를 못 낸다. ⓑ `run_tests` 는 실패 시 **결과가 불투명할 수 있다**(패키지 스킬의 명시 경고) — 좁은
+필터로 재실행하거나 Test Runner 를 봐야 한다. ⓒ 에디터가 Safe Mode·부재일 때 안쪽이 통째로 없다.
+
+**`dotnet build` 는 이제 2순위다.** 그쪽은 Unity 밖 **대리** 컴파일이라 asmdef·define 을 근사할 뿐이고,
+`recompile` 은 에디터가 실제로 쓰는 컴파일러다. 에디터가 없을 때만 `dotnet build` 로 내려간다.
+
+**뮤테이션 검증은 바깥쪽에서** — 주입·원복이 파일 단위이고 판정 근거가 "총계 중 몇 건이 빨간불인가"라
+필터 실행으로는 그 판별력이 나오지 않는다.
+
 ## 테스트 작성자 / 구현자 분리 (기본값)
 
 테스트 작성은 **구현자와 다른 에이전트에 위임**한다. 메커니즘: 테스트 작성자는 소비자 시점으로 코드를 역추적하므로 구현자의 사각지대를 구조적으로 통과한다.
@@ -84,6 +112,11 @@ UI/시각 변경(prefab/색상/위치/scale/sprite/anchor/sorting) 보고 시, *
 - **확인 위치**: 어느 Scene/씬 진입 경로/노드에서 보이는지
 - **합격 기준**: "X 가 Y 색이면 통과" 같은 명시적 pass/fail 조건
 - **회귀 가능 영역**: 같은 prefab/asset 을 공유하는 다른 화면 (예: prefab variant 부모 영향)
+
+**라이브 에디터가 붙어 있으면 검증자가 직접 본다** — `unity command capture_game_view`(Play Mode 의
+합성 결과) · `capture_scene_view` · `screenshot` 이 PNG 를 낸다. 그동안 시각 회귀의 유일한 그물이
+사용자의 눈이었던 자리가 이제 리뷰 가능해진다. 다만 **캡처가 명세를 대신하지 못한다** — 무엇을 보고
+무엇이 합격인지는 여전히 위 단위로 적는다. 캡처는 그 합격 기준을 **누가** 확인하는지만 바꾼다.
 
 **금기**: "Inspector 에서 잘 보이는지 확인 부탁" — 사용자가 어느 필드를 어디서 보고 무엇을 통과 기준으로 삼아야 할지 불명. 시각 검증 비용은 명세 없으면 지수적으로 증가.
 
