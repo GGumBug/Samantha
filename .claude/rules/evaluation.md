@@ -23,19 +23,46 @@ unity status                                   # 없으면 안쪽은 건너뛰�
 unity command set_autotick --enable true       # 필수 — 포커스 잃은 에디터는 recompile 을 멎춘다
 # (.cs 편집)
 unity command recompile && unity command recompile_status   # failed=true 면 errors 배열을 읽는다
-unity command run_tests --mode editor --filter ShopBonusPackTests
+unity command run_tests --mode editor --filter DoubleDown.Application.Tests.ShopBonusPackTests
+unity command run_tests --mode playmode --async_tests   # PlayMode 는 이 길뿐 — test_status 로 폴링
 bash tools/ddtest.sh                           # 커밋 전 전량 — 총계 비교는 여기서만
 ```
 
 **왜 바깥쪽을 못 버리는가** — 셋이다. ⓐ 우리 규율이 **총계 비교**(예: 1302 → 1303)인데 `--filter` 는
 총계를 못 낸다. ⓑ `run_tests` 는 실패 시 **결과가 불투명할 수 있다**(패키지 스킬의 명시 경고) — 좁은
-필터로 재실행하거나 Test Runner 를 봐야 한다. ⓒ 에디터가 Safe Mode·부재일 때 안쪽이 통째로 없다.
+필터로 재실행하거나 Test Runner 를 봐야 한다(그 불투명이 어떤 모습인지는 아래 「두 겹의 success」).
+ⓒ 에디터가 Safe Mode·부재일 때 안쪽이 통째로 없다.
 
 **`dotnet build` 는 이제 2순위다.** 그쪽은 Unity 밖 **대리** 컴파일이라 asmdef·define 을 근사할 뿐이고,
 `recompile` 은 에디터가 실제로 쓰는 컴파일러다. 에디터가 없을 때만 `dotnet build` 로 내려간다.
 
 **뮤테이션 검증은 바깥쪽에서** — 주입·원복이 파일 단위이고 판정 근거가 "총계 중 몇 건이 빨간불인가"라
 필터 실행으로는 그 판별력이 나오지 않는다.
+
+### 도구가 초록이라고 말할 때 — 두 겹의 success (2026-09-14)
+
+응답에는 **success 가 둘** 있다. 바깥은 *명령이 전달됐는가*이고, `data.result.success` 가 *일이
+됐는가*다. 두 겹을 구별하지 않으면 도구가 정직하게 말한 실패가 초록으로 보인다.
+
+- **`data.result.success` / `data.result.error` 를 `Summary` 보다 먼저 읽는다.** 결과 파서를 직접
+  쓸 때 `Summary` 만 올리면 안쪽 실패 사유를 통째로 건너뛴다
+- **`Total == 0` 은 통과가 아니라 실패다.** 아무것도 안 돌았다는 뜻이고, 필터 오타의 유일한 증상이다
+- **`--filter` 에는 네임스페이스를 전부 적는다** — 픽스처 이름만 적으면 매칭이 0건이다
+
+실측 2건(같은 계급의 거짓 초록): ⓐ `--filter "ShopBonusOfferDisplayTests"`(네임스페이스 누락) →
+`{"Summary":{"Total":0,...},"success":true}` — 아무것도 안 돌았는데 통과로 읽힌다. ⓑ `run_tests
+--mode play` → 바깥 `success: true`, `Summary.Total: 0`, 진짜 사유는 `data.result.error` 에 숨어
+있었다: *"PlayMode tests cannot run synchronously over HTTP: entering play mode triggers a domain
+reload that drops the request."*
+
+**PlayMode 는 비동기로만 돈다.** `--mode playmode --async_tests` 후 `test_status` 폴링이 유일한
+경로다 — 장시간 실행용 선택지가 아니다. `test_status` 의 `data.result` 는 객체가 아니라 **JSON
+문자열**(`"{\"status\":\"running\"}"`)이라 이스케이프된 따옴표 때문에 `grep '"running"'` 류 폴링이
+1회 만에 빠져나간다. 파싱한 뒤 판정한다.
+
+**폴링 술어는 긍정형으로 쓴다.** "compiling 이 아니면 끝" 같은 부정형은 **응답 자체가 없는
+구간**(도메인 리로드 중 서버 단절)을 완료로 통과시킨다. 완료 상태를 명시로 확인하고, 무응답은
+완료가 아니라 재시도다.
 
 ## 테스트 작성자 / 구현자 분리 (기본값)
 

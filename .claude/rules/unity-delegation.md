@@ -42,13 +42,14 @@ unity command                             # 이 에디터가 노출하는 명령
 | 기존 `[MenuItem]` 굽기 도구 실행 | `unity command menu` |
 | 여러 편집을 한 Undo 로 | `batch` (실패 시 전체 롤백) |
 
-**"연결 안 됨"은 세 얼굴이 똑같다 — 파일 편집으로 새기 전에 갈라라**:
+**"연결 안 됨"은 네 얼굴이 똑같다 — 파일 편집으로 새기 전에 갈라라**:
 
 | 증상 | 판별 | 처방 |
 |---|---|---|
 | 에디터가 정말 없음 | `unity editors running` 이 `count: 0` | 사용자에게 에디터를 열어 달라고 하거나 `unity open <path>` |
 | **Safe Mode** (컴파일 에러) | `unity pipeline list` 의 `Safe Mode` 칸 | **컴파일 에러를 고치는 것이 정답이다** — 우회가 아니다 |
 | 샌드박스가 가림 | 위 둘이 정상인데 `status` 만 빔 | "내 샌드박스가 가릴 수 있다"를 말하고 사용자에게 확인 요청 |
+| **도메인 리로드 중 일시 단절** | 위 셋이 다 정상인데 **방금 한 호출만** 실패 (2026-09-14 실측: `recompile` 직후 `run_tests` 가 `No Unity Editor instances found` — 직후 `status`·`editors running`·`pipeline list` 셋 다 정상) | 재시도한다 — 파일 편집으로 새는 자리가 아니다 |
 
 `pipeline list` 와 `editors running` 이 **엇갈리면** 낡은 락파일이다(`Running: true` 인데 PID 칸이 빔)
 — 프로세스를 보는 `editors running` 쪽을 믿어라. (2026-09-14 실측: 에디터가 닫혔는데 락파일만 남아
