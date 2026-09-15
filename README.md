@@ -1,6 +1,6 @@
 # Samantha
 
-GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 엔지니어링 지식을 관리하는 저장소입니다. Hwaseo와 GameCore의 실제 인시던트가 `best-practice/` 지식의 주요 원천입니다. 게임 애플리케이션 소스는 포함하지 않습니다.
+GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 엔지니어링 지식을 관리하는 저장소다. Hwaseo와 GameCore의 실제 인시던트가 `best-practice/` 지식의 주요 원천이다. 게임 애플리케이션 소스는 포함하지 않는다.
 
 ## 구조
 
@@ -14,8 +14,9 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [.claude/rules/](.claude/rules/) | Claude 시절부터 공유하는 상세 엔지니어링 규칙 문서 |
 | [best-practice/](best-practice/) | 실제 실패에서 일반화한 설계·디버깅 패턴 |
 | [reports/](reports/) | 특정 기능과 리팩터링의 설계·분석 기록 |
+| [tools/](tools/) | 산문·한국어 문체 감사 도구와 테스트 러너 |
 
-`.claude/` 자산은 기존 Claude Code 호환성과 과거 기록을 위해 유지합니다. Codex에서 자동으로 읽히는 SSOT는 `AGENTS.md`, `.codex/`, `.agents/skills/`입니다.
+`.claude/` 자산은 기존 Claude Code 호환성과 과거 기록을 위해 유지한다. Codex에서 자동으로 읽히는 SSOT는 `AGENTS.md`, `.codex/`, `.agents/skills/`다.
 
 ## Codex 팀
 
@@ -39,6 +40,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [unitask-async.md](.claude/rules/unitask-async.md) | UniTask 비동기 10개 규칙 |
 | [evaluation.md](.claude/rules/evaluation.md) | 평가 주도 검증과 작성자·검증자 분리 |
 | [markdown-docs.md](.claude/rules/markdown-docs.md) | Markdown 문서 표준 |
+| [prose-style.md](.claude/rules/prose-style.md) | 주석·커밋·문서 산문 규칙과 한국어 문체 |
 
 ## Best practices
 
@@ -91,7 +93,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [test-intent-repurposing.md](best-practice/test-intent-repurposing.md) | 전제가 소멸한 테스트의 불변식 계약 전환 |
 | [transform-channel-layering.md](best-practice/transform-channel-layering.md) | 변위 크기·동반자 기준 트랜스폼 층 배치 |
 | [transit-path-assertion.md](best-practice/transit-path-assertion.md) | 종단 상태가 같은 이동의 경유 경로 단언 |
-| [ugui-graphic-dependency-traps.md](best-practice/ugui-graphic-dependency-traps.md) | uGUI 성분이 같은 오브젝트 Graphic 에 기생하는 두 함정 |
+| [ugui-graphic-dependency-traps.md](best-practice/ugui-graphic-dependency-traps.md) | uGUI 성분이 같은 오브젝트 Graphic에 기생하는 두 함정 |
 | [ui-transition-prefab-convention.md](best-practice/ui-transition-prefab-convention.md) | UI transition prefab 시작 상태 SSOT |
 | [ui-visibility-two-layer-srp.md](best-practice/ui-visibility-two-layer-srp.md) | panel root와 content 가시성 책임 분리 |
 | [unitask-async-patterns.md](best-practice/unitask-async-patterns.md) | UniTask 비동기 인시던트 카탈로그 |
@@ -105,6 +107,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 
 | 문서 | 설명 |
 |---|---|
+| [agent-prose-readability.md](reports/agent-prose-readability.md) | 에이전트 주석·커밋 장황함의 원인 분석과 처방 |
 | [claude-agent-architecture.md](reports/claude-agent-architecture.md) | Claude Agent 아키텍처 결정 규칙 |
 | [claude-browser-decision.md](reports/claude-browser-decision.md) | 브라우저 자동화 도구 선택 결정 규칙 |
 | [claude-memory-and-settings.md](reports/claude-memory-and-settings.md) | Claude Memory·Settings 결정 규칙 |
@@ -114,6 +117,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 | [double-down-handoff-archive.md](reports/double-down-handoff-archive.md) | Double Down 핸드오프 아카이브 |
 | [double-down-ingame-handoff.md](reports/double-down-ingame-handoff.md) | Double Down 인게임 핸드오프 |
 | [groovy-wobbling-puddle.md](reports/groovy-wobbling-puddle.md) | Samantha 저장소 업데이트 계획 |
+| [korean-prose-style.md](reports/korean-prose-style.md) | 에이전트 한국어가 번역체로 읽히는 네 가지 원인 |
 | [llm-day-to-day-degradation.md](reports/llm-day-to-day-degradation.md) | LLM 일상 성능 저하 검증 |
 | [matchview-gostop-jokbo-application-plan.md](reports/matchview-gostop-jokbo-application-plan.md) | MatchView·GoStopView·Item_Jokbo 적용 계획 |
 | [mossy-nibbling-dusk.md](reports/mossy-nibbling-dusk.md) | MainScene RNG 스모크 테스트 환경 구축 계획 |
@@ -122,10 +126,10 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 
 ## 검증
 
-Codex 훅과 저장소 자산 테스트는 Python 3.11 이상에서 실행합니다. Python 3.10 이하는 훅 테스트를 실행하지만 TOML 파서 검증은 건너뜁니다.
+Codex 훅과 저장소 자산 테스트는 Python 3.11 이상에서 실행한다. Python 3.10 이하는 훅 테스트를 실행하지만 TOML 파서 검증은 건너뜁니다.
 
 ```bash
 python3 -m unittest tests.test_hooks -v
 ```
 
-Unity 수정은 구현자와 별도의 `unity-reviewer` 또는 `$unity-log-diagnostic`으로 검증합니다.
+Unity 수정은 구현자와 별도의 `unity-reviewer` 또는 `$unity-log-diagnostic`으로 검증한다.

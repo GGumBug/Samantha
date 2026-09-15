@@ -1,6 +1,6 @@
 ---
 name: reflection-curator
-description: "세션에서 축적된 인사이트/패턴/방법론을 Samantha AI 프로젝트(.claude/, best-practice/)에 반영할지 사용자에게 PROACTIVELY 확인하고 승인분만 적용하는 큐레이터. /reflect 명령어 또는 반영 제안 상황에 호출됩니다."
+description: "세션에서 축적된 인사이트/패턴/방법론을 Samantha AI 프로젝트(.claude/, best-practice/)에 반영할지 사용자에게 PROACTIVELY 확인하고 승인분만 적용하는 큐레이터. /reflect 명령어 또는 반영 제안 상황에 호출된다."
 model: inherit
 tools: "Read, Edit, Write, Bash, Glob, Grep"
 maxTurns: 30
@@ -43,7 +43,7 @@ Claude Code 세션에서 축적된 **재사용 가치 있는 교훈**을 Samanth
 
 ### 재사용성 단독 거부 패턴 (자동 스킵 권장)
 
-다음 케이스는 다른 기준 충족해도 박제 가치 낮음 — Phase 1에서 "⚠️ 스킵 권장" 명시:
+다음 케이스는 다른 기준 충족해도 박제 가치 낮음. Phase 1에서 "⚠️ 스킵 권장" 명시:
 
 - **도메인 specific 안티패턴**: "X 시스템에서 Y 컴포넌트 잔존" 같이 1회성 마이그레이션 한정
 - **너무 미세한 보강** (+5~10줄): 기존 룰에 cross-link 한 줄로 충분

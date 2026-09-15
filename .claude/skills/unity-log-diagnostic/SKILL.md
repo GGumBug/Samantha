@@ -1,6 +1,6 @@
 ---
 name: unity-log-diagnostic
-description: Claude의 픽스를 사용자 플레이 테스트로 자동 검증. Claude가 [Prefix][Layer] 형식의 진단 Debug.Log를 박은 후 사용자가 Unity Editor에서 시나리오를 재현하면, 본 스킬이 Editor.log를 읽어 픽스 성공/실패를 판정합니다 (예: /unity-log-diagnostic BattleRng).
+description: Claude의 픽스를 사용자 플레이 테스트로 자동 검증. Claude가 [Prefix][Layer] 형식의 진단 Debug.Log를 박은 후 사용자가 Unity Editor에서 시나리오를 재현하면, 본 스킬이 Editor.log를 읽어 픽스 성공/실패를 판정한다 (예: /unity-log-diagnostic BattleRng).
 argument-hint: <prefix>
 allowed-tools: Bash, Read
 ---

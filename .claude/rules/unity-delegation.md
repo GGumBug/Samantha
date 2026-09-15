@@ -2,15 +2,15 @@
 
 ## Unity 작업 위임 규칙 (필수)
 
-Unity 관련 작업은 전문 에이전트에게 위임합니다. 여러 전문 분야가 얽힌 복합 작업은 Samantha가 분해·품질 감독하고, 단일 전문 분야는 담당 전문가에게 직접 위임합니다.
+Unity 관련 작업은 전문 에이전트에게 위임한다. 여러 전문 분야가 얽힌 복합 작업은 Samantha가 분해·품질 감독하고, 단일 전문 분야는 담당 전문가에게 직접 위임한다.
 
-Codex에서는 `AGENTS.md`의 라우팅 표와 `.codex/config.toml`의 깊이 제한이 SSOT입니다. Samantha는 깊이 1에서 전문가를 깊이 2로 한 단계 재위임하며, 전문가는 추가 위임하지 않습니다.
+Codex에서는 `AGENTS.md`의 라우팅 표와 `.codex/config.toml`의 깊이 제한이 SSOT이다. Samantha는 깊이 1에서 전문가를 깊이 2로 한 단계 재위임하며, 전문가는 추가 위임하지 않는다.
 
-Samantha가 작업을 분석하고 적절한 팀원(Jarvis, Ava, Sonny, TARS)에게 재위임합니다.
+Samantha가 작업을 분석하고 적절한 팀원(Jarvis, Ava, Sonny, TARS)에게 재위임한다.
 
 ### 직접 위임이 더 효율적인 경우
 
-단일 전문 분야에 명확히 해당하는 작업은 Samantha를 거치지 않고 직접 위임할 수 있습니다:
+단일 전문 분야에 명확히 해당하는 작업은 Samantha를 거치지 않고 직접 위임할 수 있다:
 
 | 작업 유형 | 에이전트 |
 |-----------|----------|
@@ -20,18 +20,18 @@ Samantha가 작업을 분석하고 적절한 팀원(Jarvis, Ava, Sonny, TARS)에
 | 레벨 디자인, 씬 구성, 환경, Cinemachine, 내러티브 | `tars` |
 | 복합 작업 (여러 분야에 걸친 오케스트레이션) | `samantha` |
 
-### 라이브 에디터 우선 (필수 — `unity` CLI 가 붙어 있을 때)
+### 라이브 에디터 우선 (필수 — `unity` CLI가 붙어 있을 때)
 
-프로젝트에 `com.unity.pipeline` 이 있고 에디터가 떠 있으면 **CLI 가 그 에디터를 직접 조종**한다.
+프로젝트에 `com.unity.pipeline`이 있고 에디터가 떠 있으면 **CLI가 그 에디터를 직접 조종**한다.
 씬·프리팹·에셋을 만지는 작업은 **파일을 쓰기 전에 반드시** 연결을 먼저 묻는다.
 
 ```bash
-unity status                              # state "ready" + Port 가 보이면 연결됨
-unity command set_autotick --enable true  # ← 안 하면 포커스를 잃은 에디터가 recompile·test 를 멎춘다
+unity status                              # state "ready" + Port가 보이면 연결됨
+unity command set_autotick --enable true  # ← 안 하면 포커스를 잃은 에디터가 recompile·test를 멎춘다
 unity command                             # 이 에디터가 노출하는 명령 목록(에디터가 정한다 — 이름을 추측하지 마라)
 ```
 
-**연결돼 있으면 파일 대신 명령으로 한다.** `.unity`·`.prefab`·`.asset` YAML 손편집은 ⓐ fileID·GUID 를
+**연결돼 있으면 파일 대신 명령으로 한다.** `.unity`·`.prefab`·`.asset` YAML 손편집은 ⓐ fileID·GUID를
 사람이 적어 틀리기 쉽고 ⓑ 재임포트 전까지 **떠 있는 에디터에 안 보여** 조용히 실패하며 ⓒ 활성 씬이
 아닌 엉뚱한 파일을 고치기 쉽다.
 
@@ -40,34 +40,34 @@ unity command                             # 이 에디터가 노출하는 명령
 | 프리팹 노드 추가·배선 | `save_prefab_contents` (격리 스테이지 — 재직렬화 없음) · `add_component` · `attach_script` · `set_serialized_field` · `set_component_properties` |
 | 대량 저작 | `run_script --file AgentScripts/Build.cs --entry Build.All` (`Assets/` 밖 파일 → 인메모리 컴파일, 도메인 리로드 없음) |
 | 기존 `[MenuItem]` 굽기 도구 실행 | `unity command menu` |
-| 여러 편집을 한 Undo 로 | `batch` (실패 시 전체 롤백) |
+| 여러 편집을 한 Undo로 | `batch` (실패 시 전체 롤백) |
 
-**"연결 안 됨"은 네 얼굴이 똑같다 — 파일 편집으로 새기 전에 갈라라**:
+**"연결 안 됨"은 네 얼굴이 똑같다. 파일 편집으로 새기 전에 갈라라**:
 
 | 증상 | 판별 | 처방 |
 |---|---|---|
-| 에디터가 정말 없음 | `unity editors running` 이 `count: 0` | 사용자에게 에디터를 열어 달라고 하거나 `unity open <path>` |
-| **Safe Mode** (컴파일 에러) | `unity pipeline list` 의 `Safe Mode` 칸 | **컴파일 에러를 고치는 것이 정답이다** — 우회가 아니다 |
-| 샌드박스가 가림 | 위 둘이 정상인데 `status` 만 빔 | "내 샌드박스가 가릴 수 있다"를 말하고 사용자에게 확인 요청 |
-| **도메인 리로드 중 일시 단절** | 위 셋이 다 정상인데 **방금 한 호출만** 실패 (2026-09-14 실측: `recompile` 직후 `run_tests` 가 `No Unity Editor instances found` — 직후 `status`·`editors running`·`pipeline list` 셋 다 정상) | 재시도한다 — 파일 편집으로 새는 자리가 아니다 |
+| 에디터가 정말 없음 | `unity editors running`이 `count: 0` | 사용자에게 에디터를 열어 달라고 하거나 `unity open <path>` |
+| **Safe Mode** (컴파일 에러) | `unity pipeline list`의 `Safe Mode` 칸 | **컴파일 에러를 고치는 것이 정답이다** — 우회가 아니다 |
+| 샌드박스가 가림 | 위 둘이 정상인데 `status`만 빔 | "내 샌드박스가 가릴 수 있다"를 말하고 사용자에게 확인 요청 |
+| **도메인 리로드 중 일시 단절** | 위 셋이 다 정상인데 **방금 한 호출만** 실패 (2026-09-14 실측: `recompile` 직후 `run_tests`가 `No Unity Editor instances found` — 직후 `status`·`editors running`·`pipeline list` 셋 다 정상) | 재시도한다 — 파일 편집으로 새는 자리가 아니다 |
 
-`pipeline list` 와 `editors running` 이 **엇갈리면** 낡은 락파일이다(`Running: true` 인데 PID 칸이 빔)
+`pipeline list`와 `editors running`이 **엇갈리면** 낡은 락파일이다(`Running: true` 인데 PID 칸이 빔)
 — 프로세스를 보는 `editors running` 쪽을 믿어라. (2026-09-14 실측: 에디터가 닫혔는데 락파일만 남아
-`Running: true` 로 보였다. 두 명령을 나란히 보지 않았으면 "포트가 왜 안 뜨지"로 헤맸다.)
+`Running: true`로 보였다. 두 명령을 나란히 보지 않았으면 "포트가 왜 안 뜨지"로 헤맸다.)
 
 **끝내 파일을 직접 편집한다면 보고에 명시해라** — *"라이브 에디터 없음(사유), 파일 직접 편집"*.
 조용히 새는 것이 이 규칙이 막으려는 유일한 실패다.
 
 **모달 다이얼로그는 멈춤이 아니다** — 명령이 길어지면 `unity command editor_status`(막혀 있어도 즉답).
-`status: "blocked_by_dialog"` 면 재시도를 멈추고 **무엇이 막는지 사용자에게 말해라**(CLI 로 못 누른다).
+`status: "blocked_by_dialog"` 면 재시도를 멈추고 **무엇이 막는지 사용자에게 말해라**(CLI로 못 누른다).
 
 ### 금지 사항
-- Unity C# 파일을 에이전트 없이 직접 편집하지 마세요 (단, 아래 "위임 면제 기준" 충족 시 직접 편집 허용)
-- 에이전트를 Bash 명령어로 호출하지 마세요 — 반드시 Agent 도구를 사용하세요
+- Unity C# 파일을 에이전트 없이 직접 편집하지 않는다 (단, 아래 "위임 면제 기준" 충족 시 직접 편집 허용)
+- 에이전트를 Bash 명령어로 호출하지 않는다. 반드시 Agent 도구를 사용한다
 
 ### 위임 면제 기준 (직접 편집 허용)
 
-Unity C# 파일이라도 **모든** 조건을 충족하면 에이전트 위임 없이 직접 편집해 위임 비용(프롬프트 작성·결과 검증·토큰)을 절약합니다. 룰의 의도는 "전문 영역 보호"이지 "trivial 변경의 의식화"가 아닙니다.
+Unity C# 파일이라도 **모든** 조건을 충족하면 에이전트 위임 없이 직접 편집해 위임 비용(프롬프트 작성·결과 검증·토큰)을 절약한다. 룰의 의도는 "전문 영역 보호"이지 "trivial 변경의 의식화"가 아니다.
 
 **모든 조건 충족 시 직접 편집 허용**:
 - 단일 파일 변경
@@ -112,16 +112,16 @@ Unity C# 파일이라도 **모든** 조건을 충족하면 에이전트 위임 �
 
 ### 병렬 위임 원칙 (필수)
 
-- 독립적인 Unity 작업이 2개 이상이면 **단일 메시지에 여러 Agent 호출**로 병렬 실행합니다 (예: 아키텍처 리팩토링 + UI 색상 수정 → Jarvis + Ava 병렬)
-- **Codex 중첩 위임**: `agents.max_depth = 2`에서 Samantha가 Jarvis/Ava/Sonny/TARS를 직접 병렬 호출할 수 있습니다. 중첩 위임을 지원하지 않는 실행 환경에서는 상위 세션이 같은 분해안을 실행합니다. (2026-04-15 Shop 노드 통합에서 Jarvis+Ava+Sonny 병렬 3호출로 약 2.3배 속도 향상 검증)
-- **단일 에이전트 5개 항목 한계**: 한 에이전트 호출에 독립 항목을 5개 초과 몰아주면 `maxTurns: 25` 제한에 걸려 보고가 잘리고 일부 항목이 누락됩니다. 5개 초과면 ① 병렬로 분할 또는 ② 순차 호출(1차 → 검증 → 2차).
+- 독립적인 Unity 작업이 2개 이상이면 **단일 메시지에 여러 Agent 호출**로 병렬 실행한다 (예: 아키텍처 리팩토링 + UI 색상 수정 → Jarvis + Ava 병렬)
+- **Codex 중첩 위임**: `agents.max_depth = 2`에서 Samantha가 Jarvis/Ava/Sonny/TARS를 직접 병렬 호출할 수 있다. 중첩 위임을 지원하지 않는 실행 환경에서는 상위 세션이 같은 분해안을 실행한다. (2026-04-15 Shop 노드 통합에서 Jarvis+Ava+Sonny 병렬 3호출로 약 2.3배 속도 향상 검증)
+- **단일 에이전트 5개 항목 한계**: 한 에이전트 호출에 독립 항목을 5개 초과 몰아주면 `maxTurns: 25` 제한에 걸려 보고가 잘리고 일부 항목이 누락된다. 5개 초과면 ① 병렬로 분할 또는 ② 순차 호출(1차 → 검증 → 2차).
 - **동일 도메인 연속 카드는 신규 인스턴스 대신 같은 에이전트 SendMessage 재개**로 컨텍스트 재사용 — 판단 기준·운영 규칙: [best-practice/sequential-delegation-context-reuse.md](../../best-practice/sequential-delegation-context-reuse.md)
 
 ### 시각 버그 위임 우선순위 (Ava)
 
-UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset 수정 전에 Inspector 확인을 우선**합니다. Ava 위임 프롬프트에 반드시 명시: "Button.Disabled Color, SerializeField 할당, CanvasGroup.alpha를 코드 수정 전에 먼저 의심하고, 같은 가설 2회 실패 시 사용자에게 Inspector 확인을 요청하라".
+UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset 수정 전에 Inspector 확인을 우선**한다. Ava 위임 프롬프트에 반드시 명시: "Button.Disabled Color, SerializeField 할당, CanvasGroup.alpha를 코드 수정 전에 먼저 의심하고, 같은 가설 2회 실패 시 사용자에게 Inspector 확인을 요청하라".
 
-**prefab 시각 회귀 시 git diff 우선 의무**: 사용자가 "어제까지 멀쩡했는데 이상해짐" 같이 회귀를 보고하면 Ava 위임 프롬프트 1순위는 **`git diff <prefab>` + `git log --oneline <prefab>`** 으로 변경 이력 확인. 코드/asset 수정 시도보다 먼저. 직접 의심한 컴포넌트 외 어떤 필드가 함께 바뀌었는지 diff 가 가장 빠른 답을 준다 (특히 prefab variant 의 modifications 블록).
+**prefab 시각 회귀 시 git diff 우선 의무**: 사용자가 "어제까지 멀쩡했는데 이상해짐" 같이 회귀를 보고하면 Ava 위임 프롬프트 1순위는 **`git diff <prefab>` + `git log --oneline <prefab>`** 으로 변경 이력 확인. 코드/asset 수정 시도보다 먼저. 직접 의심한 컴포넌트 외 어떤 필드가 함께 바뀌었는지 diff가 가장 빠른 답을 준다 (특히 prefab variant의 modifications 블록).
 
 ### 리팩토링 위임 체크리스트
 
@@ -131,11 +131,11 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 - [ ] 사용처를 목록화한 후 **모든 수정을 한 번에** 위임 (분산하면 컴파일 에러)
 - [ ] 인라인→유틸 추출이라면 **추출 전 책임 목록화 + 추출 후 책임 매핑**을 프롬프트에 명시하고 "기능 동등성 보존" 명시적 요구
 - [ ] 기대 시나리오 1-2개 명시 (예: "minFloor=6 LocationType은 actLevel=3에서 추첨되지 않아야 함")
-- [ ] **오버로드 추가** 시 원본의 부수 효과를 diff로 나열하고 "새 오버로드가 모든 부수 효과를 복제하는지" 명시 요구 (2026-04-17 `NodeCleared(Vector2Int)` 에서 `IsSelectable=false` 한 줄 누락으로 visible bug 발생)
+- [ ] **오버로드 추가** 시 원본의 부수 효과를 diff로 나열하고 "새 오버로드가 모든 부수 효과를 복제하는지" 명시 요구 (2026-04-17 `NodeCleared(Vector2Int)`에서 `IsSelectable=false` 한 줄 누락으로 visible bug 발생)
 - [ ] **"현재" 암묵 참조 API 이동** 시(예: `_currentNode`, `_activeSession`): 이동 후 호출 시점의 포인터 타이밍을 명시하고, 필요 시 명시 파라미터(좌표/ID) 기반 오버로드 요구
 - [ ] **SSOT 통합 위임** 시 프롬프트에 5요소 모두 포함: ① 단일 진입점 메서드명 ② 모든 호출자 grep 결과 ③ 부수효과 매트릭스 ④ 통합 후 레거시 진입점 제거 의무 ⑤ 종료 게이트 grep 패턴 (`refactoring-lessons.md §12.5` 6항목 참조)
 - [ ] **패턴 미러링 보고 시 코드 형태 grep 비교 + 인용 의무**: "다른 노드 N곳 참고/미러링" 보고 시 실제 grep 결과로 현재 편집 코드와 참고 코드의 정확한 형태(가드 유무, 호출 순서, lazy-init 여부 등)를 인용해야 함. "패턴을 따랐다" 자체 정당화 회피 (헌법 §0 메타 원칙). (2026-04-27 Treasure 부트 보장 인시던트: `if (HasInstance)` 가드가 다른 노드 11곳 패턴(가드 없이 `Instance` 직접 호출)과 코드 형태가 달라 lazy-init을 막아 race 유지)
-- [ ] **패턴 미러링 — 코드 형태 grep + "적용 영역 일치" 분리 검증 의무**: grep 으로 코드 형태 일치만으로는 부족. 각 미러링 사례의 **"패턴 적용 영역"이 현재 작업과 일치하는지** 명시 검증 — ① 시간축 적용 영역(부트 의존 / 상태 의존 / 라이프사이클 단계) ② 호출 시점 의존성(lazy-init 트리거 필요 여부 / Singleton 부트 race 가능성). 영역이 다른 미러링은 **무효 정당화** — 코드 형태만 같아도 함정 가능. (2026-05-12 btnMap race fix: `HasInstance` 가드 다른 viewer 6곳 미러링 보고했으나 6곳 모두 상태 의존 컨텍스트, UIGame.OnEnable 만 부트 의존 → 영역 mismatch 로 race 발생. 상세 [best-practice/race-fix-meta-patterns.md](../../best-practice/race-fix-meta-patterns.md) §7)
+- [ ] **패턴 미러링 — 코드 형태 grep + "적용 영역 일치" 분리 검증 의무**: grep으로 코드 형태 일치만으로는 부족. 각 미러링 사례의 **"패턴 적용 영역"이 현재 작업과 일치하는지** 명시 검증 — ① 시간축 적용 영역(부트 의존 / 상태 의존 / 라이프사이클 단계) ② 호출 시점 의존성(lazy-init 트리거 필요 여부 / Singleton 부트 race 가능성). 영역이 다른 미러링은 **무효 정당화** — 코드 형태만 같아도 함정 가능. (2026-05-12 btnMap race fix: `HasInstance` 가드 다른 viewer 6곳 미러링 보고했으나 6곳 모두 상태 의존 컨텍스트, UIGame.OnEnable만 부트 의존 → 영역 mismatch로 race 발생. 상세 [best-practice/race-fix-meta-patterns.md](../../best-practice/race-fix-meta-patterns.md) §7)
 - [ ] **신규 시그니처 사용 시 Unity C# 버전 호환 확인** (record struct/required member/file-scoped types 등은 LangVersion override 필요). 상세 [best-practice/unity-csharp-version-check.md](../../best-practice/unity-csharp-version-check.md)
 
 상세:
@@ -144,9 +144,9 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 ### 위임 prompt 범위 보존 의무 (필수)
 
-위임 prompt 는 **사용자가 명시한 작업 범위만** 포함한다. 에이전트가 "겸사겸사 다른 부분도 정리할까?" / "관련 파일도 함께 수정?" 같이 **범위 외 작업을 자가 확장**하면 다음 사고 발생:
+위임 prompt는 **사용자가 명시한 작업 범위만** 포함한다. 에이전트가 "겸사겸사 다른 부분도 정리할까?" / "관련 파일도 함께 수정?" 같이 **범위 외 작업을 자가 확장**하면 다음 사고 발생:
 
-- 의도 외 변경이 working tree 에 누적 (헌법 §unity-delegation 워킹트리 인지 의무로도 사후 발견 비용 큼)
+- 의도 외 변경이 working tree에 누적 (헌법 §unity-delegation 워킹트리 인지 의무로도 사후 발견 비용 큼)
 - 사용자 검증 부담 폭발 — "내가 부탁한 것 외에 무엇이 바뀌었나" 추적
 - 위임 비용/turn 낭비 — 한 번에 너무 많이 하다 `maxTurns=25` 절단
 
@@ -166,14 +166,14 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 **자가 확장 의심 신호** (위임 결과 점검 시):
 - 보고에 "겸사겸사" / "함께" / "관련해서" 같이 작업 확장 표현
-- `git diff --stat` 에 prompt 명시 외 파일 등장
+- `git diff --stat`에 prompt 명시 외 파일 등장
 - 줄수가 예상보다 1.5배 이상
 
-발견 시 `git restore` 로 범위 외 변경 즉시 롤백 검토 + 사용자 보고.
+발견 시 `git restore`로 범위 외 변경 즉시 롤백 검토 + 사용자 보고.
 
-(2026-05-13 본 세션 회고: 시각 회귀 prompt 에 명시 안 한 컴포넌트 정리가 함께 진행되어 사용자가 별도 검증해야 한 사례)
+(2026-05-13 본 세션 회고: 시각 회귀 prompt에 명시 안 한 컴포넌트 정리가 함께 진행되어 사용자가 별도 검증해야 한 사례)
 
-**범위 보존 ≠ 맹종 — prompt 내 스펙 충돌 처리**: prompt 에 포함된 템플릿/예시가 같은 prompt 의 명시 요구와 충돌하면 템플릿 맹종 금지 — **명시 요구(상위 의도) 우선 + "의도적 변경 N건" 사유 보고 의무**. (2026-07-08 Sonny: 테스트 asmdef 템플릿이 EditMode 패턴인데 명시 요구는 PlayMode — 충돌을 식별해 PlayMode 패턴으로 수정 + "의도적 변경 1건" 보고. 올바른 에이전트 행동으로 박제)
+**범위 보존 ≠ 맹종 — prompt 내 스펙 충돌 처리**: prompt에 포함된 템플릿/예시가 같은 prompt의 명시 요구와 충돌하면 템플릿 맹종 금지 — **명시 요구(상위 의도) 우선 + "의도적 변경 N건" 사유 보고 의무**. (2026-07-08 Sonny: 테스트 asmdef 템플릿이 EditMode 패턴인데 명시 요구는 PlayMode — 충돌을 식별해 PlayMode 패턴으로 수정 + "의도적 변경 1건" 보고. 올바른 에이전트 행동으로 박제)
 
 ### 중앙 허브 파일 병렬 작업 직렬화 (필수)
 
@@ -193,32 +193,32 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 - Ava/Jarvis 위임 시 `.meta` 파일 직접 생성이 포함되면 프롬프트 보고 항목에 **"사용자 Unity Editor에서 Missing 참조 확인 필수"** 를 명시하도록 지시
 - 가능하면 `.meta` 생성은 Unity Editor의 자동 생성에 맡기고, 에이전트는 `.cs`/`.asset` 본문만 작성
-- 프리팹 대량 저작(오브젝트 5개 이상 + 상호 배선)은 YAML 손편집 대신 **멱등 굽기 도구**로 — GUID 를
-  사람이 적는 자리 0. 라이브 에디터가 붙어 있으면 `run_script` 가 같은 멱등성을 더 싸게 준다
+- 프리팹 대량 저작(오브젝트 5개 이상 + 상호 배선)은 YAML 손편집 대신 **멱등 굽기 도구**로 — GUID를
+  사람이 적는 자리 0. 라이브 에디터가 붙어 있으면 `run_script`가 같은 멱등성을 더 싸게 준다
   (`[MenuItem]` 불필요 · 도메인 리로드 없음). 상세 [best-practice/idempotent-prefab-baker.md](../../best-practice/idempotent-prefab-baker.md)
 
 ### Unity 자동 prefab mutation 함정 (공유 asset 추가 시)
 
-새 폰트/머터리얼/스프라이트/Shader 등 **공유 asset 을 Assets/ 에 추가**하면 Unity 가 import 시점에 기존 prefab 의 reference GUID 를 자동 교체하는 사고가 발생할 수 있다. 결과: 작업 범위 외 prefab 들이 `Modified` 상태로 working tree 에 등장.
+새 폰트/머터리얼/스프라이트/Shader 등 **공유 asset을 Assets/ 에 추가**하면 Unity가 import 시점에 기존 prefab의 reference GUID를 자동 교체하는 사고가 발생할 수 있다. 결과: 작업 범위 외 prefab 들이 `Modified` 상태로 working tree에 등장.
 
 **증상**:
-- `git status` 에 위임 작업과 무관한 `.prefab` 다수 등장
-- prefab modifications 블록에 `m_FontAsset` / `m_Material` / `m_Sprite` 등 GUID 만 변경된 entry
-- Inspector 에서 "보이는 폰트는 같은데 GUID 가 다른 asset 가리킴"
+- `git status`에 위임 작업과 무관한 `.prefab` 다수 등장
+- prefab modifications 블록에 `m_FontAsset` / `m_Material` / `m_Sprite` 등 GUID만 변경된 entry
+- Inspector에서 "보이는 폰트는 같은데 GUID가 다른 asset 가리킴"
 
-**처방** (헌법 §unity-delegation "워킹트리 인지 의무" 와 cross-link):
+**처방** (헌법 §unity-delegation "워킹트리 인지 의무"와 cross-link):
 
 - 공유 asset (`*.ttf` / `*.asset` TMP_FontAsset / `*.mat` / `*.png` 등) 추가가 포함된 위임 종료 직후 **`git status` 전체 점검 의무**
 - 의도한 prefab (예: UIMapView, UITutorialGuidePanel) 외 prefab mutation 발견 시 사용자 보고 + (A) 의도 적용 / (B) `git restore` 옵션 제시
-- 사전 예방: 공유 asset 추가 위임 prompt 에 "**asset import 후 `git status` 로 의도 외 prefab mutation 확인 + 사용자 보고**" 의무 명시
+- 사전 예방: 공유 asset 추가 위임 prompt에 "**asset import 후 `git status`로 의도 외 prefab mutation 확인 + 사용자 보고**" 의무 명시
 
-(2026-05-14 RIDIBatang 폰트 추가 인시던트: `1e51495b` 커밋에서 UIMapView 의 TMP_Text fontAsset GUID 가 자동 교체되어 의도된 폰트 마이그레이션과 함께 의도 외 prefab modification 도 발생. 사용자가 직접 발견 전까지 격리 안 됨)
+(2026-05-14 RIDIBatang 폰트 추가 인시던트: `1e51495b` 커밋에서 UIMapView의 TMP_Text fontAsset GUID가 자동 교체되어 의도된 폰트 마이그레이션과 함께 의도 외 prefab modification도 발생. 사용자가 직접 발견 전까지 격리 안 됨)
 
 ### 서브에이전트 Read 권한 사전 점검
 
 `.claude/settings.json`의 `permissions.allow`에 `Read(*)` 또는 Unity 작업 영역 경로가 누락된 경우, 서브에이전트가 Samantha 디렉토리 밖 파일(예: `../Assets/`)을 **Read 불가**. Interactive 승인이 필요하므로 백그라운드 에이전트는 즉시 실패.
 
-**증상**: Jarvis/Sonny가 "해당 파일을 읽을 수 없습니다" 로 조기 종료.
+**증상**: Jarvis/Sonny가 "해당 파일을 읽을 수 없다"로 조기 종료.
 
 **처방**:
 
@@ -229,7 +229,7 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 절단 시점의 상태는 **ⓐ 편집 완료 후 검증 절단 / ⓑ 탐색 소진(편집 0건) / ⓒ 절반 절단** 셋으로 갈린다. **재위임 전 `git status --short` + 산출물 mtime + 처방 grep 3종으로 상태를 판별**하고 상태별 처방을 적용 — 구분 없이 재위임하면 각각 중복 편집·헛수고·완료분 되돌림이 발생.
 
-- **재위임 전 반드시 `git diff --stat`으로 실제 수정 상태 확인** — 이미 수정되어 있으면 재수정 금지. 절단 보고가 "확인합니다 / 검토합니다" 같은 탐색 메시지로 끝나면 **편집은 끝났을 가능성 80%+**(ⓐ)
+- **재위임 전 반드시 `git diff --stat`으로 실제 수정 상태 확인** — 이미 수정되어 있으면 재수정 금지. 절단 보고가 "확인한다 / 검토한다" 같은 탐색 메시지로 끝나면 **편집은 끝났을 가능성 80%+**(ⓐ)
 - 재위임 프롬프트에 "**편집만 하고 검증/분석은 생략**, 재탐색 금지, 보고는 3줄 이내" 명시 + 보고 포맷 사전 고정(섹션 수·줄 수 상한)
 - **예방**: 파일 5개 이상 **또는 관통 어셈블리/계층 3개 이상**이면 **계층당 한 에이전트로 분할**(파일 수 반 자르기 금지 — 계층 간 시그니처는 코디네이터가 확정해 양쪽 프롬프트에 원문으로 박고, 배치 시험은 코디네이터가 돌린다). 한 에이전트에 "감사(read-only)" + "구현(edit)"을 동시에 시키지 말 것 — 분리 호출
 - **좌표 제공 의무**: 프롬프트에는 결정(설계·합격 기준)뿐 아니라 **좌표**(파일:줄, grep 결과 표, 시그니처 전문, 코드 블록 인용)를 함께 적는다. "읽어라 / 찾아라 / 맞춰라 / 미러링하라 / 참고하라"는 동사가 있으면 **좌표 누락 신호** — 그 자리에 grep 결과를 대신 넣는다
