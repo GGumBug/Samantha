@@ -135,7 +135,9 @@
 지침을 `.claude/rules/prose-style.md`로 만들고 `# Glob:` 헤더를 붙인다. Glob 규칙은 해당 확장자를 편집할 때 **모든 에이전트 컨텍스트에 자동 주입**된다. memory에는 없던 경로다. 동시에 `/commit` 스킬 본문에 상한과 식별자 의무를 직접 적는다(fork 컨텍스트에 도달하는 유일한 방법).
 
 <details>
-<summary><code>.claude/rules/prose-style.md</code> 초안 (적용 전)</summary>
+<summary><code>.claude/rules/prose-style.md</code> 초안 (2026-09-15 적용 전 스냅샷)</summary>
+
+적용된 실제 파일은 [.claude/rules/prose-style.md](../.claude/rules/prose-style.md)다. Glob이 `**/*.cs,**/*.md` 로 넓어졌고 한국어 문체 절이 더해졌다.
 
 ```markdown
 # Glob: **/*.cs
