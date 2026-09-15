@@ -17,6 +17,18 @@ allowed-tools: Bash, Read, Grep
 2. **`git add .` / `git add -A` 금지**: 파일 경로를 명시해 스테이징하고 `git diff --cached`로 범위를 검증한다.
 3. **범위 외 변경은 커밋하지 않는다**: 인자로 받은 의도에 없는 변경(디버깅 흔적·의도 외 asset·ProjectSettings 등)이 워킹트리에 있으면 **커밋을 멈추고 사용자에게 보고**한다. 절대 함께 끌어오지 않는다.
 4. **이력 재작성 금지**: 이미 생성된 커밋을 사용자 별도 요청 없이 amend·rebase·squash 하지 않는다.
+   사용자가 요청했더라도 **재작성 전에 원격 push 여부를 먼저 확인한다**.
+   ```bash
+   git status -sb            # ahead/behind 표시
+   git log --oneline @{u}..HEAD   # 아직 push 안 된 커밋
+   ```
+   대상 커밋이 **이미 원격에 있으면** 재작성이 divergence를 만든다. 그 사실과
+   force push가 필요해진다는 것을 **먼저 사용자에게 알리고 승인을 받는다**.
+   승인 후에는 안전망 브랜치(`git branch backup/origin-before-force origin/master`)를 만들고
+   `--force-with-lease`로만 push한다. 원격 각 커밋의 트리가 로컬에 존재하는지 확인해
+   손실 0을 보고에 적는다.
+   (2026-09-15 실측: 확인 없이 7개를 재작성해 로컬 10개와 원격 7개가 갈라졌고,
+   그 뒤 `git pull`이 충돌해 워킹트리에 충돌 마커가 들어갔다)
 5. **한국어 맞춤법**: 조사는 앞말에 붙여 쓴다(한글 맞춤법 제41항). 앞말이 로마자·숫자여도 같다. `ShopSession이` `0.5가`로 쓰고 `ShopSession 이`로 띄우지 않는다. 줄표 `—`는 문장 중간 삽입에 쓰지 않는다.
 
 ## 실행 절차
@@ -117,3 +129,4 @@ git log --oneline -N | cat  # 생성한 커밋 확인 (N = 이번 커밋 수)
 - [ ] **커밋 직후 `prose-audit.py`와 `korean-style-audit.py`를 돌려 초록을 확인했는가** (Step 5)
 - [ ] 커밋 메시지에 AI 귀속 표시가 전혀 없는가
 - [ ] 이미 커밋된 파일을 재커밋 시도하지 않았는가
+- [ ] **이력 재작성 전에 `git status -sb`로 원격 push 여부를 확인했는가** (절대 규칙 4)
