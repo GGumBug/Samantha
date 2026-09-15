@@ -66,6 +66,8 @@ def git(repo, *args):
 def sentences(text):
     text = re.sub(r"```.*?```", " ", text, flags=re.S)
     text = re.sub(r"`[^`]*`", "…", text)
+    # 링크 텍스트가 파일 경로면 길이가 산문이 아니라 경로 탓이다. 자리표로 줄인다.
+    text = re.sub(r"\[[^\]]*[/][^\]]*\]\([^)]*\)", "…", text)
     text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
     parts = re.split(r"(?<=[.!?])\s+|\n", text)
     # 표 행은 문장이 아니라 칸의 나열이다. 길이 측정에서 뺀다.
