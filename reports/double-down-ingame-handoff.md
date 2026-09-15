@@ -2,13 +2,13 @@
 
 # Double Down 인게임 핸드오프
 
-2026-09-15 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down**, 작업 브랜치는 **`master`**(`030023b`까지). **워킹트리 clean.**
+2026-09-15 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down**, 작업 브랜치는 **`master`**(`d008b5a`까지, **원격에 push됨**). **워킹트리 clean.**
 
-**보너스 카드가 도메인부터 화면까지 닫혔고, 상점 문법이 팩에서 매대로 바뀌었다.** 세 장이 매대에 펼쳐진 채 서 있고 누르면 그 자리에서 값이 나가고 장착된다. 개봉 단계가 없다(§3 「보너스 카드」). 카드에는 이름·효과·값 세 칸과 판의 카드와 같은 반응 연출이 붙어 있다. **판 HUD 슬롯만 코드 완결 상태로 프리팹 배선 한 걸음이 남았다**(§3 다음 후보 첫 항목).
+**보너스 카드가 도메인부터 화면까지 닫혔고, 상점 문법이 팩에서 매대로 바뀌었다.** 세 장이 매대에 펼쳐진 채 서 있고 누르면 그 자리에서 값이 나가고 장착된다. 개봉 단계가 없다(§3 「보너스 카드」). 카드에는 이름·효과·값 세 칸과 판의 카드와 같은 반응 연출이 붙어 있다. **판 HUD 기둥까지 닫혔다.** 산 낱장이 그 자리에서 기둥에 서고, 그 카드는 상점에서 산 것과 같은 자산이다(§3 「판 HUD 기둥」).
 
 > **작업 환경이 바뀌었다.** `com.unity.pipeline`이 들어와 `unity` CLI가 살아 있는 에디터를 직접 조종한다. 컴파일·시험·굽기가 초 단위로 돌고, 검증은 **두 겹**이 됐다. 안쪽은 CLI, 바깥쪽은 배치다(§4).
 >
-> 검증 총계: EditMode **1306** · PlayMode **91** · 배치 전량 총 1307 중 통과 1306, 건너뜀 1(`[Explicit]` 스윕). 뮤테이션으로 시험의 판별력까지 기계 증명한다.
+> 검증 총계: EditMode **1315**(통과 1315 · 실패 0 · 건너뜀 0, `unity command run_tests --mode editor --async_tests` 기준) · PlayMode **91**. 뮤테이션으로 시험의 판별력까지 기계 증명한다.
 >
 > 지난 구간(MatchView 마이그레이션·택1·런 계층·상점 국면)의 커밋 서사와 당시 함정 원문은 [아카이브](double-down-handoff-archive.md)로 옮겼다. 이 문서는 현재 상태와 아직 살아 있는 함정만 든다.
 
@@ -78,8 +78,9 @@
 
 1. **양쪽 저장소 pull** — 둘 다 `master`
 2. **Unity 열고 컴파일 확인** — 에러 0건
-3. **`unity` CLI 연결 확인** — `unity status`가 `state: ready` + Port를 내면 라이브 에디터가 붙은 것이다. `unity command set_autotick --enable true`를 한 번 켠다. 안 붙으면 §4의 네 얼굴 판별표로 원인을 가른다. **CLI가 없으면 `unity pipeline install`** 후 에디터 재시작
-4. **`tools/ddtest.sh` 경로 3줄 수정** — `SRC`·`DST`·`UNITY`. 그러면 EditMode 전량이 십수 초에 돈다(§4). 이 스크립트는 **git에 없다**(머신 로컬). 없으면 §4의 배치 명령 원형을 직접 쓴다
+3. **`unity` CLI 연결 확인** — `unity status`가 `state: ready` + Port를 내면 라이브 에디터가 붙은 것이다. `unity command set_autotick --enable true`를 켠다. **`--persist`를 줘도 `SessionState`라 에디터를 닫으면 사라진다**(도메인 리로드만 넘긴다). 에디터 세션마다 다시 켠다. 읽기 경로가 없어 현재 값은 `eval`로 `SessionState.GetBool("Unity.Pipeline.AutoTick.Enabled", false)`를 직접 읽어야 안다. 안 붙으면 §4의 네 얼굴 판별표로 원인을 가른다. **CLI가 없으면 `unity pipeline install`** 후 에디터 재시작
+4. **`tools/ddtest.sh` 경로 3줄 수정** — `SRC`·`DST`·`UNITY`. 그러면 EditMode 전량이 십수 초에 돈다(§4). 이 스크립트는 **Samantha 저장소에 커밋돼 있다**(`git ls-files tools/`로 확인). 상수는 Windows 경로라 머신마다 고친다. macOS에서는 사본 미러링 없이 원본 직접 실행이 가능해(§4) 이 스크립트 자체가 과하다
+   - **macOS 경로 주의**: 프로젝트 폴더는 `Double Down`(공백)이고 솔루션도 `Double Down.slnx`다. §4의 `dotnet build Double-Down.slnx`는 그대로 안 돈다
 5. **도구 두 개가 사는지 확인** — `dotnet build Double-Down.slnx`(오류 0)와 `cd Tools/HeadlessSim && dotnet run -c Release --project . -- 200`. **후자는 Unity 컴파일 단위 밖이라 아무도 안 지켜본다** — 실제로 15일간 죽어 있었다(§5). 첫 3분에 넣는 이유가 그것이다
 6. **재생 검증 5종** — 다음 판 더미·상대 손패 전부 뒷면 / 쪽·따닥·싹쓸이·뻑해소의 피 약탈 / 카드가 UI 패널에 안 물림 / 마지막 패의 치기→상대 턴→종료 순서 / 모든 패가 바닥 경유
 7. **택1 확인** — 후보가 창 중앙 가로 행으로 펼쳐지고, 확대 위 호버가 먹고, 그림자가 따라오고, 고르면 왔던 길로 내려간다
@@ -224,13 +225,63 @@ ShopSession.BuyChipPackAndDraw  →  ChipPackDraw.Draw (가중·상한·작업 �
 
 두 번 틀린 예측도 함께 남긴다. ⓐ 칩 다이얼을 "기각"이라 보고했으나 플레이어 칩과 상대 칩을 **따로** 쟀을 뿐 함께 재지 않았다 — 2D 스윕이 포화·점근을 보였다. ⓑ 라운드 상한을 `1 − 0.65^R` 로 모델링해 RL5 에서 61%를 예측했으나 실측 21.5%였다. **진 라운드가 칩을 빼 올인 패배가 늘어나는 되먹임**이 모델에 없었다.
 
+### ⭐⭐ 판 HUD 기둥 — 2026-09-15 완료 구간 (재활용)
+
+**산 낱장이 그 자리에서 기둥에 선다.** 상점에서 보너스 카드를 누르면 값이 나가고, 판 화면 오른쪽 기둥
+(`Panel_BonusCardList`)에 그 이름이 **그 순간** 붙는다. 다음 판을 기다리지 않는다.
+
+```
+ShopView.BuyBonusCard → ShopSession.BuyBonus → RunBonusCards.Equip
+  → RenderShelf 의 _bonusChanged?.Invoke(session.EquippedBonusIds)
+  → MainScene 람다 → MatchView.ShowBonusSlots → BonusSlotList.Show → BonusSlotItem.Show
+```
+
+**통보 자리가 `RenderShelf`인 근거**는 칩 통로와 같다. 그 문이 매대 표시의 유일한 갱신 지점이고
+`BuyBonusCard`가 이미 그것을 부른다. `ShowAsync`의 첫 `RenderShelf`에서도 돌아 **여는 순간의 장착 목록**까지
+민다. `BuyBonusCard` 안에 두면 성공 경로만 알리고 앞으로 생기는 갱신 지점이 통로를 잊는다.
+
+**슬롯 카드는 상점 카드를 그대로 쓴다**(`Item_BonusCard.prefab` 중첩 인스턴스). 처음에는 인라인
+`Item_BonusSlot`을 만들고 배경·폰트·재질을 복사했는데, 사용자가 그 복사를 물어 재활용으로 바꿨다.
+복사가 틀렸던 근거는 둘이다. ⓐ 소비자를 하나로 셌지만 실제로는 둘이었다(상점 매대와 판 기둥).
+ⓑ 낱장 아트가 §3 후보에 이미 올라 있어 "늘어날 때 도입한다"의 조건이 **이미 성립**해 있었다.
+YAGNI가 아니라 SSOT가 이기는 자리였다.
+
+| 계층 | 무엇 | 어디 |
+|---|---|---|
+| 도메인 조회창 | 장착 id를 슬롯 순서로. 사본이 아니라 **살아 있는 별칭**이다 | `RunBonusCards.Equipped` |
+| 응용 통과 읽기 | 값을 떠 두면 구매 직후 화면이 옛 목록을 그린다 | `ShopSession.EquippedBonusIds` |
+| 통보 통로 | `ShowAsync`의 **필수 위치 인자**. 호출처 32곳이 컴파일러 명부로 드러났다 | `ShopView._bonusChanged` |
+| 합성 루트 | 두 화면을 아는 곳이 여기뿐이다. 뷰가 뷰를 부르면 옆줄 의존이 생긴다 | `MainScene` 람다 |
+| 템플릿 | `Item_BonusCard` 중첩 인스턴스, 이름은 `Item_BonusSlot`, 비활성 | `MatchView.prefab` |
+| 저작 | 굽기가 자산을 먼저, 판을 나중에. 중첩은 디스크의 자산을 읽는다 | `AgentScripts/`(미커밋) |
+
+**판 인스턴스가 끄는 것 넷** (전부 매 굽기 강제, 시험이 각각 문다):
+값칸(`Panel_PackPrice`) · 설명칸(`Text_EffectDesc`) · `UICardReaction` · `Button`.
+앞 둘은 **판에서 채우는 사람이 없어** 저작 시점 자리표가 HUD 값으로 읽힌다(`BonusSlotItem.Show`는 이름 칸만 채운다).
+뒤 둘은 기둥이 상태 표시라서다. 다섯 장이 상시 흔들리면 판을 보는 눈을 끌고, 누를 것이 없는데 눌림 색이 거짓말한다.
+
+**크기는 `localScale` 1.8이다.** `sizeDelta`로 키우면 `Text_Title`이 상단 25px 띠에 고정돼 카드 대부분이
+빈 면이 된다(실측했다). 배율은 자식까지 함께 키워 저작 비율을 옮긴다. 대가로 `VerticalLayoutGroup.childScaleHeight`가
+**켜져 있어야** 한다. 꺼지면 칸을 배율 전 높이로 띄우면서 배율만큼 그려 다섯 장이 겹치는데, 높이 계산은
+통과한다. 실측 칸 간격 184~185px = 176(배율 높이) + 8(간격).
+
+**슬롯 상한이 3에서 5로 올랐다**(사용자 확정). 카탈로그가 5행이라 상한과 행 수가 같아져
+"슬롯이 다 찼는데 살 수 있는 낱장이 남아 있다"가 **도달 불가**가 됐다. 그 상태를 전제로 섰던 단언은
+지우고 **반대 방향 파수꾼**을 세웠다. `EffectCatalog.All.Count == RunBonusCards.MaxSlots`가 깨지는 날,
+곧 카탈로그가 6행이 되는 날 빨간불이 되어 지운 단언을 복원할 사람을 부른다. 상한 가드는 코드에 그대로 있다.
+
+**⚠️ 배율 1.8을 붙들고 있는 것이 없다** — 뮤테이션으로 확인했다. `localScale`을 1.0으로 되돌려도 8건 전부 초록이다.
+겹침 계약(`EverySlotFits...`)은 1.0에서도 성립하기 때문이다. 굽기 상수 `SlotScale = 1.8f`가 매 실행 강제하므로
+프리팹이 스크립트에서 멀어질 수는 없지만, 인스펙터 손 편집과 상수 변경은 아무도 안 본다.
+이 저장소는 저작 수치를 동결하는 선례가 있다(`e9be28c` 시안 수치 동결). **사용자 판단 대기**(아래 미결정).
+
 ### 다음 후보
 
-- **⭐⭐ 판 HUD 슬롯 프리팹 배선 (사용자 결정 대기)** — `Panel_BonusCardList`(200×1050, 왼쪽 기둥, 배경·`VerticalLayoutGroup` 저작 완료)가 **이미 `MatchView.prefab` 최상위에 있다**. 남은 것: ① 그 노드에 `BonusSlotList` 부착 ② **직계 자식** `Item_BonusSlot`(비활성, `BonusSlotItem`) + `Text_Name`(TMP) ③ 참조 셋(`MatchView._bonusSlots` ← 패널 / `BonusSlotList._slotTemplate` ← 템플릿 / `BonusSlotItem._nameLabel` ← 라벨). 선택지 (A) 직접 저작 2분, 재직렬화 없음 / (B) `MatchViewPrefabWiringTests` 먼저 세우고 베이커 + 헤드리스 굽기(§4) — 그물이 남아 앞으로 칸이 늘 때마다 자동으로 잡힘. `MatchView` 는 손 저작 17칸이라 **그물 없이 굽지 마라**. 합격: 판 진입 시 `[MatchView]` 경고 0 · 산 낱장 이름이 왼쪽 기둥에
-- **⭐ 보너스 카드 아트** — `Item_BonusCard`는 배경 한 장에 글자 세 줄이다. 낱장마다 그림이 생기면 `ShopBonusOfferCard.Bind`에 스프라이트 인자가, 카드에 `Image_Face` 칸이 함께 온다(작업패 카드 선례). **옛 팩 버튼 아트 항목은 폐기** — `Button_BuyBonusPack`은 매대 전환에서 걷어냈다
+- **~~판 HUD 슬롯 프리팹 배선~~ — 2026-09-15 완료.** 위 절 참조. 굽기는 일회성 스크립트가 했고 `MatchViewPrefabWiringTests` 8건이 계약을 문다
+- **⭐ 보너스 카드 아트** — `Item_BonusCard`는 배경 한 장에 글자 세 줄이다. 낱장마다 그림이 생기면 `ShopBonusOfferCard.Bind`에 스프라이트 인자가, 카드에 `Image_Face` 칸이 함께 온다(작업패 카드 선례). **재활용 덕에 한 번에 두 곳(상점 매대·판 기둥)에 닿는다.** 기둥은 `Bind`를 부르지 않으므로 얼굴이 자산 기본값으로 서는지 확인할 것. **옛 팩 버튼 아트 항목은 폐기** — `Button_BuyBonusPack`은 매대 전환에서 걷어냈다
 - **충전 배지 저작** — `_chargeBadge`·`_chargeLabel`은 코드가 켜고 끌 준비가 끝났으나 카드에 그 칸이 없다. 배선 명부에서 **일부러 빠져 있고**, 만드는 날 `Bind`의 널 가드가 저절로 켜진다. 시험 쪽 `OptionalSlots` 집합에서도 빼야 그때 명부에 합류한다
 - **보너스 축 측정** — `BonusCardPriceBp`·거울 2/3 확정. `RunLadderSweepScratch`에 `CreateBonusStream`(표지 `"shop-bonus"`)은 있으나 **구매 정책·집계 열이 없다** — 대조군(보너스 0장)이 옛 수치를 재현하는 것까지만 확인됨
-- **한글 글리프 실물 확인** — 발화 이름이 □로 뜨지 않는지. 스포너 옛 주석("TMP 기본 폰트에 한글 없음")과 형식상 충돌하나 같은 스포너가 이미 `뻑`·`+3칩`을 띄운다
+- **~~한글 글리프 실물 확인~~ — 2026-09-15 확인.** 기둥의 다섯 낱장 이름(까치호랑이·개평꾼·두꺼비·소금·거울)이 □ 없이 렌더링됐다(`capture_game_view` 실물). 오토사이즈가 가장 긴 이름만 폰트 15에서 14로 낮춰 맞춘다. **발화 플로팅 쪽은 아직 미확인**이다
 - **매대 여백 판단** — `Panel_BonusCards`는 1000×250인데 카드 세 장이 70×98 + 간격 40이라 290px만 쓴다. 치수는 직접 만든 쪽이 소유하므로 굽기가 건드리지 않는다
 - **개발 체육관 이름표 접기** — `EffectGymFiring.NameOf` 가 임시 표기를 들고 있고 주석이 "그 축이 생기기 전까지"라 적었다. DevSandbox 가 Presentation 을 참조하므로 `HudWords.BonusWord` 로 파생 가능 — 지금은 같은 사실이 두 곳
 - **상대 보너스 카드** — `CreateFlow` 의 `opponentEffectSlots` 는 `Array.Empty` 그대로. 관측창도 플레이어 전용(좌석 축 없음). 들어오는 날 `BonusSlotProbe` 시그니처가 좌석을 요구한다
@@ -254,7 +305,8 @@ ShopSession.BuyChipPackAndDraw  →  ChipPackDraw.Draw (가중·상한·작업 �
 | 마지막 턴 약탈 무효 범위 | 전통은 4종 전부 무효인데 현재는 **쪽만**. 의도된 편차 — 넓힐지 결정 필요 |
 | 폭탄·자뻑 | 흔들기가 미채용이라 폭탄도 보류 |
 | "다음 판 최소 밑천" 가드 | 현재 하한 1(`RunFlow.TrySpendChips` 상수 한 곳). 1보다 크게 잡는 것은 밸런스 결정 |
-| 판 HUD 슬롯 패널 저작 방식 | 직접 저작(2분, 재직렬화 없음) vs 베이커 + 배선 시험(그물이 남음). `MatchView` 는 손 저작 17칸이라 그물 없는 굽기는 위험 — §3 다음 후보 첫 항목 |
+| 슬롯 배율 1.8 동결 | 뮤테이션이 `localScale` 1.8을 붙드는 시험이 **0건**임을 찾았다(§3). (A) `EverySlotFits...`에 `Is.EqualTo(1.8f)` 한 줄을 더해 동결 — 저작 수치 동결 선례(`e9be28c`)를 따르고, 바뀌는 날 사람을 부른다. (B) 그대로 둔다 — 굽기 상수가 정본이고 겹침만 계약이다 |
+| `AgentScripts/` 취급 | 일회성 굽기 스크립트(`BakeMatchViewBonusSlots.cs`, 481줄)가 미커밋 미추적으로 남아 있다. `Assets/` 밖이라 Unity가 임포트하지 않는다. (A) `.gitignore`에 넣는다 (B) 커밋해 다음 사람이 같은 굽기를 재현하게 한다 (C) 지운다 — 계약은 시험이 지키므로 스크립트가 없어도 회귀는 잡힌다 |
 
 ### 보류 결정 — GitHub Actions (2026-08-24, 재검토 금지)
 
@@ -450,6 +502,18 @@ Unity 테스트 러너가 자동으로 실패시키는 것은 `LogError`·`LogEx
 
 ## 5. 함정 (이미 밟은 것 — 반복 금지)
 
+### 2026-09-15 (판 HUD 기둥 · 즉시 반영 · 재활용)
+
+- **⭐⭐ 절단 메시지로 상태를 추측하면 틀린다** — 에이전트가 "좌표를 모두 확인했다. 파일을 쓴다"로 끝나며 절단돼 ⓑ(탐색 소진, 편집 0)로 읽었는데, 파일이 이미 17,550바이트로 디스크에 있었다(ⓐ). 재위임했으면 중복 편집이었다. 판별은 **산출물 실물**로 한다(`ls -la`·`git status`·처방 grep). 같은 세션에 반대 방향 실수도 있었다. 다른 절단은 "다음은 기대 배열"이라 적어 미완으로 보였는데 그 배열은 이미 갱신돼 있었다. **절단 보고의 마지막 문장은 상태의 증거가 아니다**
+- **⭐⭐ `Object.Instantiate` 클론은 프리팹 연결을 잃는다** — 중첩 인스턴스인지 무는 시험을 "세운 프리팹에 `GetCorrespondingObjectFromSource`로 물어라"고 명세했으나, 클론에는 그 연결이 없어 **올바른 굽기 뒤에도 영영 null**이다. 자산 쪽 템플릿에 물어야 성립한다. 검증자가 명세를 고쳐 잡았고, 이 세션에서 그런 정정이 세 번 있었다(나머지 둘은 시험 이름의 수치 사본, 존재하지 않는 미러링 대상)
+- **⭐⭐ 시험 수가 맞아도 계약이 좁을 수 있다** — 새 시험 넷을 더하고 총계가 정확히 +4였는데, 사용자가 방금 고른 저작 수치(`localScale` 1.8)를 **아무것도 붙들고 있지 않았다**. 겹침 계약은 1.0에서도 성립하기 때문이다. 초록 개수로는 안 보이고 **뮤테이션만이 찾는다**(1.8 → 1.0 주입에 8건 전부 초록)
+- **⭐ 포커스 없는 에디터는 Play 모드에서 프레임을 돌리지 않는다** — `set_autotick`은 에디트 모드용이다. 캔버스 0개와 `timeSinceLevelLoad=0.0`을 "부팅 실패"로 오진할 수 있다. `eval`로 `Application.runInBackground = true`를 열면 프레임이 흐르고(2 → 7) UniTask 부트가 진행된다. `OnGUI`는 그 전에도 그려지므로 **디버그 패널이 보이는 것은 게임이 도는 증거가 아니다**
+- **⭐ 남의 SKU 카드를 재활용하면 그 카드가 채우던 칸이 빈 채로 보인다** — `Item_BonusCard`를 판 기둥에 중첩하니 `Text_EffectDesc`·`Text_Price`가 따라왔는데, 판에서 그것을 채우는 것은 `BonusSlotItem.Show`가 아니다(이름 칸만 채운다). 끄지 않으면 저작 시점 자리표가 HUD 값으로 읽힌다. **재활용의 비용은 무용 성분이 아니라 채워지지 않는 칸이다**
+- **⭐ `autotick --persist`는 `EditorPrefs`가 아니라 `SessionState`다** — 도메인 리로드는 넘기지만 에디터를 닫으면 사라진다(패키지 원문이 그렇게 적었다). 읽기 경로가 없어 켜졌는지 묻는 명령이 없다. 에디터 세션마다 다시 켠다
+- **⭐ `capture_game_view`의 두 제약** — `--source screen`(오버레이 캔버스 합성)은 **Play 모드 전용**이고, `--save_path`는 **프로젝트 루트 안**이어야 한다. `Temp/`를 주면 `Assets/Temp/`로 해석돼 자산이 생기므로 회수 후 `AssetDatabase.DeleteAsset`로 치운다. 스크래치패드 절대 경로는 400으로 거부된다
+- **셸이 C# 삼항 연산자를 문다** — `eval --code`에 `?:`와 중첩 인용을 섞으면 zsh가 **스크립트 전체 파싱에서** 죽어 앞줄의 `editor_play`까지 안 돈다. 그래서 "MatchView 없음"이 부팅 문제로 위장했다. 긴 C#은 파일로 써서 `run_script`로 넘긴다
+- **계획 모드가 저장소에 `C:/` 디렉토리를 만든다** — 계획 파일 경로가 Windows 형식으로 와 macOS에서 리터럴 디렉토리가 됐다. 커밋 전 `git status`에서 걷어낸다
+
 ### 2026-09-14~15 (라이브 CLI 도입 · 매대 전환 · 값 · 반응)
 
 - **⭐⭐ 살아 있는 에디터는 밖에서 고친 파일을 다시 읽지 않는다** — 프리팹 YAML에 뮤테이션을 주입하고 `run_tests`를 세 번 돌렸는데 전부 초록이었다. 시험이 무력한 것이 아니라 에디터가 메모리의 옛 사본을 들고 있었다. `unity command eval --code 'UnityEditor.AssetDatabase.ImportAsset(경로, UnityEditor.ImportAssetOptions.ForceUpdate);'`를 부르자마자 빨간불이 났다. **배치 모드에는 존재할 수 없는 함정**이다(매번 새 프로세스라 항상 디스크를 읽는다). 라이브 에디터를 쓰면서 파일을 밖에서 고치면 진실이 둘(디스크 / 에디터 메모리)이 되고 시험은 에디터 쪽을 본다
@@ -624,6 +688,9 @@ TurnEngine (도메인 — 9페이즈)
  MatchFlow.FireCaptureEffects / FireSettlementEffectsFor → EffectTriggeredEvent(id·좌석·시점 — 결과 없음)
   └ PresentationStepConverter → EffectTriggeredStep(17) → FloatingTextMotion(이름, 0초, 좌석 획득 행 머리)
  MatchSession.BonusSlotProbe() → MainScene.ApplyMatchScope → MatchView.ShowBonusSlots → BonusSlotList
+ ShopSession.EquippedBonusIds → ShopView._bonusChanged(RenderShelf) → MainScene 람다 → 같은 문
+  └ 통로가 둘인 근거는 시점이다. 판 발급 때는 동결 스냅샷, 상점 방문 중에는 살아 있는 조회창
+ 슬롯 카드 = Item_BonusCard 중첩 인스턴스 (상점과 같은 자산 · 값칸·설명칸·반응·버튼은 판에서 끈다)
  이름 SSOT = HudWords.BonusWord (상점 카드·HUD 슬롯·발화 셋이 같은 표) · 설명은 어휘에서 생성
  표지 "shop" / "shop-card" / "shop-bonus" 셋 — 공유하면 구매 이력이 다른 SKU 추첨을 민다 (영속 계약)
 
@@ -635,7 +702,7 @@ TurnEngine (도메인 — 9페이즈)
 
 IUIService (= UIManager)
  ├─ MatchView    계기판 — 라운드 `현재 | 상한` · 막 `현재 | 최종` · 요약 창 · 족보 트래커
- │                · 보너스 슬롯(Panel_BonusCardList 저작 완료 — BonusSlotList 부착·템플릿 배선 대기)
+ │                · 보너스 슬롯 기둥(Panel_BonusCardList — 상점 카드 재활용 · localScale 1.8 · 상한 5칸)
  ├─ GoStopView   고/스톱 모달
  ├─ FloorChoicePopupView 택1 딤(막 한 장, blocksRaycasts=false)
  └─ ShopView     매대 셋(각서·작업패·보너스 — 서로 독립, 나가기 잠금만 셋을 다 문다)
@@ -648,7 +715,31 @@ BoardLayout: 모든 X 가 PlayAreaHalfWidth 대칭에서 파생, 실제 크기�
 
 ## 7. 커밋 이력
 
-### 이번 구간 (2026-09-14~15, 라이브 CLI · 매대 전환 · 값 · 반응)
+### 이번 구간 (2026-09-15, 판 HUD 기둥 · 즉시 반영 · 재활용)
+
+8커밋 · EditMode 1306 → **1315**(+9) · PlayMode 91 유지 · 뮤테이션 11회 → 빨간불 10건(1건은 구멍 발견).
+**원격에 push됨**(`d008b5a`). 이후 이력 수정은 force push가 필요하다.
+
+| 커밋 | 내용 |
+|---|---|
+| `7b311da` | 설정: `EditorPipelineManager.asset`을 저장소에 넣는다. 포트 0이라 머신 중립이다 |
+| `ad61bac` | **프리팹: 기둥에 보너스 슬롯 템플릿을 배선한다** — 인라인 `Item_BonusSlot` + 배경·폰트 복사(뒤에 재활용으로 대체) |
+| `d46dfe7` | **테스트: `MatchViewPrefabWiringTests`로 판 화면 배선을 문다** — 러너가 `LogWarning`을 실패시키지 않아 경고를 직접 구독한다. 경고는 `OnCreated`가 아니라 `ResetForNewMatch`에서 난다 |
+| `60412a4` | **상점: `ShowAsync`가 보너스 장착 통로를 연다** — 칩 통로 미러. 셋째 인자를 필수로 둬 호출처 32곳이 컴파일러 명부로 드러났다 |
+| `8365105` | 테스트: `ShopViewLifecycleTests`가 통로 발화를 문다. 창이 설 때의 빈 통보를 먼저 물어 자리를 가른다 |
+| `0ae38c2` | **도메인: `MaxSlots`를 5로 올린다** — 도달 불가가 된 넘침 단언을 반대 방향 파수꾼으로 바꿨다 |
+| `e0f9650` | **프리팹: 판 기둥이 `Item_BonusCard`를 재활용한다** — 복사 제거 · 상점용 칸 넷 접기 · `localScale` 1.8 |
+| `d008b5a` | 테스트: 재활용 계약 넷. 하나는 재활용 결정 자체를 문다(인라인 사본으로 되돌리면 빨간불) |
+
+**뮤테이션 11회**: 프리팹 배선 4종(각 1건) · 통로 발화 제거(1건) · `MaxSlots` 되돌림(4건) ·
+재활용 계약 4종(각 1건) · **`localScale` 되돌림(0건 — 구멍을 찾았다)**.
+
+**이 구간의 성격**: 사용자가 두 번 개입해 방향을 바꿨다. 첫 번째는 반영 시점("구매 즉시"), 두 번째는
+**"`Item_BonusCard`를 재활용 하면 안되는거야?"** 였다. 후자가 내 YAGNI 판단의 오류를 잡았다.
+소비자를 하나로 셌지만 실제로는 둘이었고, 아트가 이미 후보에 올라 있어 확장 조건이 성립해 있었다.
+복사한 축 넷(sprite·색·폰트·재질)을 없애고 한 자산으로 모은 것이 이 구간의 알맹이다.
+
+### 지난 구간 (2026-09-14~15, 라이브 CLI · 매대 전환 · 값 · 반응)
 
 8커밋 · EditMode 1302 → **1306**(+4) · PlayMode 91 유지 · 뮤테이션 3회 → 빨간불 7건.
 
