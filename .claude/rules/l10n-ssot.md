@@ -55,11 +55,11 @@ grep -rE "class.*(VisualData|ViewData|RowData|Model|Snapshot).*\{" -A 30 | grep 
 grep -rE "(name|desc|description|title|label)\s*=\s*L10n\.(T|Format)\("
 ```
 
-**둘 다 0건 아니면 안티패턴 잔재** — 추가 sweep 필수. **Pattern B 발견 시 view가 직접 박제하는지 caller chain 추적 의무** — grep 결과 자동 위반 판정 금지, 사용 흐름 검증 (PlayerId/unitId 기반 lazy re-resolve 사용 시 정합).
+**둘 다 0건 아니면 안티패턴 잔재** — 추가 sweep 필수. **Pattern B 발견 시 view가 직접 박제하는지 caller chain 추적 의무**. grep 결과만으로 위반을 단정하지 말고 사용 흐름을 검증한다. PlayerId·unitId 기반 lazy re-resolve를 쓰면 정합이다.
 
-(2026-04-29 Shop 유물 표시 재발 사고: Relic 마이그레이션 1차에서 `RelicDefinition.NameTextKr` 제거했지만 `ShopSlotVisualData.DisplayName`와 `UIShopSlot._tooltipTitle`가 여전히 string snapshot → 상점 슬롯 + 툴팁이 활성 중 언어 토글 미반영. 사용자 시니어 검토자 역할로 layer 누락 패턴 박제 요청)
+(2026-04-29 Shop 유물 표시 재발 사고: Relic 마이그레이션 1차에서 `RelicDefinition.NameTextKr`를 제거했다. 그런데 `ShopSlotVisualData.DisplayName`와 `UIShopSlot._tooltipTitle`가 여전히 string snapshot이라 상점 슬롯과 툴팁이 활성 중 언어 토글을 반영하지 못했다. 사용자 시니어 검토자 역할로 layer 누락 패턴 박제 요청)
 
-**4-Layer 데이터 흐름 일관성** (Tooltip + {value} placeholder 등 다중 layer 파이프라인): [best-practice/multilayer-locale-snapshot.md](../../best-practice/multilayer-locale-snapshot.md) — 키 보존 + 표시 직전 lazy resolve.
+**4-Layer 데이터 흐름 일관성**은 키 보존과 표시 직전 lazy resolve로 지킨다. Tooltip과 {value} placeholder 같은 다중 layer 파이프라인이 대상이다. 상세: [best-practice/multilayer-locale-snapshot.md](../../best-practice/multilayer-locale-snapshot.md)
 
 #### 2-0-2. View-Level ILocaleAware 강제 — Manager/Static-Event 우회 금지
 
@@ -106,7 +106,7 @@ grep -rE "LocalizationDispatcher\.LocaleApplied\s*\+=" Assets/Scripts
 ```
 **결과는 0건이어야 함** — ILocaleAware 인터페이스 외부에서 static event 직접 구독 = 우회 패턴.
 
-(2026-04-29 Encounter L10n 사고: Sonny가 manager-level subscription 채택 → UIEncounterPanelView가 ILocaleAware 미구현 → 사용자가 "이 구조가 말이 돼?" 메타 비판. 3차례 진단 로그 추가 후에야 view-level 패턴으로 unification. 헌법 §0 메타 원칙 직접 위반 — Sonny가 검증된 패턴 무시 + 추측 기반 패턴 도입)
+(2026-04-29 Encounter L10n 사고: Sonny가 manager-level subscription을 채택했다. 그래서 UIEncounterPanelView가 ILocaleAware를 구현하지 않았다. 사용자가 "이 구조가 말이 돼?"라고 메타 비판했다. 3차례 진단 로그 추가 후에야 view-level 패턴으로 unification. 헌법 §0 메타 원칙 직접 위반 — Sonny가 검증된 패턴 무시 + 추측 기반 패턴 도입)
 
 **Subclass 확장 시**: 부모 `OnLocaleApplied`를 `virtual` + 자식 `override` + `base` 호출. 상세는 [best-practice/locale-aware-subclass-extension.md](../../best-practice/locale-aware-subclass-extension.md).
 

@@ -20,14 +20,15 @@ Unity 코드 작업 시 **사용자가 매번 요구하지 않아도** 다음 �
 사용자가 "시니어 판단해줘"라고 매번 말하지 않아도 **모든 코드 변경 작업에 자동 적용**되는 4단계 표준 사고. 누락 시 사고 재발(caller-driven snapshot 사고 패턴 등) 보장.
 
 **Step 1 — 변경 전 영향 분석 (Before 자동)**:
-- **코드가 외부 문서를 좌표로 인용하면(`기획 §5`, `§6①`, RFC 번호, 시트 행) 그 문서는 실재하는 SSOT다** — 조사·위임을 **시작하기 전에** 원문 접근을 확보하고, 접근 수단이 없으면 추론을 시작하기 전에 사용자에게 링크를 요청한다. 근거 위계는 **확정 스펙 원문 > 코드에서의 역추론 > 신규 조사·리서치** — 순서를 뒤집으면 이미 확정된 답을 비용을 들여 다시 만들어낸다. (2026-08-04 획득패 배치: 주석에 참조 표시 수십 개가 있는데 원문 미확인 상태로 코드 내부 근거 탐색 + Ava UX 조사 위임 → 원문에 배치 스펙 전체가 이미 확정돼 있었음)
+- **코드가 외부 문서를 좌표로 인용하면(`기획 §5`, `§6①`, RFC 번호, 시트 행) 그 문서는 실재하는 SSOT다**. 조사·위임을 **시작하기 전에** 원문 접근을 확보한다. 접근 수단이 없으면 추론을 시작하기 전에 사용자에게 링크를 요청한다. 근거 위계는 **확정 스펙 원문 > 코드에서의 역추론 > 신규 조사·리서치** — 순서를 뒤집으면 이미 확정된 답을 비용을 들여 다시 만들어낸다. (2026-08-04 획득패 배치: 주석에 참조 표시가 수십 개인데 원문을 확인하지 않고 코드 내부 근거를 탐색하고 Ava UX 조사까지 위임했다. 원문에 배치 스펙 전체가 이미 확정돼 있었음)
 - grep으로 변경 대상 심볼/패턴의 **모든 호출처/의존처** 식별, 영향 범위를 분류 테이블로 명시 (자동 위임/수동 처리/외부 시스템). "SSOT 어느 축에 영향?" 검증 (코드 식별자 / 사용자 노출 / 메타)
-- **상태·플래그·접합부 제거 시 grep 방향은 쓰기 지점이 아니라 읽기 지점 전수**. 제거 대상이 원래 목적 외 독자(정렬·순서·가시성 판정 등)를 달고 있는지 **독자별 의미 분류표**(읽는 곳 / 무엇을 판정하려고 읽는가 / 이관 후 대체 채널)를 작성하고, "대체 채널 없음" 행이 0이 될 때까지 이관 미완료로 취급. 제거 대상이 나르던 것이 값이 아니라 **보장(순서·배타·정지)** 이면 컴파일·테스트·정적 grep 어디에도 안 걸리고 시각 회귀로만 드러난다. 상세 [best-practice/implicit-proxy-state-removal.md](../../best-practice/implicit-proxy-state-removal.md). (2026-08-04 카드 연출 채널 이관: 같은 계급 누락 3회, 그중 2회가 사용자 재현에서야 발견)
-- **타입에 필드·축을 더할 때는 반대로 생산 지점 전수** — 그 타입을 만드는 곳을 모두 grep해 표로 세고(재생·되감기 모델, 프리뷰, 테스트 빌더, 역직렬화가 상습 제2 생산자) 새 축 열을 행마다 채운다. 새 축은 **기본적으로 필수 인자로 추가** — 선택 인자(`= default`)는 컴파일러가 생산자 명부를 만들어 주는 강제를 끄고 기본값을 조용히 흘린다. 상세 [best-practice/second-producer-axis-drift.md](../../best-practice/second-producer-axis-drift.md). (2026-08-04 획득패 배치: `CardSnapshot.Kind`는 예외로 즉사, `SeatSnapshot.CapturedTally`는 조용히 0 — 같은 계급 누락 2회)
+- **상태·플래그·접합부 제거 시 grep 방향은 쓰기 지점이 아니라 읽기 지점 전수**. 제거 대상이 원래 목적 외 독자(정렬·순서·가시성 판정 등)를 달고 있는지 **독자별 의미 분류표**를 작성한다. 표의 열은 읽는 곳, 무엇을 판정하려고 읽는가, 이관 후 대체 채널이다. "대체 채널 없음" 행이 0이 될 때까지 이관 미완료로 취급한다. 제거 대상이 나르던 것이 값이 아니라 **보장(순서·배타·정지)** 이면 컴파일·테스트·정적 grep 어디에도 안 걸리고 시각 회귀로만 드러난다. 상세 [best-practice/implicit-proxy-state-removal.md](../../best-practice/implicit-proxy-state-removal.md). (2026-08-04 카드 연출 채널 이관: 같은 계급 누락 3회, 그중 2회가 사용자 재현에서야 발견)
+- **타입에 필드·축을 더할 때는 반대로 생산 지점 전수** — 그 타입을 만드는 곳을 모두 grep해 표로 세고 새 축 열을 행마다 채운다. 재생·되감기 모델, 프리뷰, 테스트 빌더, 역직렬화가 상습 제2 생산자다. 새 축은 **기본적으로 필수 인자로 추가** — 선택 인자(`= default`)는 컴파일러가 생산자 명부를 만들어 주는 강제를 끄고 기본값을 조용히 흘린다. 상세 [best-practice/second-producer-axis-drift.md](../../best-practice/second-producer-axis-drift.md). (2026-08-04 획득패 배치: `CardSnapshot.Kind`는 예외로 즉사, `SeatSnapshot.CapturedTally`는 조용히 0 — 같은 계급 누락 2회)
 - **상속 계층 분석 시 `: BaseClass\b` grep + 결과 표 작성 의무**. 사전 조사를 일부 종에 제한 금지 — grep 결과 모두 포함 (2026-04-30 Category 18건 + TooltipTarget 발견)
 - **사용자 의도 모호 질문(예: "~는 어떻게 된거지?")은 부분 마이그레이션 누락 노출 신호** — 답변 전 grep 전수 검사 의무
 - **자산 마이그레이션 script 작성 시 파일명 정렬 vs 시트 Code Name 정렬의 case sensitivity 일관성 사전 검증 의무** — 상세 [best-practice/asset-migration-sort-consistency.md](../../best-practice/asset-migration-sort-consistency.md)
-- **Unity 라이프사이클 메시지(`Awake`/`Start`/`OnEnable`/`OnDestroy`) 신설 시 부모 클래스 grep 의무** — Unity 메시지는 reflection 기반이라 자식 정의 시 부모 호출 누락 위험 (`override` 강제 없음, 컴파일러/IDE 경고 없음). 상세 [best-practice/unity-lifecycle-message-override.md](../../best-practice/unity-lifecycle-message-override.md). (2026-05-12 UIShop Awake 가로채기 회귀 인시던트)
+- **Unity 라이프사이클 메시지 신설 시 부모 클래스 grep 의무**(`Awake`/`Start`/`OnEnable`/`OnDestroy`).
+  Unity 메시지는 reflection 기반이라 자식이 정의하면 부모 호출이 누락될 수 있다. `override` 강제도 컴파일러·IDE 경고도 없다. 상세 [best-practice/unity-lifecycle-message-override.md](../../best-practice/unity-lifecycle-message-override.md). (2026-05-12 UIShop Awake 가로채기 회귀 인시던트)
 - **표현 계층이 호출할 API 시그니처 확정 전 반환·인자 타입의 어셈블리 확인** — asmdef references는 컴파일러가 강제하는 계층 경계. 경계를 넘는 선례를 먼저 grep 하고, 참조 추가보다 표시용 struct 이동 우선. 상세 [best-practice/assembly-boundary-api-design.md](../../best-practice/assembly-boundary-api-design.md). (2026-09-01 `BuyPackAndDraw` 도메인 타입 반환 — Presentation이 Domain 미참조로 호출 불가, asmdef 사전 확인으로 배선 전 발견)
 
 **Step 2 — 합리화 회피 (During 자동)**:
@@ -85,7 +86,9 @@ Unity 코드 작업 시 **사용자가 매번 요구하지 않아도** 다음 �
 
 #### 2-0. Caller-Driven UI String Snapshot 안티패턴 → [l10n-ssot.md](l10n-ssot.md) 분리
 
-§2-0 (caller-driven snapshot 식별) · §2-0-1 (데이터 흐름 string snapshot 절대 금지) · §2-0-2 (View-Level ILocaleAware 강제) 전문은 [l10n-ssot.md](l10n-ssot.md)에 **동일 섹션 번호로 분리** (200줄 정책). 적용 강제력 동일 (Glob 자동 주입). 핵심 3원칙:
+§2-0 시리즈 전문은 [l10n-ssot.md](l10n-ssot.md)에 **동일 섹션 번호로 분리**했다(200줄 정책).
+§2-0은 caller-driven snapshot 식별이다.
+§2-0-1은 데이터 흐름 string snapshot 금지, §2-0-2는 View-Level ILocaleAware 강제다. 적용 강제력은 같다(Glob 자동 주입). 핵심 3원칙:
 
 - caller가 `L10n.T(...)` 결과 string을 UI에 전달 금지 — UI는 **키 보존** + `LocaleApplied` 구독 (Observer)
 - 데이터 클래스(`*VisualData`/`*ViewData`/`*Model` 등)는 사용자 노출 텍스트 string 보유 금지 — **키만**

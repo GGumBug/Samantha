@@ -91,7 +91,7 @@ Unity C# 파일이라도 **모든** 조건을 충족하면 에이전트 위임 �
 
 ### 위임 종료 시 워킹트리 전체 인지 의무 (필수)
 
-위임이 끝나고 사용자에게 보고하기 전에 **반드시 `git status --short` 전체를 확인**하고, 위임 작업과 무관한 변경(디버깅 흔적, 자동 갱신된 `.asset`, 의도 외 수정)이 있으면 보고에 **별도 강조**한다.
+위임이 끝나고 사용자에게 보고하기 전에 **반드시 `git status --short` 전체를 확인**한다. 위임 작업과 무관한 변경이 있으면 보고에 **별도 강조**한다. 디버깅 흔적, 자동 갱신된 `.asset`, 의도 외 수정이 그 대상이다.
 
 **의무 보고 형식**:
 
@@ -108,20 +108,21 @@ Unity C# 파일이라도 **모든** 조건을 충족하면 에이전트 위임 �
 
 **왜 의무인가**: 광범위 add(`git add .` / `git add -A`) 시 의도 외 변경이 함께 끌려들어가 게임 밸런스 깨짐, 임시 디버그 값 commit, 비밀 노출 등 심각한 결과 가능. 시니어 검토의 본질은 "내가 의도한 것 외에 무엇이 따라오는가"를 점검하는 것.
 
-(2026-04-27 옵션 5b/2 작업 시 Monster_101~110 .asset 10개의 maxHP=1 디버깅 흔적이 working tree에 있었던 사례 — 사용자가 직접 발견 전까지 격리 안 됨)
+(2026-04-27 옵션 5b/2 작업 때 Monster_101~110 .asset 10개에 maxHP=1 디버깅 흔적이 남아 있었다. 사용자가 직접 발견하기 전까지 격리되지 않았다)
 
 ### 병렬 위임 원칙 (필수)
 
-- 독립적인 Unity 작업이 2개 이상이면 **단일 메시지에 여러 Agent 호출**로 병렬 실행한다 (예: 아키텍처 리팩토링 + UI 색상 수정 → Jarvis + Ava 병렬)
+- 독립적인 Unity 작업이 2개 이상이면 **단일 메시지에 여러 Agent 호출**로 병렬 실행한다.
+  예를 들어 아키텍처 리팩토링과 UI 색상 수정은 Jarvis와 Ava를 함께 부른다.
 - **Codex 중첩 위임**: `agents.max_depth = 2`에서 Samantha가 Jarvis/Ava/Sonny/TARS를 직접 병렬 호출할 수 있다. 중첩 위임을 지원하지 않는 실행 환경에서는 상위 세션이 같은 분해안을 실행한다. (2026-04-15 Shop 노드 통합에서 Jarvis+Ava+Sonny 병렬 3호출로 약 2.3배 속도 향상 검증)
 - **단일 에이전트 5개 항목 한계**: 한 에이전트 호출에 독립 항목을 5개 초과 몰아주면 `maxTurns: 25` 제한에 걸려 보고가 잘리고 일부 항목이 누락된다. 5개 초과면 ① 병렬로 분할 또는 ② 순차 호출(1차 → 검증 → 2차).
 - **동일 도메인 연속 카드는 신규 인스턴스 대신 같은 에이전트 SendMessage 재개**로 컨텍스트 재사용 — 판단 기준·운영 규칙: [best-practice/sequential-delegation-context-reuse.md](../../best-practice/sequential-delegation-context-reuse.md)
 
 ### 시각 버그 위임 우선순위 (Ava)
 
-UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset 수정 전에 Inspector 확인을 우선**한다. Ava 위임 프롬프트에 반드시 명시: "Button.Disabled Color, SerializeField 할당, CanvasGroup.alpha를 코드 수정 전에 먼저 의심하고, 같은 가설 2회 실패 시 사용자에게 Inspector 확인을 요청하라".
+UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset 수정 전에 Inspector 확인을 우선**한다. Ava 위임 프롬프트에 다음을 반드시 명시한다. "Button.Disabled Color, SerializeField 할당, CanvasGroup.alpha를 코드 수정 전에 먼저 의심하라. 같은 가설이 2회 실패하면 사용자에게 Inspector 확인을 요청하라".
 
-**prefab 시각 회귀 시 git diff 우선 의무**: 사용자가 "어제까지 멀쩡했는데 이상해짐" 같이 회귀를 보고하면 Ava 위임 프롬프트 1순위는 **`git diff <prefab>` + `git log --oneline <prefab>`** 으로 변경 이력 확인. 코드/asset 수정 시도보다 먼저. 직접 의심한 컴포넌트 외 어떤 필드가 함께 바뀌었는지 diff가 가장 빠른 답을 준다 (특히 prefab variant의 modifications 블록).
+**prefab 시각 회귀 시 git diff 우선 의무**. 사용자가 "어제까지 멀쩡했는데 이상해짐" 같이 회귀를 보고하면 Ava 위임 프롬프트 1순위는 변경 이력 확인이다. **`git diff <prefab>`과 `git log --oneline <prefab>`**을 먼저 본다. 코드/asset 수정 시도보다 먼저. 직접 의심한 컴포넌트 외 어떤 필드가 함께 바뀌었는지 diff가 가장 빠른 답을 준다 (특히 prefab variant의 modifications 블록).
 
 ### 리팩토링 위임 체크리스트
 
@@ -131,12 +132,17 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 - [ ] 사용처를 목록화한 후 **모든 수정을 한 번에** 위임 (분산하면 컴파일 에러)
 - [ ] 인라인→유틸 추출이라면 **추출 전 책임 목록화 + 추출 후 책임 매핑**을 프롬프트에 명시하고 "기능 동등성 보존" 명시적 요구
 - [ ] 기대 시나리오 1-2개 명시 (예: "minFloor=6 LocationType은 actLevel=3에서 추첨되지 않아야 함")
-- [ ] **오버로드 추가** 시 원본의 부수 효과를 diff로 나열하고 "새 오버로드가 모든 부수 효과를 복제하는지" 명시 요구 (2026-04-17 `NodeCleared(Vector2Int)`에서 `IsSelectable=false` 한 줄 누락으로 visible bug 발생)
+- [ ] **오버로드 추가** 시 원본의 부수 효과를 diff로 나열하고 "새 오버로드가 모든 부수 효과를 복제하는지" 명시 요구.
+      (2026-04-17 `NodeCleared(Vector2Int)`에서 `IsSelectable=false` 한 줄이 빠져 visible bug 발생)
 - [ ] **"현재" 암묵 참조 API 이동** 시(예: `_currentNode`, `_activeSession`): 이동 후 호출 시점의 포인터 타이밍을 명시하고, 필요 시 명시 파라미터(좌표/ID) 기반 오버로드 요구
-- [ ] **SSOT 통합 위임** 시 프롬프트에 5요소 모두 포함: ① 단일 진입점 메서드명 ② 모든 호출자 grep 결과 ③ 부수효과 매트릭스 ④ 통합 후 레거시 진입점 제거 의무 ⑤ 종료 게이트 grep 패턴 (`refactoring-lessons.md §12.5` 6항목 참조)
-- [ ] **패턴 미러링 보고 시 코드 형태 grep 비교 + 인용 의무**: "다른 노드 N곳 참고/미러링" 보고 시 실제 grep 결과로 현재 편집 코드와 참고 코드의 정확한 형태(가드 유무, 호출 순서, lazy-init 여부 등)를 인용해야 함. "패턴을 따랐다" 자체 정당화 회피 (헌법 §0 메타 원칙). (2026-04-27 Treasure 부트 보장 인시던트: `if (HasInstance)` 가드가 다른 노드 11곳 패턴(가드 없이 `Instance` 직접 호출)과 코드 형태가 달라 lazy-init을 막아 race 유지)
-- [ ] **패턴 미러링 — 코드 형태 grep + "적용 영역 일치" 분리 검증 의무**: grep으로 코드 형태 일치만으로는 부족. 각 미러링 사례의 **"패턴 적용 영역"이 현재 작업과 일치하는지** 명시 검증 — ① 시간축 적용 영역(부트 의존 / 상태 의존 / 라이프사이클 단계) ② 호출 시점 의존성(lazy-init 트리거 필요 여부 / Singleton 부트 race 가능성). 영역이 다른 미러링은 **무효 정당화** — 코드 형태만 같아도 함정 가능. (2026-05-12 btnMap race fix: `HasInstance` 가드 다른 viewer 6곳 미러링 보고했으나 6곳 모두 상태 의존 컨텍스트, UIGame.OnEnable만 부트 의존 → 영역 mismatch로 race 발생. 상세 [best-practice/race-fix-meta-patterns.md](../../best-practice/race-fix-meta-patterns.md) §7)
-- [ ] **신규 시그니처 사용 시 Unity C# 버전 호환 확인** (record struct/required member/file-scoped types 등은 LangVersion override 필요). 상세 [best-practice/unity-csharp-version-check.md](../../best-practice/unity-csharp-version-check.md)
+- [ ] **SSOT 통합 위임** 시 프롬프트에 5요소를 모두 넣는다(`refactoring-lessons.md §12.5` 참조).
+      ① 단일 진입점 메서드명 ② 모든 호출자 grep 결과 ③ 부수효과 매트릭스 ④ 통합 후 레거시 진입점 제거 의무 ⑤ 종료 게이트 grep 패턴
+- [ ] **패턴 미러링 보고 시 코드 형태 grep 비교와 인용 의무**. "다른 노드 N곳 참고·미러링" 보고에는 실제 grep 결과를 인용한다.
+      현재 편집 코드와 참고 코드의 정확한 형태(가드 유무, 호출 순서, lazy-init 여부)를 나란히 적는다. "패턴을 따랐다" 자체 정당화 회피 (헌법 §0 메타 원칙). (2026-04-27 Treasure 부트 보장 인시던트: `if (HasInstance)` 가드가 다른 노드 11곳 패턴(가드 없이 `Instance` 직접 호출)과 코드 형태가 달라 lazy-init을 막아 race 유지)
+- [ ] **패턴 미러링 — 코드 형태 grep + "적용 영역 일치" 분리 검증 의무**: grep으로 코드 형태 일치만으로는 부족. 각 미러링 사례의 **"패턴 적용 영역"이 현재 작업과 일치하는지** 명시 검증한다.
+      ① 시간축 적용 영역(부트 의존, 상태 의존, 라이프사이클 단계) ② 호출 시점 의존성(lazy-init 트리거 필요 여부, Singleton 부트 race 가능성)
+      영역이 다른 미러링은 **무효 정당화**다. 코드 형태만 같아도 함정일 수 있다. (2026-05-12 btnMap race fix: `HasInstance` 가드를 다른 viewer 6곳에서 미러링했다고 보고했다. 그러나 6곳 모두 상태 의존 컨텍스트였고 UIGame.OnEnable만 부트 의존이라, 영역 mismatch로 race가 났다. 상세 [best-practice/race-fix-meta-patterns.md](../../best-practice/race-fix-meta-patterns.md) §7)
+- [ ] **신규 시그니처 사용 시 Unity C# 버전 호환 확인**. record struct, required member, file-scoped types는 LangVersion override가 필요하다. 상세 [best-practice/unity-csharp-version-check.md](../../best-practice/unity-csharp-version-check.md)
 
 상세:
 - [best-practice/refactoring-lessons.md](../../best-practice/refactoring-lessons.md) — 일반 리팩토링 교훈
@@ -173,7 +179,7 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 (2026-05-13 본 세션 회고: 시각 회귀 prompt에 명시 안 한 컴포넌트 정리가 함께 진행되어 사용자가 별도 검증해야 한 사례)
 
-**범위 보존 ≠ 맹종 — prompt 내 스펙 충돌 처리**: prompt에 포함된 템플릿/예시가 같은 prompt의 명시 요구와 충돌하면 템플릿 맹종 금지 — **명시 요구(상위 의도) 우선 + "의도적 변경 N건" 사유 보고 의무**. (2026-07-08 Sonny: 테스트 asmdef 템플릿이 EditMode 패턴인데 명시 요구는 PlayMode — 충돌을 식별해 PlayMode 패턴으로 수정 + "의도적 변경 1건" 보고. 올바른 에이전트 행동으로 박제)
+**범위 보존은 맹종이 아니다. prompt 내 스펙 충돌 처리**: prompt의 템플릿·예시가 같은 prompt의 명시 요구와 충돌하면 템플릿을 맹종하지 않는다. **명시 요구(상위 의도)가 우선이고, "의도적 변경 N건" 사유 보고가 의무다**. (2026-07-08 Sonny: 테스트 asmdef 템플릿은 EditMode 패턴인데 명시 요구는 PlayMode였다. 충돌을 식별해 PlayMode 패턴으로 고치고 "의도적 변경 1건"을 보고했다. 올바른 에이전트 행동으로 박제)
 
 ### 중앙 허브 파일 병렬 작업 직렬화 (필수)
 
@@ -187,7 +193,7 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 ### `.meta` GUID 수동 지정 리스크 (Ava/Jarvis)
 
-에이전트가 Animator `.controller` 또는 `.cs.meta` 파일을 **직접 생성**하면서 GUID를 수동으로 지정하면, Unity 첫 import 시 **재발급**될 수 있음. 결과: prefab의 Script/Asset 참조가 `Missing (Mono Script)` 상태로 깨짐.
+에이전트가 Animator `.controller`나 `.cs.meta`를 **직접 생성**하며 GUID를 수동 지정하면 Unity 첫 import 때 **재발급**될 수 있다. 그러면 prefab의 Script·Asset 참조가 `Missing (Mono Script)`로 깨진다.
 
 **처방**:
 
@@ -199,7 +205,8 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 ### Unity 자동 prefab mutation 함정 (공유 asset 추가 시)
 
-새 폰트/머터리얼/스프라이트/Shader 등 **공유 asset을 Assets/ 에 추가**하면 Unity가 import 시점에 기존 prefab의 reference GUID를 자동 교체하는 사고가 발생할 수 있다. 결과: 작업 범위 외 prefab 들이 `Modified` 상태로 working tree에 등장.
+새 폰트·머터리얼·스프라이트·Shader 같은 **공유 asset을 Assets/에 추가**할 때가 있다.
+그러면 Unity가 import 시점에 기존 prefab의 reference GUID를 자동 교체할 수 있다. 그러면 작업 범위 밖 prefab이 `Modified` 상태로 working tree에 나타난다.
 
 **증상**:
 - `git status`에 위임 작업과 무관한 `.prefab` 다수 등장
@@ -209,10 +216,11 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 **처방** (헌법 §unity-delegation "워킹트리 인지 의무"와 cross-link):
 
 - 공유 asset (`*.ttf` / `*.asset` TMP_FontAsset / `*.mat` / `*.png` 등) 추가가 포함된 위임 종료 직후 **`git status` 전체 점검 의무**
-- 의도한 prefab (예: UIMapView, UITutorialGuidePanel) 외 prefab mutation 발견 시 사용자 보고 + (A) 의도 적용 / (B) `git restore` 옵션 제시
+- 의도한 prefab(UIMapView, UITutorialGuidePanel 등) 밖에서 mutation을 발견하면 사용자에게 보고한다.
+  (A) 의도 적용 (B) `git restore` 두 옵션을 함께 제시한다.
 - 사전 예방: 공유 asset 추가 위임 prompt에 "**asset import 후 `git status`로 의도 외 prefab mutation 확인 + 사용자 보고**" 의무 명시
 
-(2026-05-14 RIDIBatang 폰트 추가 인시던트: `1e51495b` 커밋에서 UIMapView의 TMP_Text fontAsset GUID가 자동 교체되어 의도된 폰트 마이그레이션과 함께 의도 외 prefab modification도 발생. 사용자가 직접 발견 전까지 격리 안 됨)
+(2026-05-14 RIDIBatang 폰트 추가 인시던트: `1e51495b` 커밋에서 UIMapView의 TMP_Text fontAsset GUID가 자동 교체됐다. 의도한 폰트 마이그레이션과 함께 의도 외 prefab modification도 생겼고, 사용자가 직접 발견하기 전까지 격리되지 않았다)
 
 ### 서브에이전트 Read 권한 사전 점검
 
@@ -231,7 +239,8 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 - **재위임 전 반드시 `git diff --stat`으로 실제 수정 상태 확인** — 이미 수정되어 있으면 재수정 금지. 절단 보고가 "확인한다 / 검토한다" 같은 탐색 메시지로 끝나면 **편집은 끝났을 가능성 80%+**(ⓐ)
 - 재위임 프롬프트에 "**편집만 하고 검증/분석은 생략**, 재탐색 금지, 보고는 3줄 이내" 명시 + 보고 포맷 사전 고정(섹션 수·줄 수 상한)
-- **예방**: 파일 5개 이상 **또는 관통 어셈블리/계층 3개 이상**이면 **계층당 한 에이전트로 분할**(파일 수 반 자르기 금지 — 계층 간 시그니처는 코디네이터가 확정해 양쪽 프롬프트에 원문으로 박고, 배치 시험은 코디네이터가 돌린다). 한 에이전트에 "감사(read-only)" + "구현(edit)"을 동시에 시키지 말 것 — 분리 호출
+- **예방**: 파일 5개 이상 **또는 관통 어셈블리·계층 3개 이상**이면 **계층당 한 에이전트로 분할**한다(파일 수 반 자르기 금지).
+  계층 간 시그니처는 코디네이터가 확정해 양쪽 프롬프트에 원문으로 박고, 배치 시험도 코디네이터가 돌린다. 한 에이전트에 "감사(read-only)" + "구현(edit)"을 동시에 시키지 말 것 — 분리 호출
 - **좌표 제공 의무**: 프롬프트에는 결정(설계·합격 기준)뿐 아니라 **좌표**(파일:줄, grep 결과 표, 시그니처 전문, 코드 블록 인용)를 함께 적는다. "읽어라 / 찾아라 / 맞춰라 / 미러링하라 / 참고하라"는 동사가 있으면 **좌표 누락 신호** — 그 자리에 grep 결과를 대신 넣는다
 
 3상태 판별표·상태별 처방·프롬프트 과적재로 인한 탐색 소진 예방: [best-practice/delegation-truncation-triage.md](../../best-practice/delegation-truncation-triage.md)
