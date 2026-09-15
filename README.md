@@ -109,6 +109,7 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 |---|---|
 | [agent-prose-readability.md](reports/agent-prose-readability.md) | 에이전트 주석·커밋 장황함의 원인 분석과 처방 |
 | [claude-agent-architecture.md](reports/claude-agent-architecture.md) | Claude Agent 아키텍처 결정 규칙 |
+| [double-down-comment-archive.md](reports/double-down-comment-archive.md) | 압축한 클래스 doc 10개의 원문 좌표 |
 | [claude-browser-decision.md](reports/claude-browser-decision.md) | 브라우저 자동화 도구 선택 결정 규칙 |
 | [claude-memory-and-settings.md](reports/claude-memory-and-settings.md) | Claude Memory·Settings 결정 규칙 |
 | [claude-operational-limits.md](reports/claude-operational-limits.md) | Claude 운영 한계와 도구 결정 규칙 |
