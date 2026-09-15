@@ -123,8 +123,10 @@ def audit_commits(repo, count):
         sha, subject = parts[0], parts[1]
         body = parts[2] if len(parts) > 2 else ""
         files = git(repo, "show", "--name-only", "--format=", "-1", sha).split()
-        stems = {os.path.basename(f).rsplit(".", 1)[0]
-                 for f in files if f.endswith((".cs", ".prefab", ".unity", ".asset"))}
+        # 확장자를 Unity 자산으로 좁히면 문서·스크립트 저장소에서 늘 0건이 나온다.
+        stems = {os.path.basename(f).rsplit(".", 1)[0] for f in files}
+        stems |= {os.path.basename(f) for f in files}
+        stems = {s for s in stems if len(s) > 3}
         names_file = any(s and s.lower() in subject.lower() for s in stems)
         body_lines = [l for l in body.splitlines() if l.strip()]
         paragraphs = [p for p in re.split(r"\n\s*\n", body) if p.strip()]
