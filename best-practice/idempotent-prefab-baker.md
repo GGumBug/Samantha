@@ -93,6 +93,27 @@ var card = (GameObject)PrefabUtility.InstantiatePrefab(cardAsset, shelf);
 
 판별: 그 컴포넌트·참조가 **"이 물건이 이 물건인 이유"** 면 자산에, **"이 화면에서만 그렇다"** 면 인스턴스에.
 
+## 7. 공유 asset 추가가 남의 프리팹을 바꾼다 (2026-09-16 이관)
+
+> [.claude/rules/unity-delegation.md](../.claude/rules/unity-delegation.md)에서 옮겨 왔다.
+
+새 폰트·머터리얼·스프라이트·Shader 같은 **공유 asset을 Assets/에 추가**할 때가 있다.
+그러면 Unity가 import 시점에 기존 prefab의 reference GUID를 자동 교체할 수 있다. 그러면 작업 범위 밖 prefab이 `Modified` 상태로 working tree에 나타난다.
+
+**증상**:
+- `git status`에 위임 작업과 무관한 `.prefab` 다수 등장
+- prefab modifications 블록에 `m_FontAsset` / `m_Material` / `m_Sprite` 등 GUID만 변경된 entry
+- Inspector에서 "보이는 폰트는 같은데 GUID가 다른 asset 가리킴"
+
+**처방** (헌법 §unity-delegation "워킹트리 인지 의무"와 cross-link):
+
+- 공유 asset (`*.ttf` / `*.asset` TMP_FontAsset / `*.mat` / `*.png` 등) 추가가 포함된 위임 종료 직후 **`git status` 전체 점검 의무**
+- 의도한 prefab(UIMapView, UITutorialGuidePanel 등) 밖에서 mutation을 발견하면 사용자에게 보고한다.
+  (A) 의도 적용 (B) `git restore` 두 옵션을 함께 제시한다.
+- 사전 예방: 공유 asset 추가 위임 prompt에 "**asset import 후 `git status`로 의도 외 prefab mutation 확인 + 사용자 보고**" 의무 명시
+
+(2026-05-14 RIDIBatang 폰트 추가 인시던트: `1e51495b` 커밋에서 UIMapView의 TMP_Text fontAsset GUID가 자동 교체됐다. 의도한 폰트 마이그레이션과 함께 의도 외 prefab modification도 생겼고, 사용자가 직접 발견하기 전까지 격리되지 않았다)
+
 ## 관련 문서
 
 - [.claude/rules/unity-delegation.md](../.claude/rules/unity-delegation.md) — `.meta` GUID 수동 지정 리스크 (본 문서는 그 처방의 구체화)

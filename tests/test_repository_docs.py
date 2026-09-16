@@ -48,8 +48,7 @@ def parse_skill_frontmatter(contents):
 class RepositoryDocumentationTests(unittest.TestCase):
     def test_instruction_files_stay_under_200_lines(self):
         paths = [ROOT / "AGENTS.md", ROOT / "CLAUDE.md", ROOT / "README.md"]
-        # 규칙 문서는 아직 이 문턱을 넘는 파일이 있어 제외한다.
-        # unity-delegation.md 246줄 분리가 끝나면 여기에 더한다.
+        paths.extend((ROOT / ".claude" / "rules").glob("*.md"))
         paths.extend((ROOT / ".claude" / "agents").glob("*.md"))
         for path in paths:
             line_count = len(path.read_text(encoding="utf-8").splitlines())

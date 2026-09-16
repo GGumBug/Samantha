@@ -9,7 +9,8 @@ AGENTS.md는 그 규약 이름을 읽는 다른 도구를 위한 얇은 포인�
 |---|---|
 | 저장소 작업 규칙, Unity 라우팅 표 | [CLAUDE.md](CLAUDE.md) |
 | SOLID·SSOT 헌법 | [.claude/rules/engineering-constitution.md](.claude/rules/engineering-constitution.md) |
-| Unity 위임과 범위 보존, 라이브 에디터 우선 | [.claude/rules/unity-delegation.md](.claude/rules/unity-delegation.md) |
+| Unity 위임과 범위 보존 | [.claude/rules/unity-delegation.md](.claude/rules/unity-delegation.md) |
+| 라이브 에디터 조종 규율 | [.claude/rules/unity-live-editor.md](.claude/rules/unity-live-editor.md) |
 | 평가 주도 검증, 두 겹 검증 루프 | [.claude/rules/evaluation.md](.claude/rules/evaluation.md) |
 | 주석·커밋·문서 산문 규칙 | [.claude/rules/prose-style.md](.claude/rules/prose-style.md) |
 | 전문가 에이전트 정의 | [.claude/agents/](.claude/agents/) |

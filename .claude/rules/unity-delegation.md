@@ -20,46 +20,11 @@ Samantha가 작업을 분석하고 적절한 팀원(Jarvis, Ava, Sonny, TARS)에
 | 레벨 디자인, 씬 구성, 환경, Cinemachine, 내러티브 | `tars` |
 | 복합 작업 (여러 분야에 걸친 오케스트레이션) | `samantha` |
 
-### 라이브 에디터 우선 (필수 — `unity` CLI가 붙어 있을 때)
+### 라이브 에디터 우선 → [unity-live-editor.md](unity-live-editor.md) 분리
 
-프로젝트에 `com.unity.pipeline`이 있고 에디터가 떠 있으면 **CLI가 그 에디터를 직접 조종**한다.
-씬·프리팹·에셋을 만지는 작업은 **파일을 쓰기 전에 반드시** 연결을 먼저 묻는다.
-
-```bash
-unity status                              # state "ready" + Port가 보이면 연결됨
-unity command set_autotick --enable true  # ← 안 하면 포커스를 잃은 에디터가 recompile·test를 멎춘다
-unity command                             # 이 에디터가 노출하는 명령 목록(에디터가 정한다 — 이름을 추측하지 마라)
-```
-
-**연결돼 있으면 파일 대신 명령으로 한다.** `.unity`·`.prefab`·`.asset` YAML 손편집은 ⓐ fileID·GUID를
-사람이 적어 틀리기 쉽고 ⓑ 재임포트 전까지 **떠 있는 에디터에 안 보여** 조용히 실패하며 ⓒ 활성 씬이
-아닌 엉뚱한 파일을 고치기 쉽다.
-
-| 하려는 일 | 명령 |
-|---|---|
-| 프리팹 노드 추가·배선 | `save_prefab_contents` (격리 스테이지 — 재직렬화 없음) · `add_component` · `attach_script` · `set_serialized_field` · `set_component_properties` |
-| 대량 저작 | `run_script --file AgentScripts/Build.cs --entry Build.All` (`Assets/` 밖 파일 → 인메모리 컴파일, 도메인 리로드 없음) |
-| 기존 `[MenuItem]` 굽기 도구 실행 | `unity command menu` |
-| 여러 편집을 한 Undo로 | `batch` (실패 시 전체 롤백) |
-
-**"연결 안 됨"은 네 얼굴이 똑같다. 파일 편집으로 새기 전에 갈라라**:
-
-| 증상 | 판별 | 처방 |
-|---|---|---|
-| 에디터가 정말 없음 | `unity editors running`이 `count: 0` | 사용자에게 에디터를 열어 달라고 하거나 `unity open <path>` |
-| **Safe Mode** (컴파일 에러) | `unity pipeline list`의 `Safe Mode` 칸 | **컴파일 에러를 고치는 것이 정답이다** — 우회가 아니다 |
-| 샌드박스가 가림 | 위 둘이 정상인데 `status`만 빔 | "내 샌드박스가 가릴 수 있다"를 말하고 사용자에게 확인 요청 |
-| **도메인 리로드 중 일시 단절** | 위 셋이 다 정상인데 **방금 한 호출만** 실패 (2026-09-14 실측: `recompile` 직후 `run_tests`가 `No Unity Editor instances found` — 직후 `status`·`editors running`·`pipeline list` 셋 다 정상) | 재시도한다 — 파일 편집으로 새는 자리가 아니다 |
-
-`pipeline list`와 `editors running`이 **엇갈리면** 낡은 락파일이다(`Running: true` 인데 PID 칸이 빔)
-— 프로세스를 보는 `editors running` 쪽을 믿어라. (2026-09-14 실측: 에디터가 닫혔는데 락파일만 남아
-`Running: true`로 보였다. 두 명령을 나란히 보지 않았으면 "포트가 왜 안 뜨지"로 헤맸다.)
-
-**끝내 파일을 직접 편집한다면 보고에 명시해라** — *"라이브 에디터 없음(사유), 파일 직접 편집"*.
-조용히 새는 것이 이 규칙이 막으려는 유일한 실패다.
-
-**모달 다이얼로그는 멈춤이 아니다** — 명령이 길어지면 `unity command editor_status`(막혀 있어도 즉답).
-`status: "blocked_by_dialog"` 면 재시도를 멈추고 **무엇이 막는지 사용자에게 말해라**(CLI로 못 누른다).
+전문은 [unity-live-editor.md](unity-live-editor.md)로 분리했다(200줄 정책). 적용 강제력은 같다.
+씬·프리팹·에셋을 만지기 전에 `unity status`로 연결을 먼저 묻고, `ready`면 파일이 아니라 명령으로 한다.
+끝내 파일을 직접 편집한다면 보고에 명시한다. 조용히 새는 것이 그 규칙이 막으려는 유일한 실패다.
 
 ### 금지 사항
 - Unity C# 파일을 에이전트 없이 직접 편집하지 않는다 (단, 아래 "위임 면제 기준" 충족 시 직접 편집 허용)
@@ -85,7 +50,7 @@ Unity C# 파일이라도 **모든** 조건을 충족하면 에이전트 위임 �
 - 새 메서드/클래스/인터페이스 신설
 - SSOT 통합·리팩토링·아키텍처 변경
 - `.meta`/`.asset`/`.prefab` 등 Unity 직렬화 파일 수정 — **YAML 손편집은 라이브 에디터가 붙어
-  있든 없든 금지다.** 붙어 있으면 위 「라이브 에디터 우선」의 명령으로, 없으면 멱등 굽기 도구로 한다
+  있든 없든 금지다.** 붙어 있으면 [unity-live-editor.md](unity-live-editor.md)의 명령으로, 없으면 멱등 굽기 도구로 한다
 
 (2026-04-27 row-lock 작업 회고: Sonny 위임 6번 중 진단 로그 추가/제거 2번은 이 면제 기준에 해당. 위임 비용 약 30% 절감 가능 추산)
 
@@ -203,24 +168,11 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
   사람이 적는 자리 0. 라이브 에디터가 붙어 있으면 `run_script`가 같은 멱등성을 더 싸게 준다
   (`[MenuItem]` 불필요 · 도메인 리로드 없음). 상세 [best-practice/idempotent-prefab-baker.md](../../best-practice/idempotent-prefab-baker.md)
 
-### Unity 자동 prefab mutation 함정 (공유 asset 추가 시)
+### Unity 자동 prefab mutation 함정 → [베이커 문서](../../best-practice/idempotent-prefab-baker.md) 분리
 
-새 폰트·머터리얼·스프라이트·Shader 같은 **공유 asset을 Assets/에 추가**할 때가 있다.
-그러면 Unity가 import 시점에 기존 prefab의 reference GUID를 자동 교체할 수 있다. 그러면 작업 범위 밖 prefab이 `Modified` 상태로 working tree에 나타난다.
-
-**증상**:
-- `git status`에 위임 작업과 무관한 `.prefab` 다수 등장
-- prefab modifications 블록에 `m_FontAsset` / `m_Material` / `m_Sprite` 등 GUID만 변경된 entry
-- Inspector에서 "보이는 폰트는 같은데 GUID가 다른 asset 가리킴"
-
-**처방** (헌법 §unity-delegation "워킹트리 인지 의무"와 cross-link):
-
-- 공유 asset (`*.ttf` / `*.asset` TMP_FontAsset / `*.mat` / `*.png` 등) 추가가 포함된 위임 종료 직후 **`git status` 전체 점검 의무**
-- 의도한 prefab(UIMapView, UITutorialGuidePanel 등) 밖에서 mutation을 발견하면 사용자에게 보고한다.
-  (A) 의도 적용 (B) `git restore` 두 옵션을 함께 제시한다.
-- 사전 예방: 공유 asset 추가 위임 prompt에 "**asset import 후 `git status`로 의도 외 prefab mutation 확인 + 사용자 보고**" 의무 명시
-
-(2026-05-14 RIDIBatang 폰트 추가 인시던트: `1e51495b` 커밋에서 UIMapView의 TMP_Text fontAsset GUID가 자동 교체됐다. 의도한 폰트 마이그레이션과 함께 의도 외 prefab modification도 생겼고, 사용자가 직접 발견하기 전까지 격리되지 않았다)
+새 폰트·머터리얼·스프라이트를 `Assets/`에 더하면 Unity가 import 시점에 남의 prefab GUID를 자동 교체할 수 있다.
+공유 asset 추가가 낀 위임이 끝나면 **`git status` 전체를 점검**하고 의도 밖 prefab mutation을 사용자에게 보고한다.
+증상과 처방 전문은 [idempotent-prefab-baker.md](../../best-practice/idempotent-prefab-baker.md) §7이다.
 
 ### 서브에이전트 Read 권한 사전 점검
 
