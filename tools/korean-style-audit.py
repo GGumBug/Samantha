@@ -29,7 +29,15 @@ JOSA = ("은|는|이|가|을|를|의|에서는|에서|에게|에도|에는|에|�
 # '>'는 마크다운 인용 마커이고, 한글 뒤 '.'은 문장 끝이라 그다음 "이"는 관형사다. 둘 다 앞말에서 뺀다.
 TAIL = r"[A-Za-z0-9_\)\]`\"']"
 BOUND = r"(?=[\s\.,·—!?)\]\"'…:;]|$)"
-JOSA_BAD = re.compile(TAIL + r" (?:" + JOSA + r")" + BOUND)
+# 닫는 괄호 뒤의 "이"는 조사가 아니라 관형사다. 괄호가 끼어든 절이 끝나고 새 절이
+# "이 값은"으로 시작하는 자리라, 한글 뒤 마침표를 앞말에서 뺀 것과 같은 이유로 뺀다.
+# 2026-09-16 실측: 이 갈래를 세지 않으면 25건 중 대부분이 고칠 수 없는 위반으로 남는다.
+JOSA_NO_PAREN = "이"
+JOSA_REST = "|".join(j for j in JOSA.split("|") if j != JOSA_NO_PAREN)
+TAIL_NO_PAREN = r"[A-Za-z0-9_\]`\"']"
+JOSA_BAD = re.compile(
+    "(?:" + TAIL + r" (?:" + JOSA_REST + r")" + BOUND
+    + "|" + TAIL_NO_PAREN + r" " + JOSA_NO_PAREN + BOUND + ")")
 JOSA_OK = re.compile(TAIL + r"(?:" + JOSA + r")" + BOUND)
 # 문장 중간 삽입만 잡는다. 주술이 끝난 뒤(종결어미) 덧붙는 줄표가 영어 em dash 용법이다.
 # `**라벨** — 설명`이나 `Step 1 — 제목` 같은 부제·라벨 구분자는 규정이 드는 용법이라 제외한다.
@@ -158,7 +166,12 @@ def main():
                     for l in open(os.path.join(dp, f), encoding="utf-8", errors="ignore"):
                         s = l.strip()
                         if s.startswith("//") or s.startswith("*"):
-                            lines.append(re.sub(r"<[^>]+>", " ", s))
+                            # 태그는 낱말 한 글자로 바꾼다. 공백도 빈 문자열도 허수를 만든다.
+                            # 공백이면 `<c>Foo</c>가` 가 `Foo 가` 가 되고, 빈 문자열이면
+                            # `uGUI <see/>는` 이 `uGUI 는` 이 된다. 둘 다 원문에 없는 공백이다.
+                            # 태그는 그 자리에 낱말이 하나 서 있는 것이므로 한 글자가 맞다.
+                            # 2026-09-16 실측: 공백 방식이 522건 중 433건을 허수로 만들었다.
+                            lines.append(re.sub(r"<[^>]+>", "A", s))
         measure("C# 주석", "\n".join(lines), fails)
 
     if os.path.isdir(".claude/rules"):
