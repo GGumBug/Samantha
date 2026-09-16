@@ -78,7 +78,8 @@
 
 ```bash
 python tools/prose-audit.py --gate          # 길이·구조·검색성
-python tools/korean-style-audit.py --gate   # 맞춤법·줄표·문체
+python tools/korean-style-audit.py --new --gate   # 이번 변경분 (커밋 전 게이트)
+python tools/korean-style-audit.py --gate         # 전량 (보고용)
 ```
 
 둘 다 초록이어야 한다. 주장 대신 실행 결과로 증명한다(헌법 [evaluation.md](evaluation.md) "자기 평가 금지").
