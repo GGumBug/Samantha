@@ -63,6 +63,7 @@ GameCore Unity 개발에 사용하는 Claude Code 에이전트·스킬·훅·규
 | [deterministic-reentry-cache.md](best-practice/deterministic-reentry-cache.md) | 재진입 시 결정론 캐시 |
 | [distribution-parity-regression.md](best-practice/distribution-parity-regression.md) | 출력이 정당하게 달라지는 리팩터링의 분포·불변식 회귀 게이트 |
 | [dual-meaning-field-split.md](best-practice/dual-meaning-field-split.md) | 사실과 계획을 겸직한 필드의 축 분리 |
+| [duplicate-track-divergence.md](best-practice/duplicate-track-divergence.md) | 갈라진 두 트랙과 검증·실행 대상 어긋남 |
 | [evidence-based-debugging.md](best-practice/evidence-based-debugging.md) | 증거 기반 디버깅 4단계 프로토콜 |
 | [external-critique-simulation.md](best-practice/external-critique-simulation.md) | 외부 시니어 비판자 시뮬레이션 |
 | [generation-token-reset.md](best-practice/generation-token-reset.md) | 일괄 리셋의 swap-before-cancel 세대 토큰 |

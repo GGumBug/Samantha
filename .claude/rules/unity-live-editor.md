@@ -44,6 +44,31 @@ unity command                             # 이 에디터가 노출하는 명령
 **모달 다이얼로그는 멈춤이 아니다** — 명령이 길어지면 `unity command editor_status`(막혀 있어도 즉답).
 `status: "blocked_by_dialog"` 면 재시도를 멈추고 **무엇이 막는지 사용자에게 말해라**(CLI로 못 누른다).
 
+### 밖에서 고친 파일을 에디터는 다시 읽지 않는다 (2026-09-16)
+
+에디터가 떠 있는 동안 파일을 CLI 밖에서 고치면 진실이 둘이 된다. 디스크와 에디터 메모리다.
+`run_tests`는 에디터 쪽을 보므로 **주입한 뮤테이션이 초록으로 통과**한다. 실측에서 프리팹 YAML에
+뮤테이션을 넣고 세 번 돌렸는데 전부 초록이었고, 아래 한 줄을 부르자 그 자리에서 빨간불이 났다.
+
+```bash
+unity command eval --code 'UnityEditor.AssetDatabase.ImportAsset("Assets/<경로>.prefab", UnityEditor.ImportAssetOptions.ForceUpdate);'
+```
+
+**배치 모드에는 이 함정이 없다.** 매 실행이 새 프로세스라 항상 디스크를 읽는다. 그래서 바깥 겹에서
+통하던 절차가 안쪽 겹에서만 조용히 무너진다. 밖에서 고쳤으면 재임포트를 부르고 나서 시험을 돌린다.
+
+### 포커스를 잃은 에디터는 Play 모드에서 프레임을 진행하지 않는다 (2026-09-16)
+
+`set_autotick`은 에디트 모드용이다. Play 모드에 들어가도 포커스가 없으면 프레임이 흐르지 않아
+캔버스 0개와 `timeSinceLevelLoad=0.0`이 보이고, 이것을 부팅 실패로 오진하기 쉽다.
+
+```bash
+unity command eval --code 'UnityEngine.Application.runInBackground = true;'   # 프레임이 흐른다(2 → 7)
+```
+
+`OnGUI`는 프레임이 멎어 있어도 그려진다. **디버그 패널이 보이는 것은 게임이 도는 증거가 아니다.**
+Play 모드 캡처로 화면을 검증하는 경로는 이 한 줄을 먼저 연다([../agents/unity-reviewer.md](../agents/unity-reviewer.md)).
+
 ## 관련 문서
 
 - [unity-delegation.md](unity-delegation.md) — 위임 규칙 본문(이 파일의 모체)

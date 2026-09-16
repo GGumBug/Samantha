@@ -72,3 +72,7 @@ unity command console --level error --tail 50                # 라이브 콘솔
 **읽기 전용 원칙은 그대로다.** 캡처·조회·시험 실행은 검증이지만 `set_*`·`create_*`·`delete_*` 같은
 변경 명령은 이 에이전트의 것이 아니다. 고치기 시작하면 검증자가 아닌 두 번째 구현자가 된다.
 `editor_play`는 상태를 바꾸므로 **켰으면 `editor_stop`으로 되돌리고 그 사실을 보고**한다.
+
+**Play 모드 캡처 전에 `eval`로 `Application.runInBackground = true`를 연다.** 포커스를 잃은 에디터는
+Play 모드에서 프레임을 진행하지 않아 빈 화면이 찍히고, `OnGUI`로 그려지는 디버그 패널만 남아 부팅
+성공으로 오독된다([../rules/unity-live-editor.md](../rules/unity-live-editor.md)).
