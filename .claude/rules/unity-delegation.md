@@ -4,7 +4,7 @@
 
 Unity 관련 작업은 전문 에이전트에게 위임한다. 여러 전문 분야가 얽힌 복합 작업은 Samantha가 분해·품질 감독하고, 단일 전문 분야는 담당 전문가에게 직접 위임한다.
 
-Codex에서는 `AGENTS.md`의 라우팅 표와 `.codex/config.toml`의 깊이 제한이 SSOT이다. Samantha는 깊이 1에서 전문가를 깊이 2로 한 단계 재위임하며, 전문가는 추가 위임하지 않는다.
+Samantha는 전문가를 한 단계 재위임하며, 전문가는 추가 위임하지 않는다.
 
 Samantha가 작업을 분석하고 적절한 팀원(Jarvis, Ava, Sonny, TARS)에게 재위임한다.
 

@@ -1,24 +1,26 @@
 # Samantha
 
-GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 엔지니어링 지식을 관리하는 저장소다. Hwaseo와 GameCore의 실제 인시던트가 `best-practice/` 지식의 주요 원천이다. 게임 애플리케이션 소스는 포함하지 않는다.
+GameCore Unity 개발에 사용하는 Claude Code 에이전트·스킬·훅·규칙과 실전 엔지니어링 지식을 관리하는 저장소다. Hwaseo와 GameCore의 실제 인시던트가 `best-practice/` 지식의 주요 원천이다. 게임 애플리케이션 소스는 포함하지 않는다.
 
 ## 구조
 
 | 경로 | 설명 |
 |---|---|
-| [AGENTS.md](AGENTS.md) | Codex 저장소 작업 규칙과 Unity 라우팅 SSOT |
-| [.codex/config.toml](.codex/config.toml) | MCP·멀티에이전트·셸 환경 설정 |
-| [.codex/agents/](.codex/agents/) | Samantha, Jarvis, Ava, Sonny, TARS, 검증자, 회고 큐레이터 |
-| [.codex/hooks.json](.codex/hooks.json) | Codex 라이프사이클 훅 등록 |
-| [.agents/skills/](.agents/skills/) | 브라우저, Unity 로그 검증, 회고 스킬 |
-| [.claude/rules/](.claude/rules/) | Claude 시절부터 공유하는 상세 엔지니어링 규칙 문서 |
+| [CLAUDE.md](CLAUDE.md) | 저장소 작업 규칙과 Unity 라우팅 SSOT |
+| [AGENTS.md](AGENTS.md) | CLAUDE.md를 가리키는 교차 도구 규약 파일 |
+| [.claude/settings.json](.claude/settings.json) | 훅 이벤트 등록과 권한 |
+| [.claude/agents/](.claude/agents/) | Samantha, Jarvis, Ava, Sonny, TARS, 검증자, 회고 큐레이터 |
+| [.claude/skills/](.claude/skills/) | Unity CLI·파이프라인, 스프라이트·TMP·uGUI, 커밋, 로그 검증 |
+| [.claude/commands/](.claude/commands/) | `/reflect` 같은 워크플로 명령어 |
+| [.claude/hooks/](.claude/hooks/) | 훅 핸들러·설정·사운드 |
+| [.claude/rules/](.claude/rules/) | 상세 엔지니어링 규칙 문서 |
 | [best-practice/](best-practice/) | 실제 실패에서 일반화한 설계·디버깅 패턴 |
 | [reports/](reports/) | 특정 기능과 리팩터링의 설계·분석 기록 |
 | [tools/](tools/) | 산문·한국어 문체 감사 도구와 테스트 러너 |
 
-`.claude/` 자산은 기존 Claude Code 호환성과 과거 기록을 위해 유지한다. Codex에서 자동으로 읽히는 SSOT는 `AGENTS.md`, `.codex/`, `.agents/skills/`다.
+자동으로 읽히는 SSOT는 `CLAUDE.md`와 `.claude/`다. Codex 자산(`.codex/`, `.agents/skills/`)은 2026-09-16에 걷어냈다. 두 벌로 갈라져 있던 `hooks.py`·`agent-browser`·`unity-log-diagnostic`이 각자 표류했고, 검증하는 쪽과 실제로 실행되는 쪽이 어긋나 있었다. 이력은 git에 남아 있다.
 
-## Codex 팀
+## 에이전트 팀
 
 | 에이전트 | 역할 |
 |---|---|
@@ -127,10 +129,12 @@ GameCore Unity 개발에 사용하는 Codex 에이전트·스킬·훅과 실전 
 
 ## 검증
 
-Codex 훅과 저장소 자산 테스트는 Python 3.11 이상에서 실행한다. Python 3.10 이하는 훅 테스트를 실행하지만 TOML 파서 검증은 건너뜁니다.
+훅과 저장소 자산 테스트는 Python 3.9 이상에서 실행한다.
 
 ```bash
-python3 -m unittest tests.test_hooks -v
+python -m unittest discover -s tests      # 훅 동작 + 저장소 문서 색인
+python tools/prose-audit.py --gate        # 주석·커밋 길이와 검색성
+python tools/korean-style-audit.py --gate # 맞춤법·줄표·문체
 ```
 
-Unity 수정은 구현자와 별도의 `unity-reviewer` 또는 `$unity-log-diagnostic`으로 검증한다.
+Unity 수정은 구현자와 별도의 `unity-reviewer` 또는 `/unity-log-diagnostic`으로 검증한다. 라이브 에디터가 붙어 있으면 `unity command run_tests`가 안쪽 겹이고, 커밋 직전 전량 게이트가 바깥쪽 겹이다([evaluation.md](.claude/rules/evaluation.md)).

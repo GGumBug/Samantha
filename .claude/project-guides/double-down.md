@@ -85,4 +85,4 @@ BGDatabase(`Assets/BansheeGz`) → 생성 코드 `DoubleDown.Data.Generated` →
 2. **`unity-reviewer`로 독립 검증** — 구현자와 검증자를 분리한다
 3. Unity 플레이 테스트가 필요하면 `[Prefix][Layer]` 진단 로그 삽입 → 사용자 재현 → `/unity-log-diagnostic <Prefix>`로 판정
 
-`.gitignore`가 `/.claude`·`/CLAUDE.md`·`/AGENTS.md`·`/.codex/`를 무시하므로 이 설정들은 Double-Down 저장소를 오염시키지 않는다. 설계·플랜 문서는 `C:/AI_Projects/Samantha/reports/`에 쌓이다.
+`.gitignore`가 `/.claude`·`/CLAUDE.md`·`/AGENTS.md`를 무시하므로 이 설정들은 Double-Down 저장소를 오염시키지 않는다. 설계·플랜 문서는 `C:/AI_Projects/Samantha/reports/`에 쌓인다.
