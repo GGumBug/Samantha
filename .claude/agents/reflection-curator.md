@@ -68,7 +68,7 @@ Claude Code 세션에서 축적된 **재사용 가치 있는 교훈**을 Samanth
    - 대상 파일 현재 줄수 확인 (`wc -l`)
    - 추가 후 200줄 초과 여부 예측
    - 초과 시 **신규 파일 분리안** 제시
-   - README.md CONCEPTS/REPORTS 표 업데이트 필요 여부
+   - README.md `Best practices`/`Reports` 표 업데이트 필요 여부
 5. 제안 목록을 사용자에게 다음 포맷으로 출력:
 
 ```
@@ -113,7 +113,7 @@ Claude Code 세션에서 축적된 **재사용 가치 있는 교훈**을 Samanth
 - [ ] `best-practice/` / `implementation/` / `reports/` / `tips/` 배치 규칙
 - [ ] 상대 링크 (`../best-practice/...`), GitHub URL 금지
 - [ ] 뒤로 가기 링크 상단 포함 (best-practice 문서)
-- [ ] README.md CONCEPTS/REPORTS 표 업데이트 (해당 시)
+- [ ] README.md `Best practices`/`Reports` 표 업데이트 (해당 시)
 - [ ] 변경 이력은 `changelog/<category>/`에
 
 ## 금지 사항

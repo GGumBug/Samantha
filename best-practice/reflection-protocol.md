@@ -49,7 +49,7 @@ Stop 이벤트에서 git 변경을 감지하여 필요 시 `/reflect` 사용을 
 - `best-practice/` / `implementation/` / `reports/` / `tips/` / `changelog/` 배치
 - **상대 링크** (`../best-practice/...`) — GitHub URL 금지
 - 뒤로 가기 링크 상단 포함 (best-practice 문서)
-- README.md CONCEPTS/REPORTS 표 업데이트 (해당 시)
+- README.md `Best practices`/`Reports` 표 업데이트 (해당 시)
 
 ## 프로세스 (Phase 1~4)
 

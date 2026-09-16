@@ -71,7 +71,7 @@ Stop 훅이 세션 종료 시점에 다음 조건이면 이 명령어 제안:
 - `best-practice/`, `implementation/`, `reports/`, `tips/` 배치 규칙
 - 상대 링크 (`../best-practice/...`) — GitHub URL 금지
 - 뒤로 가기 링크 포함 (best-practice 문서 상단)
-- README.md CONCEPTS/REPORTS 표 업데이트 (해당 시)
+- README.md `Best practices`/`Reports` 표 업데이트 (해당 시)
 
 ## 금지 사항
 
