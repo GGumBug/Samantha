@@ -21,6 +21,7 @@ import argparse
 import array
 import io
 import wave
+from datetime import datetime
 from pathlib import Path
 
 # Windows-only module for playing WAV files
@@ -547,6 +548,56 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def _run_git(args, cwd):
+    """Run a read-only git query and return stripped stdout."""
+    try:
+        result = subprocess.run(
+            ["git"] + args,
+            cwd=cwd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            timeout=3,
+            check=True,
+        )
+        return result.stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError,
+            subprocess.TimeoutExpired):
+        return ""
+
+
+def get_session_context(hook_data=None):
+    """
+    Gather context information for the SessionStart hook.
+    This output goes to stdout and feeds into the model's context.
+
+    Returns:
+        String of context information
+    """
+    hook_data = hook_data or {}
+    cwd = Path(hook_data.get("cwd") or Path.cwd()).resolve()
+    branch = _run_git(["rev-parse", "--abbrev-ref", "HEAD"], cwd) or "unknown"
+    status = _run_git(["status", "--short"], cwd)
+    status_lines = status.splitlines()
+
+    if not status_lines:
+        worktree = "clean"
+    elif len(status_lines) <= 20:
+        worktree = "dirty\n" + "\n".join(status_lines)
+    else:
+        visible = "\n".join(status_lines[:20])
+        worktree = f"dirty ({len(status_lines)} paths; first 20)\n{visible}"
+
+    timestamp = datetime.now().astimezone().isoformat(timespec="seconds")
+    return "\n".join([
+        "Samantha repository session context:",
+        f"- time: {timestamp}",
+        f"- cwd: {cwd}",
+        f"- git branch: {branch}",
+        f"- working tree: {worktree}",
+    ])
+
+
 def main():
     """
     Main program - this runs when Claude triggers a hook.
@@ -582,10 +633,16 @@ def main():
             # Hook is disabled, exit silently without playing sound
             sys.exit(0)
 
-        # Step 4: Determine which sound to play (may be special, default, or agent-specific)
+        # Step 4: SessionStart writes repo context to stdout, which Claude adds to
+        # the model context. Agent sessions are skipped - a subagent inherits the
+        # parent's context and a second copy only crowds it out.
+        if event_name == "SessionStart" and not args.agent:
+            print(get_session_context(input_data))
+
+        # Step 5: Determine which sound to play (may be special, default, or agent-specific)
         sound_name = get_sound_name(input_data, agent_name=args.agent)
 
-        # Step 5: Play the sound (if we found one)
+        # Step 6: Play the sound (if we found one)
         if sound_name:
             play_sound(sound_name)
 
