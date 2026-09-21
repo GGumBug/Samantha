@@ -1,0 +1,10 @@
+# Archify는 구운 산출물을 바이트 단위로 대조한다(check:viewer, check:validators, 골든 템플릿).
+# core.autocrlf=true인 Windows에서 체크아웃이 CRLF로 풀리면 그 대조가 깨진다.
+# 원본 저장소 .gitattributes의 줄바꿈 규칙을 이 하위 트리에만 적용한다.
+* text=auto eol=lf
+
+# 결정론적 빌드 산출물이다. Linguist 통계에서 제외한다.
+assets/template.html linguist-generated=true
+renderers/shared/generated-brand-marks.mjs linguist-generated=true
+renderers/shared/generated-validators.mjs linguist-generated=true
+examples/*.html linguist-generated=true
