@@ -56,6 +56,7 @@ GameCore Unity 개발에 사용하는 Claude Code 에이전트·스킬·훅·규
 | [bgdatabase-enum-binding.md](best-practice/bgdatabase-enum-binding.md) | BGDatabase enum 필드 3종·시트 어휘 계약·다형 컬럼 파싱 |
 | [caller-driven-assumption-anti-pattern.md](best-practice/caller-driven-assumption-anti-pattern.md) | 호출자 상태를 암묵적으로 가정하는 설계 제거 |
 | [cancel-cleanup-bypass.md](best-practice/cancel-cleanup-bypass.md) | 취소 예외의 cleanup 우회와 멱등 토글 |
+| [coincidental-pass.md](best-practice/coincidental-pass.md) | 살아남은 뮤테이션·배포 에셋 겹·여백 0으로 우연 일치 적발 |
 | [dead-stub-pattern.md](best-practice/dead-stub-pattern.md) | 결과가 무시되는 비동기 stub 제거 |
 | [deferred-commit-pattern.md](best-practice/deferred-commit-pattern.md) | Backup → Mutate → Commit/Rollback 패턴 |
 | [delegation-truncation-triage.md](best-practice/delegation-truncation-triage.md) | 에이전트 절단 3상태 분류와 재위임 처방 |
