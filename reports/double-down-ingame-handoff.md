@@ -2,17 +2,17 @@
 
 # Double Down 인게임 핸드오프
 
-2026-09-23 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down**, 작업 브랜치는 **`master`**(로컬 `ebeff8a`까지. 원격은 `7b95955`까지 푸시됨, 뒤 두 커밋은 **미푸시**). **워킹트리 clean.** 문서와 설계는 **Samantha** 저장소가 SSOT다.
+2026-09-23 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down**, 작업 브랜치는 **`master`**(로컬 `9bcbb6d`까지. 원격은 `a365e5d`까지 푸시됨, 마지막 1건 **미푸시**). **워킹트리 clean.** 문서와 설계는 **Samantha** 저장소가 SSOT다.
 
 **보너스 카드가 도메인부터 화면까지 닫혔고, 상점 문법이 팩에서 매대로 바뀌었다.** 세 장이 매대에 펼쳐진 채 서 있고 누르면 그 자리에서 값이 나가고 장착된다. 개봉 단계가 없다(§3 「보너스 카드」). 카드에는 이름·효과·값 세 칸과 판의 카드와 같은 반응 연출이 붙어 있다. **판 HUD 기둥까지 닫혔다.** 산 낱장이 그 자리에서 기둥에 서고, 그 카드는 상점에서 산 것과 같은 자산이다(§3 「판 HUD 기둥」).
 
-**2026-09-23 구간에서 덱 패시브가 도메인에 이어 배선까지 섰다**(§3 「덱 패시브」 · `7b95955`·`53afe28`·`ebeff8a`). 화면은 아직 없다. 타이틀이 중립 덱 상수를 건네므로 게임은 여전히 기본 덱만 돌고, 초짜 덱의 유일한 소비자는 시험이다. 인게임에서 확인할 것은 아직 없다.
+**2026-09-23 구간에서 덱 패시브가 도메인·배선·선턴 고정·덱 선택 화면까지 닫혔다**(§3 「덱 패시브」 · `7b95955`·`53afe28`·`ebeff8a`·`910ccee`·`9bcbb6d`). 타이틀의 런 설정 팝업에서 `BasicCardBack` 한 장을 `<` `>`로 넘겨 기본·초짜·선턴을 고르면 그 덱으로 런이 선다. 인게임에서 확인할 것: 초짜를 고르면 첫 판 개시 칩 1800, 선턴을 고르면 매 라운드 내가 선. **인스톨러 이음매에 시험이 아직 없다**(§3 ⚠️, 다음 세션 첫 카드).
 
 **낱장이 터지면 그 슬롯이 스스로 딸깍 튕긴다.** 발라트로의 조커 발동과 같은 계급이고 도메인은 한 줄도 바뀌지 않았다(§3 「발화 딸깍」). **손패 발광은 지금 낼 수 있을 때만 켜진다.** 판정을 렌더가 아니라 매 프레임 입력 게이트와 세션 프로브로 한다(§3 「손패 발광 게이트」). 줄끝도 이제 저장소가 정한다(`.gitattributes`, `* text=auto eol=lf`).
 
 > **작업 환경이 바뀌었다.** `com.unity.pipeline`이 들어와 `unity` CLI가 살아 있는 에디터를 직접 조종한다. 컴파일·시험·굽기가 초 단위로 돌고, 검증은 **두 겹**이 됐다. 안쪽은 CLI, 바깥쪽은 배치다(§4).
 >
-> 검증 총계(2026-09-23 실측): EditMode **1461** · PlayMode **116**. 세는 규칙이 겹마다 다르다 — 배치는 건너뜀을 `total`에 세고(1462 중 1) 라이브 에디터는 뺀다. 그래서 같은 저장소가 1462와 1461로 보인다. 건너뛰는 하나는 `RunLadderSweepScratch.LadderSweep`이다. 둘 다 실패 0이다. 뮤테이션으로 시험의 판별력까지 기계 증명한다.
+> 검증 총계(2026-09-23 실측): EditMode **1471** · PlayMode **122**. 세는 규칙이 겹마다 다르다 — 배치는 건너뜀을 `total`에 세고(1462 중 1) 라이브 에디터는 뺀다. 그래서 같은 저장소가 1462와 1461로 보인다. 건너뛰는 하나는 `RunLadderSweepScratch.LadderSweep`이다. 둘 다 실패 0이다. 뮤테이션으로 시험의 판별력까지 기계 증명한다.
 >
 > 지난 구간(MatchView 마이그레이션·택1·런 계층·상점 국면)의 커밋 서사와 당시 함정 원문은 [아카이브](double-down-handoff-archive.md)로 옮겼다. 이 문서는 현재 상태와 아직 살아 있는 함정만 든다.
 
@@ -374,7 +374,7 @@ CardView:  발광 목표 = _hasFloorMatch(카드별 사실) && _glowLive(판 전
 ### 다음 후보
 
 - **~~판 HUD 슬롯 프리팹 배선~~ — 2026-09-15 완료.** 위 절 참조. 굽기는 일회성 스크립트가 했고 `MatchViewPrefabWiringTests` 8건이 계약을 문다
-- **⭐ 덱 선택 화면 — 도메인·배선은 2026-09-23 완료(`7b95955`·`53afe28`), 화면 미착수.** 「시스템 디자인 & 밸런스」 §4-3 ⑤가 정본이다. 1차는 초짜·선턴 고정 2종이고 주머니·칼판·각서 뭉치는 2차다. 화면이 채우는 자리는 `TitleScene.cs:150`의 `DeckCatalog.BasicDeckId` 상수 하나다. `RunSetupView.StartRequested`는 `Action<string, ushort>`로 권고돼 있다(Presentation은 Domain 미참조). 덱마다 뒷면 스프라이트가 다르다 · 판단 대기 셋(끈질긴의 라운드 상한 4 / 동네판의 상대 칩 하향 / 뒷면이 보이는 자리). 화면이 열리는 날 인스톨러 합성 시험도 함께 붙인다(§3 「덱 패시브」 생존 뮤테이션). `PlayerDeck`은 렌즈이고 판은 공유 48장을 돌리므로 덱 구성 변형은 좌석별 딜러 선행이라 후보 밖
+- **⭐ 덱 패시브 후속 — 네 레인은 2026-09-23 완료(§3).** 남은 것 다섯. ① 인스톨러 `Compose` 추출 + 시험(§3 ⚠️, 첫 카드). ② 덱마다 뒷면 스프라이트. 사용자가 에셋을 더할 예정이고 `RunSetupView`에 `Image_DeckBack` 칸과 id→스프라이트 표가 생긴다. ③ 화살표 버튼 틀이 판과 같은 색이라 눌림 영역이 안 보인다. 무작위·복사와 같은 기존 스타일이고 원하면 `UniversalPanel3` 슬라이스로 바꾼다. ④ 2차 덱(주머니·칼판·각서 뭉치). ⑤ `MainScene.cs:1042` 재현 좌표에 덱 id 표시. `PlayerDeck`은 렌즈이고 판은 공유 48장을 돌리므로 덱 구성 변형은 좌석별 딜러 선행이라 후보 밖
 - **⭐ 보너스 카드 아트** — `Item_BonusCard`는 배경 한 장에 글자 세 줄이다. 낱장마다 그림이 생기면 `ShopBonusOfferCard.Bind`에 스프라이트 인자가, 카드에 `Image_Face` 칸이 함께 온다(작업패 카드 선례). **재활용 덕에 한 번에 두 곳(상점 매대·판 기둥)에 닿는다.** 기둥은 `Bind`를 부르지 않으므로 얼굴이 자산 기본값으로 서는지 확인할 것. **옛 팩 버튼 아트 항목은 폐기** — `Button_BuyBonusPack`은 매대 전환에서 걷어냈다
 - **충전 배지 저작** — `_chargeBadge`·`_chargeLabel`은 코드가 켜고 끌 준비가 끝났으나 카드에 그 칸이 없다. 배선 명부에서 **일부러 빠져 있고**, 만드는 날 `Bind`의 널 가드가 저절로 켜진다. 시험 쪽 `OptionalSlots` 집합에서도 빼야 그때 명부에 합류한다
 - **보너스 축 측정** — `BonusCardPriceBp`·거울 2/3 확정. `RunLadderSweepScratch`에 `CreateBonusStream`(표지 `"shop-bonus"`)은 있으나 **구매 정책·집계 열이 없다** — 대조군(보너스 0장)이 옛 수치를 재현하는 것까지만 확인됨
@@ -396,7 +396,7 @@ CardView:  발광 목표 = _hasFloorMatch(카드별 사실) && _glowLive(판 전
 - **런 종료 화면 / 막 표시 데이터화 / `special_steal_pi_count` 배선 / `pi_bak_loser_max < pi_bak_winner_min` 확인** — 이전 목록 유지
 - **연출 다듬기 소묶음** — 죽은 손잡이(`TurnBeatBudget._choiceLiftFactor`) 제거 · 그림자 각도 테스트 공백 · 택1/선언 수치 조정 · `FloorChoicePopupView` 개명(주소 동반) · 턴 전환 연출 · `SetFastBattle` 노출
 
-### ⭐ 덱 패시브 (2026-09-23 · 카드 1 도메인·배선 레인 완료)
+### ⭐ 덱 패시브 (2026-09-23 · 네 레인 완료, 인스톨러 시험 하나 남음)
 
 **진행 상태**
 
@@ -404,14 +404,21 @@ CardView:  발광 목표 = _hasFloorMatch(카드별 사실) && _glowLive(판 전
 |---|---|---|
 | 카드 1 · 도메인(타입 5 + 시험 11) | **완료** | `7b95955` |
 | 카드 1 · 배선(`RunConfig`·`MatchSceneInstaller`·`MatchSessionFactory`·`TitleScene`) | **완료** | `53afe28`·`ebeff8a` |
-| 카드 1 · 화면(덱 선택 카드, `RunSetupView`) | 미착수 | Unity 에디터 필요. 채울 자리는 `TitleScene.cs:150` 상수 하나 |
-| 카드 2 · 선턴 고정 | 미착수 | 쓸기 33건 |
+| 카드 1 · 화면(덱 캐러셀, `RunSetupView`) | **완료** | `9bcbb6d` |
+| 카드 2 · 선턴 고정 | **완료** | `910ccee` |
+| 인스톨러 합성 시험(`Compose` 추출) | **미착수** | 아래 ⚠️. 다음 세션 첫 카드 |
 
 **배선이 섰다** (`53afe28`·`ebeff8a`). `RunConfig`가 덱 id를 든다. 카탈로그 밖 id는 생성 시점에 `ArgumentException`이다. `MatchSceneInstaller`가 `RunRulesReducer.Reduce(balances.Match, DeckCatalog.RowsFor(PendingRunConfig.Value.DeckId))`로 규칙을 접어 `RunFlow`와 `MatchSessionFactory`(필수 인자 `rules`)에 넘긴다. `StartNewRun`은 `_rules.StartChip`으로 새 런을 세워 같은 덱으로 다시 선다. `TitleScene`은 아직 `BasicDeckId` 상수를 건넨다. 그래서 **게임은 여전히 기본 덱만 돈다.** 초짜 덱의 유일한 소비자가 `DeckPassiveWiringTests`다.
 
 **뮤테이션 7건 중 5건 사망** (PlayMode 116, 한 건씩 배치 고립, 회당 50초). 죽은 것은 다섯이다. 새 런이 덱을 잊음(1건). 덱 이득을 판마다 재적용(3건, 기존 이월 시험 둘이 함께 잡았다). 카탈로그 가드 제거(1건). 기본 덱을 초짜로(1건). 타이틀이 초짜를 건넴(1건). **살아남은 둘은 `MatchSceneInstaller`다.** 고른 덱을 무시해도, 규칙을 무시하고 시트 값으로 런을 세워도 초록이다. 시험 asmdef가 Reflex를 참조하지 않아 인스톨러 합성을 무는 시험이 0건이고, 타이틀이 기본 덱만 건네 런타임에서도 안 드러난다. 화면 레인이 덱 선택을 여는 날 `(BalanceSet, IOpponentCatalog, IRandomFactory, RunConfig) → MatchSessionFactory` 합성을 `Container` 없는 정적 메서드로 뺀다. 그 위에 초짜 덱 시험 1건을 붙인다(리뷰어 권고).
 
 **트레이드오프 하나.** 공장이 `run`과 `rules`를 따로 받아 `run.Chips == rules.StartChip`을 아무도 강제하지 않는다. 공장이 첫 런을 `rules`에서 스스로 세우면 입력 하나가 준다. 그런데 이음매 시험 넷이 공장과 같은 `RunFlow` 인스턴스를 쥐고 합성 결과로 사다리를 민다. 그 계약이 그 위에 서 있어 그대로 뒀다.
+
+**카드 2 선턴 고정이 섰다** (`910ccee`). `DeckEffectKind.ForcePlayerFirstSeat`·`FirstSeatPolicy`(`ByPick`·`PlayerFirst`)·`RunRules.FirstSeat`·`SeonteonDeckId`가 들어왔다. `SeonResolver`는 뽑기를 그대로 1회 치르고 결과만 덮는다. 정책은 `MatchFlow` 입구 셋의 `settlementBalance` 다음 **필수 인자**이고, 공장이 판 조립 시점에 `_rules.FirstSeat`를 동결해 넘긴다. 호출부 33곳을 쓸었고 시험 7건이 새로 섰다. **뮤테이션 F1~F7 전부 사망**(EditMode 5·PlayMode 2, 각각 의도한 시험 하나만 빨간불).
+
+**덱 선택 화면이 섰다** (`9bcbb6d`). 사용자 지시로 세 칸 버튼 대신 **카드 캐러셀**이다. `Container_Decks` 안에 `BasicCardBack`(70×98를 ×2 정수 배로 140×196) 한 장, 좌우 `<` `>`(ASCII. `◀▶`는 픽셀 폰트에 없다), 아래 `Text_DeckName`·`Text_DeckBlurb`가 선다. `RunSetupView.SetDecks(ids)`가 명부를 담고 첫 id를 보이고, 화살표는 끝에서 반대쪽으로 돈다. `StartRequested`는 `Action<string, ushort>`다. 이름표는 `TitleWords.DeckName/DeckBlurb`(숫자 리터럴 표, `HudWords.BonusWord` 선례)이고 `TitleWordsTests`가 카탈로그 상수와 잇는다. `TitleScene`이 `Awake`에서 `SetDecks(DeckCatalog.AllDeckIds)`를 부르고 고른 덱을 `_deckId`로 기억한다. 굽기 도구는 `AgentScripts/BakeRunSetupDecks.cs`(멱등, 2회차 변경 0). 덱마다 뒷면이 갈리는 날 `Image_DeckBack`을 바꾸는 칸이 생긴다(사용자가 뒷면 에셋을 더할 예정). **뮤테이션 L1·L2 사망, L3~L9 미측정**(전원 종료로 중단. `scratchpad/mutate_copy.py`에 L 묶음 9건이 등록돼 있다).
+
+**⚠️ 아직 무는 시험이 없는 이음매 하나.** `MatchSceneInstaller.CreateSessionFactory`가 `PendingRunConfig.Value.DeckId`를 읽는 자리다. 시험 asmdef가 Reflex를 참조하지 않아 K6·K7(인스톨러가 덱·규칙을 무시)이 살아남았고, 이제 화면이 덱을 고르므로 **실제로 보이는 공백**이다. 처방을 시작했다가 전원 종료로 되돌렸다. `public static MatchSessionFactory Compose(IRandomFactory, IOpponentCatalog, BalanceSet, RunConfig)`를 빼고 `CreateSessionFactory`가 그것을 부르게 한 뒤, `MatchSceneInstallerComposeTests`(PlayMode)가 초짜 설정은 첫 판 칩 1800, 선턴 설정은 8판 전부 플레이어 선, `RootSeed == config.Seed`를 문다. `scratchpad/refresh_k_installer.py`가 그 뒤 K6~K9를 새 줄로 등록한다. **다음 세션 첫 카드다.**
 
 **사용자 승인 결정 넷** (2026-09-23)
 
@@ -704,6 +711,8 @@ Unity 테스트 러너가 자동으로 실패시키는 것은 `LogError`·`LogEx
 
 **뮤테이션이 도는 동안 원본을 고치지 마라** (2026-09-23, 밟을 뻔함). `mutate_copy.py`는 주입 전에 사본과 원본을 바이트로 대조하고 다르면 그 건을 무실행으로 넘긴다. 리뷰어가 잡은 doc 한 줄을 K3·K4가 끝나기 전에 고쳤으면 그 둘이 "사본이 원본과 다르다"로 빠졌다. 원본 수정은 마지막 건이 끝나고 원복 대조를 본 다음이다. 위임 절단 상태 판별과 같은 계급이다. 도구가 말한 "안 돌았다"를 "초록"으로 읽지 않으려면 그 줄이 출력에 있어야 한다.
 
+**⚠️ 사용자가 Aseprite로 저장하는 동안 에디터가 새 GUID를 발급했다** (2026-09-23). `.aseprite` 6개가 14:11~15:12에 바뀌었고 매번 약 20초 뒤 `.meta`가 **새 guid**로 다시 써졌다(`BonusCard` `44a0…`→`b083…` 등). 그 6개의 옛 guid를 `Item_BonusCard.prefab`·`ShopView.prefab`·`CardSpriteTable.asset`이 참조하므로 **지금 그 참조가 끊겨 있다**. 사용자 커밋 `43b2c7f`가 새 guid meta를 그대로 담았다. 처방은 사용자 결정이다. (B) `git checkout 910ccee -- <6개 .meta>`로 옛 guid를 되살리고 에디터에서 재임포트(바이너리는 그대로), 또는 (C) 세 자산의 참조를 새 guid로 다시 배선. 원인 가설: CLI `set_autotick`이 켜져 있어 포커스 없는 에디터가 저장 도중 상태를 잡았다. 아트 작업 중엔 autotick을 끄거나 저장을 마친 뒤 한 번에 갱신하는 편이 안전하다. 코디네이터가 `git checkout`으로 되돌리려 했으나 HEAD가 이미 새 guid라 바뀐 것이 없었다.
+
 
 ### 2026-09-16 (발화 딸깍 · 손패 발광 게이트 · 줄끝)
 
@@ -930,7 +939,19 @@ BoardLayout: 모든 X 가 PlayAreaHalfWidth 대칭에서 파생, 실제 크기�
 
 ## 7. 커밋 이력
 
-### 이번 구간 (2026-09-23, 덱 패시브 카드 1 배선)
+### 이번 구간 (2026-09-23 후반, 카드 2 선턴 고정 · 덱 선택 화면)
+
+EditMode 1461 → **1471**(+6 도메인, +3 이름표 · 건너뜀 1 · 실패 0). PlayMode 116 → **122**(+1 선턴, +5 화면 · 실패 0). 뮤테이션 F 7/7 사망, L은 측정한 2/2 사망(7건 미측정). 사용자 병행 커밋 둘(`43b2c7f`·`a365e5d`, 그래픽)이 사이에 들어왔다.
+
+| 커밋 | 내용 |
+|---|---|
+| **Double Down `910ccee`** | **기능: `FirstSeatPolicy`가 선턴 덱의 선을 매 라운드 덮는다.** 25파일 +279/−23, 시험 7 신규, 쓸기 33곳 |
+| **Double Down `9bcbb6d`** | **화면: `RunSetupView`가 덱 캐러셀로 고른 덱을 `RunConfig`에 싣는다.** 10파일, 프리팹·굽기 도구·`TitleWords`·시험 8 |
+| 이 커밋 | 문서: 핸드오프에 카드 2와 화면 레인, GUID 사고를 적는다 |
+
+**이 구간의 성격**: 위임을 계층당 한 에이전트로 갈라 일곱 갈래를 병렬로 띄웠고 절단 0건이었다. 세 칸 버튼으로 먼저 구웠다가 사용자 지시("카드 뒤집어 놓고 화살표로")로 캐러셀로 다시 구웠다. 첫 캡처가 낱말 중간 줄바꿈을 잡아 설명 문구를 줄였고 두 번째 캡처로 확인했다. 배치 사본이 `NUnit could not be found`를 내 `--full-sync`로 되살렸다(§4의 그 함정). 전원 종료 지시로 미검증분(인스톨러 `Compose`)은 되돌리고 검증된 것만 커밋했다.
+
+### 지난 구간 (2026-09-23, 덱 패시브 카드 1 배선)
 
 EditMode **1461** 불변(Boot 변경이라 EditMode 시험은 컴파일만 지난다). PlayMode 111 → **116**(신규 5 · 실패 0). 뮤테이션 7건 중 **5건 사망**, 생존 2건은 인스톨러 합성 공백(§3 「덱 패시브」). 안쪽 겹 Integration 묶음 92/92.
 
