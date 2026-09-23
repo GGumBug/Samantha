@@ -374,7 +374,7 @@ CardView:  발광 목표 = _hasFloorMatch(카드별 사실) && _glowLive(판 전
 ### 다음 후보
 
 - **~~판 HUD 슬롯 프리팹 배선~~ — 2026-09-15 완료.** 위 절 참조. 굽기는 일회성 스크립트가 했고 `MatchViewPrefabWiringTests` 8건이 계약을 문다
-- **⭐ 덱 선택 화면 — 도메인·배선은 2026-09-23 완료(`7b95955`·`53afe28`), 화면 미착수.** 「시스템 디자인 & 밸런스」 §4-3 ⑤가 정본이다. 1차는 초짜·선턴 고정 2종이고 주머니·칼판·각서 뭉치는 2차다. 화면이 채우는 자리는 `TitleScene.cs:150`의 `DeckCatalog.BasicDeckId` 상수 하나이고, `RunSetupView.StartRequested`는 `Action<string, ushort>`로 권고돼 있다(Presentation은 Domain 미참조). 덱마다 뒷면 스프라이트가 다르다 · 판단 대기 셋(끈질긴의 라운드 상한 4 / 동네판의 상대 칩 하향 / 뒷면이 보이는 자리). 화면이 열리는 날 인스톨러 합성 시험도 함께 붙인다(§3 「덱 패시브」 생존 뮤테이션). `PlayerDeck`은 렌즈이고 판은 공유 48장을 돌리므로 덱 구성 변형은 좌석별 딜러 선행이라 후보 밖
+- **⭐ 덱 선택 화면 — 도메인·배선은 2026-09-23 완료(`7b95955`·`53afe28`), 화면 미착수.** 「시스템 디자인 & 밸런스」 §4-3 ⑤가 정본이다. 1차는 초짜·선턴 고정 2종이고 주머니·칼판·각서 뭉치는 2차다. 화면이 채우는 자리는 `TitleScene.cs:150`의 `DeckCatalog.BasicDeckId` 상수 하나다. `RunSetupView.StartRequested`는 `Action<string, ushort>`로 권고돼 있다(Presentation은 Domain 미참조). 덱마다 뒷면 스프라이트가 다르다 · 판단 대기 셋(끈질긴의 라운드 상한 4 / 동네판의 상대 칩 하향 / 뒷면이 보이는 자리). 화면이 열리는 날 인스톨러 합성 시험도 함께 붙인다(§3 「덱 패시브」 생존 뮤테이션). `PlayerDeck`은 렌즈이고 판은 공유 48장을 돌리므로 덱 구성 변형은 좌석별 딜러 선행이라 후보 밖
 - **⭐ 보너스 카드 아트** — `Item_BonusCard`는 배경 한 장에 글자 세 줄이다. 낱장마다 그림이 생기면 `ShopBonusOfferCard.Bind`에 스프라이트 인자가, 카드에 `Image_Face` 칸이 함께 온다(작업패 카드 선례). **재활용 덕에 한 번에 두 곳(상점 매대·판 기둥)에 닿는다.** 기둥은 `Bind`를 부르지 않으므로 얼굴이 자산 기본값으로 서는지 확인할 것. **옛 팩 버튼 아트 항목은 폐기** — `Button_BuyBonusPack`은 매대 전환에서 걷어냈다
 - **충전 배지 저작** — `_chargeBadge`·`_chargeLabel`은 코드가 켜고 끌 준비가 끝났으나 카드에 그 칸이 없다. 배선 명부에서 **일부러 빠져 있고**, 만드는 날 `Bind`의 널 가드가 저절로 켜진다. 시험 쪽 `OptionalSlots` 집합에서도 빼야 그때 명부에 합류한다
 - **보너스 축 측정** — `BonusCardPriceBp`·거울 2/3 확정. `RunLadderSweepScratch`에 `CreateBonusStream`(표지 `"shop-bonus"`)은 있으나 **구매 정책·집계 열이 없다** — 대조군(보너스 0장)이 옛 수치를 재현하는 것까지만 확인됨
@@ -407,11 +407,11 @@ CardView:  발광 목표 = _hasFloorMatch(카드별 사실) && _glowLive(판 전
 | 카드 1 · 화면(덱 선택 카드, `RunSetupView`) | 미착수 | Unity 에디터 필요. 채울 자리는 `TitleScene.cs:150` 상수 하나 |
 | 카드 2 · 선턴 고정 | 미착수 | 쓸기 33건 |
 
-**배선이 섰다** (`53afe28`·`ebeff8a`). `RunConfig`가 덱 id를 들고(카탈로그 밖 id는 생성 시점에 `ArgumentException`), `MatchSceneInstaller`가 `RunRulesReducer.Reduce(balances.Match, DeckCatalog.RowsFor(PendingRunConfig.Value.DeckId))`로 접은 규칙을 `RunFlow`와 `MatchSessionFactory`(필수 인자 `rules`)에 넘긴다. `StartNewRun`은 `_rules.StartChip`으로 새 런을 세워 같은 덱으로 다시 선다. `TitleScene`은 아직 `BasicDeckId` 상수를 건넨다. 그래서 **게임은 여전히 기본 덱만 돈다.** 초짜 덱의 유일한 소비자가 `DeckPassiveWiringTests`다.
+**배선이 섰다** (`53afe28`·`ebeff8a`). `RunConfig`가 덱 id를 든다. 카탈로그 밖 id는 생성 시점에 `ArgumentException`이다. `MatchSceneInstaller`가 `RunRulesReducer.Reduce(balances.Match, DeckCatalog.RowsFor(PendingRunConfig.Value.DeckId))`로 규칙을 접어 `RunFlow`와 `MatchSessionFactory`(필수 인자 `rules`)에 넘긴다. `StartNewRun`은 `_rules.StartChip`으로 새 런을 세워 같은 덱으로 다시 선다. `TitleScene`은 아직 `BasicDeckId` 상수를 건넨다. 그래서 **게임은 여전히 기본 덱만 돈다.** 초짜 덱의 유일한 소비자가 `DeckPassiveWiringTests`다.
 
-**뮤테이션 7건 중 5건 사망** (PlayMode 116, 한 건씩 배치 고립, 회당 50초). 죽은 것은 새 런이 덱을 잊음(1건) · 덱 이득을 판마다 재적용(3건, 기존 이월 시험 둘이 함께 잡음) · 카탈로그 가드 제거(1건) · 기본 덱을 초짜로(1건) · 타이틀이 초짜를 건넴(1건)이다. **살아남은 둘은 `MatchSceneInstaller`다.** 고른 덱을 무시해도, 규칙을 무시하고 시트 값으로 런을 세워도 초록이다. 시험 asmdef가 Reflex를 참조하지 않아 인스톨러 합성을 무는 시험이 0건이고, 타이틀이 기본 덱만 건네 런타임에서도 안 드러난다. 화면 레인이 덱 선택을 여는 날 `(BalanceSet, IOpponentCatalog, IRandomFactory, RunConfig) → MatchSessionFactory` 합성을 `Container` 없는 정적 메서드로 빼 초짜 덱 시험 1건을 붙인다(리뷰어 권고).
+**뮤테이션 7건 중 5건 사망** (PlayMode 116, 한 건씩 배치 고립, 회당 50초). 죽은 것은 다섯이다. 새 런이 덱을 잊음(1건). 덱 이득을 판마다 재적용(3건, 기존 이월 시험 둘이 함께 잡았다). 카탈로그 가드 제거(1건). 기본 덱을 초짜로(1건). 타이틀이 초짜를 건넴(1건). **살아남은 둘은 `MatchSceneInstaller`다.** 고른 덱을 무시해도, 규칙을 무시하고 시트 값으로 런을 세워도 초록이다. 시험 asmdef가 Reflex를 참조하지 않아 인스톨러 합성을 무는 시험이 0건이고, 타이틀이 기본 덱만 건네 런타임에서도 안 드러난다. 화면 레인이 덱 선택을 여는 날 `(BalanceSet, IOpponentCatalog, IRandomFactory, RunConfig) → MatchSessionFactory` 합성을 `Container` 없는 정적 메서드로 뺀다. 그 위에 초짜 덱 시험 1건을 붙인다(리뷰어 권고).
 
-**트레이드오프 하나.** 공장이 `run`과 `rules`를 따로 받아 `run.Chips == rules.StartChip`을 아무도 강제하지 않는다. 공장이 첫 런을 `rules`에서 스스로 세우면 입력 하나가 줄지만, 이음매 시험 넷이 공장과 같은 `RunFlow` 인스턴스를 쥐고 합성 결과로 사다리를 미는 계약이 그 위에 서 있어 그대로 뒀다.
+**트레이드오프 하나.** 공장이 `run`과 `rules`를 따로 받아 `run.Chips == rules.StartChip`을 아무도 강제하지 않는다. 공장이 첫 런을 `rules`에서 스스로 세우면 입력 하나가 준다. 그런데 이음매 시험 넷이 공장과 같은 `RunFlow` 인스턴스를 쥐고 합성 결과로 사다리를 민다. 그 계약이 그 위에 서 있어 그대로 뒀다.
 
 **사용자 승인 결정 넷** (2026-09-23)
 
