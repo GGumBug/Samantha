@@ -2,9 +2,11 @@
 
 # Double Down 인게임 핸드오프
 
-2026-09-16 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down**, 작업 브랜치는 **`master`**(`26edac7`까지, **로컬**). **워킹트리 clean.**
+2026-09-23 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down**, 작업 브랜치는 **`master`**(`da26145`까지, **원격까지 푸시됨**). **워킹트리 clean.** 문서와 설계는 **Samantha** 저장소가 SSOT다.
 
 **보너스 카드가 도메인부터 화면까지 닫혔고, 상점 문법이 팩에서 매대로 바뀌었다.** 세 장이 매대에 펼쳐진 채 서 있고 누르면 그 자리에서 값이 나가고 장착된다. 개봉 단계가 없다(§3 「보너스 카드」). 카드에는 이름·효과·값 세 칸과 판의 카드와 같은 반응 연출이 붙어 있다. **판 HUD 기둥까지 닫혔다.** 산 낱장이 그 자리에서 기둥에 서고, 그 카드는 상점에서 산 것과 같은 자산이다(§3 「판 HUD 기둥」).
+
+**2026-09-23 구간은 Unity 코드 0줄이다.** 런 시작 덱 패시브의 구조를 확정하고 문서로만 남겼다(§3 「덱 패시브」). 검증 총계는 그대로고 인게임에서 확인할 것이 없다. 다음 PC는 구현 카드 1부터 시작한다.
 
 **낱장이 터지면 그 슬롯이 스스로 딸깍 튕긴다.** 발라트로의 조커 발동과 같은 계급이고 도메인은 한 줄도 바뀌지 않았다(§3 「발화 딸깍」). **손패 발광은 지금 낼 수 있을 때만 켜진다.** 판정을 렌더가 아니라 매 프레임 입력 게이트와 세션 프로브로 한다(§3 「손패 발광 게이트」). 줄끝도 이제 저장소가 정한다(`.gitattributes`, `* text=auto eol=lf`).
 
@@ -78,7 +80,7 @@
 
 ## 2. ⚠️ 새 PC에서 첫 3분
 
-1. **양쪽 저장소 pull** — 둘 다 `master`
+1. **양쪽 저장소 pull** — 둘 다 `master`. **Samantha 쪽에 덱 패시브 설계가 들어 있다**(`ec1bc96`). 덱 작업을 이어갈 것이면 아래 3~12번(인게임 재생 검증)은 건너뛰어도 된다. 덱은 코드가 0줄이라 화면에 나타난 것이 없다
 2. **Unity 열고 컴파일 확인** — 에러 0건
 3. **`unity` CLI 연결 확인** — `unity status`가 `state: ready` + Port를 내면 라이브 에디터가 붙은 것이다. `unity command set_autotick --enable true`를 켠다. **`--persist`를 줘도 `SessionState`라 에디터를 닫으면 사라진다**(도메인 리로드만 넘긴다). 에디터 세션마다 다시 켠다. 읽기 경로가 없어 현재 값은 `eval`로 `SessionState.GetBool("Unity.Pipeline.AutoTick.Enabled", false)`를 직접 읽어야 안다. 안 붙으면 §4의 네 얼굴 판별표로 원인을 가른다. **CLI가 없으면 `unity pipeline install`** 후 에디터 재시작
 4. **`tools/ddtest.sh` 경로 3줄 수정** — `SRC`·`DST`·`UNITY`. 그러면 EditMode 전량이 십수 초에 돈다(§4). 이 스크립트는 **Samantha 저장소에 커밋돼 있다**(`git ls-files tools/`로 확인). 상수는 Windows 경로라 머신마다 고친다. macOS에서는 사본 미러링 없이 원본 직접 실행이 가능해(§4) 이 스크립트 자체가 과하다
@@ -394,6 +396,54 @@ CardView:  발광 목표 = _hasFloorMatch(카드별 사실) && _glowLive(판 전
 - **런 종료 화면 / 막 표시 데이터화 / `special_steal_pi_count` 배선 / `pi_bak_loser_max < pi_bak_winner_min` 확인** — 이전 목록 유지
 - **연출 다듬기 소묶음** — 죽은 손잡이(`TurnBeatBudget._choiceLiftFactor`) 제거 · 그림자 각도 테스트 공백 · 택1/선언 수치 조정 · `FloorChoicePopupView` 개명(주소 동반) · 턴 전환 연출 · `SetFastBattle` 노출
 
+### ⭐ 덱 패시브 (2026-09-23 설계 완료, 구현 0줄)
+
+**코드는 한 줄도 없다.** 이 구간의 산출물은 설계 문서와 구조 그림이고, 인게임에서 확인할 것이 없다.
+
+Balatro의 덱 자리다. 런을 시작할 때 고른 덱이 그 런 전체의 규칙을 바꾼다. 1차는 **초짜**(시작 칩 이득)와 **선턴 고정**(플레이어가 항상 선) 둘이다(GDD 「시스템 디자인 & 밸런스」 §4-3 ⑤).
+
+**구조** · 사용자의 우려가 "효과가 늘 때마다 조건이 붙고 클래스 결합도가 오른다"였고, 답은 계층당 하나의 접기다.
+
+```
+덱 선택 → RunConfig(seed, deckId) → DeckCatalog.RowsFor(deckId)
+  → RunRulesReducer.Reduce(MatchBalance, rows)   ← 종류 판정 switch가 여기 한 곳
+  → RunRules { StartChip, FirstSeat }            ← 불변 값 객체
+  → MatchSessionFactory:444 (RunFlow) · SeonResolver:72 (선 판정)
+```
+
+소비자는 `RunRules`의 칸만 읽고 덱을 모른다. 기존 종류를 쓰는 새 덱은 코드 0줄이고, 새 종류는 열거·리듀서 case·`RunRules` 칸·소비자 읽기 네 곳에 **더하기만** 한다. 빠짐은 `Enum.GetValues` 순회 시험이 잡는다. 인터페이스 다형을 쓰지 않는 이유는 닫힌 열거만 "종류가 다 있는가"를 물을 대상을 주기 때문이다(등록형은 그 명부가 없다).
+
+**판 중 패시브도 같은 구조를 탄다.** `DeckEffectKind.EquipEffect` 행이 `MatchSessionFactory.cs:281`의 슬롯 목록에 합류하면 `EffectInterpreter`는 한 줄도 바뀌지 않는다. **1차는 이 종류를 만들지 않는다.** 소비자 없는 종류는 `EffectCatalog` 헤더가 거부하는 빈 훅이다.
+
+**상세 설계**: [double-down-deck-passive-design.md](double-down-deck-passive-design.md). 타입 6개의 시그니처 전문, 소비 지점 14곳의 before/after, 시험 7개와 각각을 빨간불로 만드는 뮤테이션 한 줄, 계층 분할, 열린 결정이 그 문서에 있다. **구현 위임은 그 문서 §2·§4를 프롬프트에 원문으로 박고 시작한다.**
+
+**구조 그림**: [double-down-deck-passive-design.architecture.json](double-down-deck-passive-design.architecture.json). HTML(819KB)은 저장소에 두지 않고 스펙에서 다시 굽는다.
+
+```bash
+cd .claude/skills/archify && node bin/archify.mjs deliver architecture \
+  ../../../reports/double-down-deck-passive-design.architecture.json \
+  /tmp/deck-passive.html --quality showcase
+```
+
+#### ⚠️ 구현은 카드 둘로 가른다 (권고, 사용자 미승인)
+
+| 카드 | 쓸기 | 내용 |
+|---|---|---|
+| 1 | 19건 | 타입 6개 + 리듀서 + 초짜 + **덱 선택 화면**. `MatchFlow`를 건드리지 않는다 |
+| 2 | 33건 | 선턴 고정. `MatchFlow` 생성자 20 → 21인자 쓸기가 이 카드 안에 갇힌다 |
+
+**값의 생존 기간이 비용을 정한다.** 초짜는 런 조립 시점에 한 번 읽히고 끝나 생산 지점 하나만 바뀐다. 선턴 고정은 판마다 읽혀야 해서 런·판·라운드 세 경계를 넘고, 경계마다 시그니처가 하나씩 늘어난다. 실측 쓸기 건수는 `SeonResolver.Resolve` 10 · `new MatchFlow` 7 · `CreateWithOpponentProfile` 11 · `CreateWithRuleJudges` 5 · `new MatchSessionFactory` 11 · `RunConfig` 생성 8이다.
+
+정책 축은 **필수 인자**로 넣는다. 선택 인자로 두면 `MatchSimRunner`가 조용히 `ByPick`으로 계측해 덱 밸런스 수치 자체가 어긋난다.
+
+**1차 배선이 기본 덱이면 초짜와 선턴 고정의 유일한 소비자가 시험이다.** 덱 선택 화면이 카드 1에 같이 와야 검증되지 않은 표면이 남지 않는다. 그 화면이 채우는 자리는 `TitleScene.cs:148` 한 곳이고, `RunSetupView` 이벤트는 `Action<string, ushort>`로 권고돼 있다(Presentation asmdef가 Domain을 참조하지 않아 도메인 타입을 실을 수 없다).
+
+**설계가 보고한 발견 셋** (구조 충돌은 0건이다)
+
+- **이름 겹침.** `Domain.Decks`의 `DeckCatalog`·`DeckEffectRow`가 48장 덱 어휘(`PlayerDeck`·`DeckEntry`·`CanonicalDeckSize`)와 같은 낱말을 쓴다
+- **재현 좌표가 넓어진다.** 같은 판을 되살리는 좌표가 시드 코드 하나에서 (시드 코드, 덱 id) 쌍이 된다. `MainScene.cs:1042`는 시드만 표시한다
+- **`MatchFlow` 생성자가 이미 20인자다.** 정책 축을 더하면 21이 된다
+
 ### 미결정 (사용자 판단 대기)
 
 | 항목 | 내용 |
@@ -403,6 +453,11 @@ CardView:  발광 목표 = _hasFloorMatch(카드별 사실) && _glowLive(판 전
 | 폭탄·자뻑 | 흔들기가 미채용이라 폭탄도 보류 |
 | "다음 판 최소 밑천" 가드 | 현재 하한 1(`RunFlow.TrySpendChips` 상수 한 곳). 1보다 크게 잡는 것은 밸런스 결정 |
 | 슬롯 배율 1.8 동결 | 뮤테이션이 `localScale` 1.8을 붙드는 시험이 **0건**임을 찾았다(§3). (A) `EverySlotFits...`에 `Is.EqualTo(1.8f)` 한 줄을 더해 동결 — 저작 수치 동결 선례(`e9be28c`)를 따르고, 바뀌는 날 사람을 부른다. (B) 그대로 둔다 — 굽기 상수가 정본이고 겹침만 계약이다 |
+| 덱 — `RunConfig.Default`의 덱 | **중립 기본 덱**(행 0개) 권고. 빈 목록을 접은 값이 시트 기준값과 한 비트도 안 달라 회귀 시험의 주체가 된다 |
+| 덱 — 선턴 고정일 때 선 뽑기 | **의식 유지, `firstSeat`만 덮기** 권고. 6필드가 다 채워진 채 "정확히 1 draw" 동결이 유지되고 정책이 닿는 자리가 한 줄로 끝난다 |
+| 덱 — 초짜가 가산인가 배율인가 | **가산** 권고. 가산은 행이 몇 개든 순서 무관이 형태로 성립한다. 배율은 절단 규칙과 bp 단위를 1차에 미리 확정해야 한다 |
+| 덱 — 덱 효과와 보너스 슬롯 5칸 | **안 먹는다**(별도 목록) 권고. 5칸은 상점에서 사는 자원이라 덱이 한 칸 먹으면 숨은 세금이고, 먹게 하면 추첨 풀 제외 규칙이 덱을 알아야 해 덱이 상점 계층으로 샌다 |
+| 덱 — 구현 카드 분할 | 위 §3 표의 카드 1·2로 가를지 한 카드로 몰지. 한 카드면 52건이 한 번에 열려 회귀 시 원인이 안 갈린다 |
 
 
 ### 보류 결정 — GitHub Actions (2026-08-24, 재검토 금지)
@@ -824,10 +879,30 @@ BoardLayout: 모든 X 가 PlayAreaHalfWidth 대칭에서 파생, 실제 크기�
 
 ## 7. 커밋 이력
 
+### 이번 구간 (2026-09-23, 덱 패시브 설계)
+
+**Unity 코드 0줄.** 검증 총계 그대로(EditMode 1327 · PlayMode 97)이고 뮤테이션도 없다. 잰 것이 없어서가 아니라 잴 코드가 없다. 산출물은 전부 **Samantha** 저장소다.
+
+| 커밋 | 내용 |
+|---|---|
+| `ec1bc96` | 문서: `double-down-deck-passive-design.md`를 들인다. 설계 223줄 + archify 스펙 + README 색인 |
+| 이 커밋 | 문서: 핸드오프에 덱 패시브 구간을 적는다 |
+
+Notion GDD 「시스템 디자인 & 밸런스」 §4-3 ⑤도 세 곳 고쳤다(Notion은 git 밖이라 여기 적는다).
+
+- **1차 채택이 4종에서 2종으로** 좁았다. 초짜·선턴 고정만 남고 주머니·칼판·각서 뭉치는 2차로 이월됐다
+- **덱과 보너스 피의 경계를 다시 그었다.** "구조·자원 vs 사건 반응"이 아니라 **획득 시점과 영속성**이다. 초판 문장은 철회로 명기했다. 덱도 상시 패시브를 사전 장착할 수 있고 그 효과는 보너스 피와 같은 해석기를 탄다
+- **구현 절을 `RunRules` 구조로** 바꿨다. "시트 1행을 런 시작에 적용"이 아니라 행 목록 → 리듀서 한 곳 → 불변 값 객체이고, 1차에 시트 탭은 없다
+
+웹 조사 결과가 구조에 둘을 더했다. 하나는 **행 순서 무관 시험**이다. meredoth/Stat-System이 열거값을 정수 order로 못 박아 결정론을 얻는다. 다른 하나는 **Override를 sentinel이 아니라 타입으로** 두는 것이다. Unity GAS가 Override 0을 "없음"으로 쓰는 것의 반면교사다.
+
+조사한 저장소 다섯 중 **`Enum.GetValues` 완전성 시험을 둔 곳은 없었다**. 등록형은 물을 대상 자체가 없다. 그 빈자리가 우리가 처음부터 시험을 두는 근거다.
+
+
 ### 이번 구간 (2026-09-16, 발화 딸깍 · 손패 발광 게이트 · 줄끝)
 
 14커밋 · EditMode 1315 → **1327**(+12) · PlayMode 91 → **97**(+6) · 뮤테이션 9회 → 빨간불 24건.
-**원격 push 안 됨**(`26edac7`까지 로컬).
+당시 원격 push 전이었고, 지금은 `da26145`까지 푸시됐다.
 
 | 커밋 | 내용 |
 |---|---|
