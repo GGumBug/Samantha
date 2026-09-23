@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "덱 패시브 구조 (RunRules)",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "config-path",
+        "label": "설정 계층 경로",
+        "focus": [
+          "title",
+          "run_config",
+          "deck_rows",
+          "balance",
+          "reducer",
+          "run_rules"
+        ],
+        "note": "덱 선택이 행 목록이 되고, 리듀서 한 곳이 RunRules로 접는다."
+      },
+      {
+        "id": "consumers",
+        "label": "소비자는 RunRules만",
+        "focus": [
+          "run_rules",
+          "factory",
+          "seon"
+        ],
+        "note": "소비자는 값 객체의 칸만 읽는다. 덱의 존재를 모른다."
+      },
+      {
+        "id": "event-layer",
+        "label": "사건 계층 (기존)",
+        "focus": [
+          "effect_rows",
+          "interpreter",
+          "turn_engine"
+        ],
+        "note": "보너스 카드는 이미 같은 모양이다. 행 목록과 해석기 한 곳."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "title",
+      "type": "frontend",
+      "label": "RunSetupView",
+      "sublabel": "덱 선택 UI",
+      "pos": [
+        40,
+        180
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "run_config",
+      "type": "backend",
+      "label": "RunConfig",
+      "sublabel": "seedCode + deckId",
+      "pos": [
+        260,
+        180
+      ],
+      "size": [
+        150,
+        60
+      ],
+      "tag": "Boot"
+    },
+    {
+      "id": "deck_rows",
+      "type": "database",
+      "label": "DeckEffect 행",
+      "sublabel": "deck_id · kind · param",
+      "pos": [
+        480,
+        40
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "새 덱 = 코드 0줄"
+    },
+    {
+      "id": "balance",
+      "type": "database",
+      "label": "MatchBalance",
+      "sublabel": "PlayerStartChip 등",
+      "pos": [
+        720,
+        40
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "시트 1:1"
+    },
+    {
+      "id": "reducer",
+      "type": "backend",
+      "label": "RunRulesReducer",
+      "sublabel": "DeckEffectKind switch 한 곳",
+      "pos": [
+        480,
+        180
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "신설"
+    },
+    {
+      "id": "run_rules",
+      "type": "backend",
+      "label": "RunRules",
+      "sublabel": "StartChip · FirstSeatPolicy",
+      "pos": [
+        720,
+        180
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "불변 값 객체 · 2차에 PassiveEffectIds"
+    },
+    {
+      "id": "test",
+      "type": "security",
+      "label": "완전성 시험",
+      "sublabel": "Enum.GetValues(DeckEffectKind)",
+      "pos": [
+        260,
+        400
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "factory",
+      "type": "backend",
+      "label": "MatchSessionFactory",
+      "sublabel": "RunFlow(rules.StartChip)",
+      "pos": [
+        960,
+        110
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "seon",
+      "type": "backend",
+      "label": "SeonResolver",
+      "sublabel": "rules.FirstSeatPolicy",
+      "pos": [
+        960,
+        250
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "effect_rows",
+      "type": "database",
+      "label": "EffectCatalog 행",
+      "sublabel": "phase · op · condition",
+      "pos": [
+        480,
+        400
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "기존 5행"
+    },
+    {
+      "id": "interpreter",
+      "type": "backend",
+      "label": "EffectInterpreter",
+      "sublabel": "EffectOperationKind switch 한 곳",
+      "pos": [
+        720,
+        400
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "기존"
+    },
+    {
+      "id": "turn_engine",
+      "type": "backend",
+      "label": "TurnEngine · Settlement",
+      "sublabel": "EffectContext 발화",
+      "pos": [
+        960,
+        400
+      ],
+      "size": [
+        170,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "설정 계층 · 런 시작에 한 번 접는다",
+      "wraps": [
+        "deck_rows",
+        "balance",
+        "reducer",
+        "run_rules"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "사건 계층 · 판 중 훅 (기존)",
+      "wraps": [
+        "effect_rows",
+        "interpreter",
+        "turn_engine"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "pick-deck",
+      "from": "title",
+      "to": "run_config",
+      "label": "StartRequested(seed, deckId)",
+      "variant": "emphasis",
+      "labelDy": -24
+    },
+    {
+      "id": "config-to-reducer",
+      "from": "run_config",
+      "to": "reducer",
+      "label": "deckId",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rows-to-reducer",
+      "from": "deck_rows",
+      "to": "reducer",
+      "label": "행 목록",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "balance-to-reducer",
+      "from": "balance",
+      "to": "reducer",
+      "label": "기준값",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "reducer-to-rules",
+      "from": "reducer",
+      "to": "run_rules",
+      "label": "접기",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rules-to-factory",
+      "from": "run_rules",
+      "to": "factory",
+      "label": "StartChip"
+    },
+    {
+      "id": "rules-to-seon",
+      "from": "run_rules",
+      "to": "seon",
+      "label": "FirstSeatPolicy"
+    },
+    {
+      "id": "test-guards-reducer",
+      "from": "test",
+      "to": "reducer",
+      "label": "빠진 case 검출",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "effect-rows-to-interpreter",
+      "from": "effect_rows",
+      "to": "interpreter",
+      "label": "행 목록"
+    },
+    {
+      "id": "events-to-interpreter",
+      "from": "turn_engine",
+      "to": "interpreter",
+      "label": "EffectContext → 수정값",
+      "labelDy": -26
+    },
+    {
+      "id": "passive-reach",
+      "from": "run_rules",
+      "to": "interpreter",
+      "label": "사전 장착 슬롯 (:281, 2차)",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "규칙 1·2 — 소비자와 리듀서",
+      "items": [
+        "소비자는 RunRules 칸만 읽는다. 덱을 모른다",
+        "종류 판정 switch는 계층당 한 곳 (RunRulesReducer · EffectInterpreter)"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "규칙 3·4 — 데이터와 추가",
+      "items": [
+        "기존 kind를 쓰는 새 덱은 DeckEffect 행만 추가",
+        "새 kind는 열거·리듀서 case·RunRules 칸·소비자 읽기 네 곳에 더한다. 기존 case 수정 0",
+        "판 중 패시브도 같은 구조 — EquipEffect 행이 MatchSessionFactory:281의 슬롯 목록에 합류한다. 해석기 수정 0"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "규칙 5 + 조사가 더한 둘",
+      "items": [
+        "Enum.GetValues 순회 시험이 빠진 case를 잡는다",
+        "행을 뒤섞어도 RunRules가 같다 (순서 무관 시험)",
+        "Override는 sentinel 대신 FirstSeatPolicy 열거"
+      ]
+    }
+  ]
+}
