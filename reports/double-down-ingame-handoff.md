@@ -2,11 +2,11 @@
 
 # Double Down 인게임 핸드오프
 
-2026-09-23 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down**, 작업 브랜치는 **`master`**(로컬 `9bcbb6d`까지. 원격은 `a365e5d`까지 푸시됨, 마지막 1건 **미푸시**). **워킹트리 clean.** 문서와 설계는 **Samantha** 저장소가 SSOT다.
+2026-09-24 갱신. 다른 PC에서 이어가기 위한 인수인계. 대상 저장소는 **Double Down**, 작업 브랜치는 **`master`**(로컬 `de781de`까지. 원격은 `a365e5d`까지 푸시됨, 뒤 2건 **미푸시**). **워킹트리 clean.** 문서와 설계는 **Samantha** 저장소가 SSOT다.
 
 **보너스 카드가 도메인부터 화면까지 닫혔고, 상점 문법이 팩에서 매대로 바뀌었다.** 세 장이 매대에 펼쳐진 채 서 있고 누르면 그 자리에서 값이 나가고 장착된다. 개봉 단계가 없다(§3 「보너스 카드」). 카드에는 이름·효과·값 세 칸과 판의 카드와 같은 반응 연출이 붙어 있다. **판 HUD 기둥까지 닫혔다.** 산 낱장이 그 자리에서 기둥에 서고, 그 카드는 상점에서 산 것과 같은 자산이다(§3 「판 HUD 기둥」).
 
-**2026-09-23 구간에서 덱 패시브가 도메인·배선·선턴 고정·덱 선택 화면까지 닫혔다**(§3 「덱 패시브」 · `7b95955`·`53afe28`·`ebeff8a`·`910ccee`·`9bcbb6d`). 타이틀의 런 설정 팝업에서 `BasicCardBack` 한 장을 `<` `>`로 넘겨 기본·초짜·선턴을 고르면 그 덱으로 런이 선다. 인게임에서 확인할 것: 초짜를 고르면 첫 판 개시 칩 1800, 선턴을 고르면 매 라운드 내가 선. **인스톨러 이음매에 시험이 아직 없다**(§3 ⚠️, 다음 세션 첫 카드).
+**2026-09-23 구간에서 덱 패시브가 도메인·배선·선턴 고정·덱 선택 화면까지 닫혔다**(§3 「덱 패시브」 · `7b95955`·`53afe28`·`ebeff8a`·`910ccee`·`9bcbb6d`). 타이틀의 런 설정 팝업에서 `BasicCardBack` 한 장을 `<` `>`로 넘겨 손님·물주·단골을 고르면 그 덱으로 런이 선다. 인게임에서 확인할 것: 물주를 고르면 첫 판 개시 칩 1800, 단골을 고르면 매 라운드 내가 선. **인스톨러 이음매에 시험이 아직 없다**(§3 ⚠️, 다음 세션 첫 카드).
 
 **낱장이 터지면 그 슬롯이 스스로 딸깍 튕긴다.** 발라트로의 조커 발동과 같은 계급이고 도메인은 한 줄도 바뀌지 않았다(§3 「발화 딸깍」). **손패 발광은 지금 낼 수 있을 때만 켜진다.** 판정을 렌더가 아니라 매 프레임 입력 게이트와 세션 프로브로 한다(§3 「손패 발광 게이트」). 줄끝도 이제 저장소가 정한다(`.gitattributes`, `* text=auto eol=lf`).
 
@@ -398,6 +398,8 @@ CardView:  발광 목표 = _hasFloorMatch(카드별 사실) && _glowLive(판 전
 
 ### ⭐ 덱 패시브 (2026-09-23 · 네 레인 완료, 인스톨러 시험 하나 남음)
 
+**2026-09-24 개명** (`de781de`). 덱 이름을 판에 앉는 사람 축으로 맞췄다. 기본은 **손님**, 초짜는 **물주**, 선턴은 **단골**이다. 코드 키는 `BasicDeckId`·`MuljuDeckId`·`DangolDeckId`이고 id 값 1·2·3은 저장 계약이라 그대로다. 기본만 코드 키가 `Basic`으로 남는 것은 역할 이름이라서다. 이 절 아래의 초짜·선턴은 당시 기록이다. 뒷면 파일명은 `MuljuCardBack`·`DangolCardBack`(70×98)으로 코드 키를 따른다. Notion GDD §4-3 ⑤의 이름은 아직 옛 이름이다.
+
 **진행 상태**
 
 | 레인 | 상태 | 커밋 |
@@ -418,7 +420,7 @@ CardView:  발광 목표 = _hasFloorMatch(카드별 사실) && _glowLive(판 전
 
 **덱 선택 화면이 섰다** (`9bcbb6d`). 사용자 지시로 세 칸 버튼 대신 **카드 캐러셀**이다. `Container_Decks` 안에 `BasicCardBack`(70×98를 ×2 정수 배로 140×196) 한 장, 좌우 `<` `>`(ASCII. `◀▶`는 픽셀 폰트에 없다), 아래 `Text_DeckName`·`Text_DeckBlurb`가 선다. `RunSetupView.SetDecks(ids)`가 명부를 담고 첫 id를 보이고, 화살표는 끝에서 반대쪽으로 돈다. `StartRequested`는 `Action<string, ushort>`다. 이름표는 `TitleWords.DeckName/DeckBlurb`(숫자 리터럴 표, `HudWords.BonusWord` 선례)이고 `TitleWordsTests`가 카탈로그 상수와 잇는다. `TitleScene`이 `Awake`에서 `SetDecks(DeckCatalog.AllDeckIds)`를 부르고 고른 덱을 `_deckId`로 기억한다. 굽기 도구는 `AgentScripts/BakeRunSetupDecks.cs`(멱등, 2회차 변경 0). 덱마다 뒷면이 갈리는 날 `Image_DeckBack`을 바꾸는 칸이 생긴다(사용자가 뒷면 에셋을 더할 예정). **뮤테이션 L1·L2 사망, L3~L9 미측정**(전원 종료로 중단. `scratchpad/mutate_copy.py`에 L 묶음 9건이 등록돼 있다).
 
-**⚠️ 아직 무는 시험이 없는 이음매 하나.** `MatchSceneInstaller.CreateSessionFactory`가 `PendingRunConfig.Value.DeckId`를 읽는 자리다. 시험 asmdef가 Reflex를 참조하지 않아 K6·K7(인스톨러가 덱·규칙을 무시)이 살아남았고, 이제 화면이 덱을 고르므로 **실제로 보이는 공백**이다. 처방을 시작했다가 전원 종료로 되돌렸다. `public static MatchSessionFactory Compose(IRandomFactory, IOpponentCatalog, BalanceSet, RunConfig)`를 빼고 `CreateSessionFactory`가 그것을 부르게 한 뒤, `MatchSceneInstallerComposeTests`(PlayMode)가 초짜 설정은 첫 판 칩 1800, 선턴 설정은 8판 전부 플레이어 선, `RootSeed == config.Seed`를 문다. `scratchpad/refresh_k_installer.py`가 그 뒤 K6~K9를 새 줄로 등록한다. **다음 세션 첫 카드다.**
+**⚠️ 아직 무는 시험이 없는 이음매 하나.** `MatchSceneInstaller.CreateSessionFactory`가 `PendingRunConfig.Value.DeckId`를 읽는 자리다. 시험 asmdef가 Reflex를 참조하지 않아 K6·K7(인스톨러가 덱·규칙을 무시)이 살아남았고, 이제 화면이 덱을 고르므로 **실제로 보이는 공백**이다. 처방을 시작했다가 전원 종료로 되돌렸다. `public static MatchSessionFactory Compose(IRandomFactory, IOpponentCatalog, BalanceSet, RunConfig)`를 빼고 `CreateSessionFactory`가 그것을 부르게 한 뒤, `MatchSceneInstallerComposeTests`(PlayMode)가 물주 설정은 첫 판 칩 1800, 단골 설정은 8판 전부 플레이어 선, `RootSeed == config.Seed`를 문다. `scratchpad/refresh_k_installer.py`가 그 뒤 K6~K9를 새 줄로 등록한다. 개명 뒤라 `mutate_copy.py`의 K3~K5·F·L 원문 일부가 옛 이름을 들고 있어, 다시 뜨기 전엔 "원문이 0회"로 빠진다. **다음 세션 첫 카드다.**
 
 **사용자 승인 결정 넷** (2026-09-23)
 
@@ -947,7 +949,9 @@ EditMode 1461 → **1471**(+6 도메인, +3 이름표 · 건너뜀 1 · 실패 0
 |---|---|
 | **Double Down `910ccee`** | **기능: `FirstSeatPolicy`가 선턴 덱의 선을 매 라운드 덮는다.** 25파일 +279/−23, 시험 7 신규, 쓸기 33곳 |
 | **Double Down `9bcbb6d`** | **화면: `RunSetupView`가 덱 캐러셀로 고른 덱을 `RunConfig`에 싣는다.** 10파일, 프리팹·굽기 도구·`TitleWords`·시험 8 |
-| 이 커밋 | 문서: 핸드오프에 카드 2와 화면 레인, GUID 사고를 적는다 |
+| `19fc35d` | 문서: 핸드오프에 카드 2와 화면 레인, GUID 사고를 적는다 |
+| **Double Down `de781de`** | 개명: `DeckCatalog`의 덱을 손님·물주·단골로 부른다. 9파일 ±74, 총계 불변(EditMode 1471 · PlayMode 122) |
+| 이 커밋 | 문서: 핸드오프에 덱 개명을 적는다 |
 
 **이 구간의 성격**: 위임을 계층당 한 에이전트로 갈라 일곱 갈래를 병렬로 띄웠고 절단 0건이었다. 세 칸 버튼으로 먼저 구웠다가 사용자 지시("카드 뒤집어 놓고 화살표로")로 캐러셀로 다시 구웠다. 첫 캡처가 낱말 중간 줄바꿈을 잡아 설명 문구를 줄였고 두 번째 캡처로 확인했다. 배치 사본이 `NUnit could not be found`를 내 `--full-sync`로 되살렸다(§4의 그 함정). 전원 종료 지시로 미검증분(인스톨러 `Compose`)은 되돌리고 검증된 것만 커밋했다.
 
