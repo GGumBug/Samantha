@@ -130,6 +130,7 @@ GameCore Unity 개발에 사용하는 Claude Code 에이전트·스킬·훅·규
 | [mossy-nibbling-dusk.md](reports/mossy-nibbling-dusk.md) | MainScene RNG 스모크 테스트 환경 구축 계획 |
 | [slice-a-hybrid-render-plan.md](reports/slice-a-hybrid-render-plan.md) | 카드(월드 스프라이트) × 패널(uGUI) 하이브리드 렌더 계획 |
 | [slice-a-sim-1000seed-v2.md](reports/slice-a-sim-1000seed-v2.md) | Slice A 자동 시뮬레이션 1,000 Seed 검증 |
+| [zany-orbiting-rabin.md](reports/zany-orbiting-rabin.md) | Double Down 폭탄 룰 도입 계획과 카드별 검증 기록 (Ruleset v0.2) |
 
 ## 검증
 
