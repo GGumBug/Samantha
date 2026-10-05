@@ -121,6 +121,8 @@ GameCore Unity 개발에 사용하는 Claude Code 에이전트·스킬·훅·규
 | [double-down-bonus-card-effect-references.md](reports/double-down-bonus-card-effect-references.md) | 보너스 카드 구현 참고 — Balatro 조커·StS 파워/렐릭 효과 구현법 대조 |
 | [double-down-card-upgrade-visual-plan.md](reports/double-down-card-upgrade-visual-plan.md) | 작업패(패 칩 강화) 표시 시안 — 자리 넷·두 렌더 경로 |
 | [double-down-deck-passive-design.md](reports/double-down-deck-passive-design.md) | 런 시작 덱 패시브 설계 — 설정·사건 두 계층과 접기 리듀서 |
+| [double-down-deckbuilding-design.md](reports/double-down-deckbuilding-design.md) | 덱빌딩 설계 방향 「내 패 더미」와 사용자 결정 11개 |
+| [double-down-wall-design.md](reports/double-down-wall-design.md) | 초반 벽(올인 못 시키면 패배) 설계 「밑천 내기」와 사용자 결정 8개 |
 | [double-down-handoff-archive.md](reports/double-down-handoff-archive.md) | Double Down 핸드오프 아카이브 |
 | [double-down-ingame-handoff.md](reports/double-down-ingame-handoff.md) | Double Down 인게임 핸드오프 |
 | [groovy-wobbling-puddle.md](reports/groovy-wobbling-puddle.md) | Samantha 저장소 업데이트 계획 |
