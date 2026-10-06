@@ -122,7 +122,7 @@ GDD §2-1-1과 Ruleset §2의 "3판 안에 못 올인시키면 패배" 문장은
 
 1. **양쪽 저장소 pull.** 둘 다 `master`다. **Samantha 쪽에 덱빌딩 설계 방향이 들어 있다**([double-down-deckbuilding-design.md](double-down-deckbuilding-design.md)). 그 작업을 이어갈 것이면 아래 3~12번(인게임 재생 검증)은 건너뛰어도 된다. 사용자 결정 대기라 코드가 0줄이고 화면에 나타난 것이 없다. 덱 패시브(`ec1bc96`의 설계)는 2026-09-23에 화면까지 닫혔다(§3 「덱 패시브」)
 2. **Unity 열고 컴파일 확인** — 에러 0건
-3. **`unity` CLI 연결 확인** — `unity status`가 `state: ready` + Port를 내면 라이브 에디터가 붙은 것이다. `unity command set_autotick --enable true`를 켠다. **`--persist`를 줘도 `SessionState`라 에디터를 닫으면 사라진다**(도메인 리로드만 넘긴다). 에디터 세션마다 다시 켠다. 읽기 경로가 없어 현재 값은 `eval`로 `SessionState.GetBool("Unity.Pipeline.AutoTick.Enabled", false)`를 직접 읽어야 안다. 안 붙으면 §4의 네 얼굴 판별표로 원인을 가른다. **CLI가 없으면 `unity pipeline install`** 후 에디터 재시작
+3. **`unity` CLI 연결 확인** — `unity status`가 `state: ready` + Port를 내면 라이브 에디터가 붙은 것이다. `unity command set_autotick --enable true`를 켠다. **`--persist`를 줘도 `SessionState`라 에디터를 닫으면 사라진다**(도메인 리로드만 넘긴다). 에디터 세션마다 다시 켠다. 읽기 경로가 없어 현재 값은 `eval`로 `SessionState.GetBool("Unity.Pipeline.AutoTick.Enabled", false)`를 직접 읽어야 안다. 안 붙으면 §4의 다섯 얼굴 판별표로 원인을 가른다. **CLI가 없으면 `unity pipeline install`** 후 에디터 재시작
 4. **`tools/ddtest.sh` 경로 3줄 수정** — `SRC`·`DST`·`UNITY`. 그러면 EditMode 전량이 십수 초에 돈다(§4). 이 스크립트는 **Samantha 저장소에 커밋돼 있다**(`git ls-files tools/`로 확인). 상수는 Windows 경로라 머신마다 고친다. macOS에서는 사본 미러링 없이 원본 직접 실행이 가능해(§4) 이 스크립트 자체가 과하다
    - **macOS 경로 주의**: 프로젝트 폴더는 `Double Down`(공백)이고 솔루션도 `Double Down.slnx`다. §4의 `dotnet build Double-Down.slnx`는 그대로 안 돈다
 5. **도구 두 개가 사는지 확인** — `dotnet build Double-Down.slnx`(오류 0)와 `cd Tools/HeadlessSim && dotnet run -c Release --project . -- 200`. **후자는 Unity 컴파일 단위 밖이라 아무도 안 지켜본다** — 실제로 15일간 죽어 있었다(§5). 첫 3분에 넣는 이유가 그것이다

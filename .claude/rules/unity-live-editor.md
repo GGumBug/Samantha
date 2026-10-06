@@ -25,18 +25,22 @@ unity command                             # 이 에디터가 노출하는 명령
 | 기존 `[MenuItem]` 굽기 도구 실행 | `unity command menu` |
 | 여러 편집을 한 Undo로 | `batch` (실패 시 전체 롤백) |
 
-**"연결 안 됨"은 네 얼굴이 똑같다. 파일 편집으로 새기 전에 갈라라**:
+**"연결 안 됨"은 다섯 얼굴이 똑같다. 파일 편집으로 새기 전에 갈라라**:
 
 | 증상 | 판별 | 처방 |
 |---|---|---|
 | 에디터가 정말 없음 | `unity editors running`이 `count: 0` | 사용자에게 에디터를 열어 달라고 하거나 `unity open <path>` |
 | **Safe Mode** (컴파일 에러) | `unity pipeline list`의 `Safe Mode` 칸 | **컴파일 에러를 고치는 것이 정답이다** — 우회가 아니다 |
-| 샌드박스가 가림 | 위 둘이 정상인데 `status`만 빔 | "내 샌드박스가 가릴 수 있다"를 말하고 사용자에게 확인 요청 |
-| **도메인 리로드 중 일시 단절** | 위 셋이 다 정상인데 **방금 한 호출만** 실패 (2026-09-14 실측: `recompile` 직후 `run_tests`가 `No Unity Editor instances found` — 직후 `status`·`editors running`·`pipeline list` 셋 다 정상) | 재시도한다 — 파일 편집으로 새는 자리가 아니다 |
+| **`status`만 거짓 음성** | `editors running`이 그 에디터를 `reachable: true`로 보이는데 `status`만 `STATUS_NO_INSTANCES` | `unity command editor_status`가 답하면 연결된 것이다. 명령으로 진행한다 (2026-09-30 하루 4회, 2026-10-06 라이브와 배치 사본이 함께 떠 있을 때. 원인 미확정) |
+| 샌드박스가 가림 | 위 둘이 정상인데 `status`가 비고 `unity command`도 답하지 않음 | "내 샌드박스가 가릴 수 있다"를 말하고 사용자에게 확인 요청 |
+| **도메인 리로드 중 일시 단절** | `status`·`editors running`·`pipeline list`가 다 정상인데 **방금 한 호출만** 실패 (2026-09-14 실측: `recompile` 직후 `run_tests`가 `No Unity Editor instances found` — 직후 `status`·`editors running`·`pipeline list` 셋 다 정상) | 재시도한다 — 파일 편집으로 새는 자리가 아니다 |
 
 `pipeline list`와 `editors running`이 **엇갈리면** 낡은 락파일이다(`Running: true` 인데 PID 칸이 빔)
 — 프로세스를 보는 `editors running` 쪽을 믿어라. (2026-09-14 실측: 에디터가 닫혔는데 락파일만 남아
 `Running: true`로 보였다. 두 명령을 나란히 보지 않았으면 "포트가 왜 안 뜨지"로 헤맸다.)
+
+에디터가 둘 이상 떠 있으면 CLI 문서는 `--project-path`로 대상을 고정하라고 권한다. 도달 가능성도 `status`가
+아니라 `unity command`로 확인하라고 적는다([integration-advanced.md](../skills/unity-cli/references/integration-advanced.md)).
 
 **끝내 파일을 직접 편집한다면 보고에 명시해라** — *"라이브 에디터 없음(사유), 파일 직접 편집"*.
 조용히 새는 것이 이 규칙이 막으려는 유일한 실패다.

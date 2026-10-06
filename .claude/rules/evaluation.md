@@ -19,7 +19,7 @@ Unity 프로젝트의 검증은 **두 겹**이다. 안쪽을 건너뛰면 느리
 | **바깥쪽** | `bash tools/ddtest.sh` (+ PlayMode) | **커밋 직전** · 뮤테이션 검증 | 전량 총계. 에디터 없이도 돈다 |
 
 ```bash
-unity status                                   # 없으면 안쪽은 건너뛰고 그 사실을 말한다
+unity status                                   # 비면 editor_status로 재확인. 둘 다 무응답이면 안쪽은 건너뛰고 그 사실을 말한다
 unity command set_autotick --enable true       # 필수 — 포커스 잃은 에디터는 recompile을 멎춘다
 # (.cs 편집)
 unity command recompile && unity command recompile_status   # failed=true 면 errors 배열을 읽는다
