@@ -95,6 +95,7 @@ GameCore Unity 개발에 사용하는 Claude Code 에이전트·스킬·훅·규
 | [single-composition-point.md](best-practice/single-composition-point.md) | 소유권 교대 제거와 단일 합성 지점 |
 | [solid-unity-principles.md](best-practice/solid-unity-principles.md) | SOLID의 Unity 적용 카탈로그 |
 | [stale-artifact-false-signal.md](best-practice/stale-artifact-false-signal.md) | 부산물 잔재를 판정자로 쓰는 게이트의 거짓 양성 |
+| [switch-off-pixel-gate.md](best-practice/switch-off-pixel-gate.md) | 스위치로 갈리는 화면 변경의 꺼진 쪽 픽셀 0 게이트와 탐침 규율 |
 | [test-intent-repurposing.md](best-practice/test-intent-repurposing.md) | 전제가 소멸한 테스트의 불변식 계약 전환 |
 | [transform-channel-layering.md](best-practice/transform-channel-layering.md) | 변위 크기·동반자 기준 트랜스폼 층 배치 |
 | [transit-path-assertion.md](best-practice/transit-path-assertion.md) | 종단 상태가 같은 이동의 경유 경로 단언 |
