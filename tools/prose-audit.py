@@ -113,7 +113,7 @@ def audit_comments(repo):
 
 
 def audit_commits(repo, count):
-    raw = git(repo, "log", f"-{count}", "--format=%H\x1f%s\x1f%b\x1e")
+    raw = git(repo, "log", f"-{count}", "--format=%H\x1f%s\x1f%b\x1f%B\x1e")
     records = [r for r in raw.split("\x1e") if r.strip()]
     rows = []
     for rec in records:
@@ -122,6 +122,9 @@ def audit_commits(repo, count):
             continue
         sha, subject = parts[0], parts[1]
         body = parts[2] if len(parts) > 2 else ""
+        # 제목 뒤 빈 줄이 빠지면 git이 본문 줄을 %s에 이어 붙인다. 원문 첫 줄과 다르면 그 사고다.
+        first_line = parts[3].strip().split("\n", 1)[0] if len(parts) > 3 else subject
+        merged = first_line.strip() != subject.strip()
         files = git(repo, "show", "--name-only", "--format=", "-1", sha).split()
         # 확장자를 Unity 자산으로 좁히면 문서·스크립트 저장소에서 늘 0건이 나온다.
         stems = {os.path.basename(f).rsplit(".", 1)[0] for f in files}
@@ -133,7 +136,8 @@ def audit_commits(repo, count):
         rows.append(dict(sha=sha[:7], subject=subject, len=len(subject),
                          typed=bool(TYPE_PREFIX.match(subject)),
                          names_file=names_file, has_ident=bool(IDENTIFIER.search(subject)),
-                         body_lines=len(body_lines), paragraphs=len(paragraphs)))
+                         body_lines=len(body_lines), paragraphs=len(paragraphs),
+                         merged=merged))
     return rows
 
 
@@ -219,13 +223,24 @@ def main():
         named = sum(1 for x in commits if x["names_file"])
         typed = sum(1 for x in commits if x["typed"])
         long_body = [x for x in commits if x["body_lines"] > LIMIT_BODY_LINES]
-        print(f"  제목 글자             평균 {statistics.mean(slen):4.0f}  최대 {max(slen)}  {LIMIT_SUBJECT}자 초과 {sum(1 for s in slen if s > LIMIT_SUBJECT)}")
+        long_subj = [x for x in commits if x["len"] > LIMIT_SUBJECT]
+        merged = [x for x in commits if x["merged"]]
+        print(f"  제목 글자             평균 {statistics.mean(slen):4.0f}  최대 {max(slen)}  {LIMIT_SUBJECT}자 초과 {len(long_subj)}")
+        for x in long_subj[:5]:
+            print(f"      {x['sha']}  {x['len']:3d}자  {x['subject'][:46]}")
+        print(f"  제목 뒤 빈 줄 누락    {len(merged)} / {n}   ← 본문이 제목에 합쳐진 커밋")
+        for x in merged[:5]:
+            print(f"      {x['sha']}  {x['subject'][:46]}")
         print(f"  제목이 바뀐 파일 언급 {named} / {n}  ({pct(named, n):.0f}%)   ← 100% 가 목표")
         print(f"  유형 접두 사용        {typed} / {n}  ({pct(typed, n):.0f}%)")
         print(f"  본문 줄               평균 {statistics.mean(blines):4.1f}  최대 {max(blines)}  문단 평균 {statistics.mean(paras):3.1f}")
         print(f"  본문 {LIMIT_BODY_LINES}줄 초과         {len(long_body)} / {n}  ({pct(len(long_body), n):.0f}%)")
         for x in long_body[:5]:
             print(f"      {x['sha']}  {x['body_lines']:2d}줄  {x['subject'][:46]}")
+        if long_subj:
+            fails.append(f"제목 {LIMIT_SUBJECT}자 초과 {len(long_subj)}건")
+        if merged:
+            fails.append(f"제목 뒤 빈 줄 누락 {len(merged)}건")
         if named < n:
             fails.append(f"제목에 파일 미언급 {n - named}건")
         if long_body:
