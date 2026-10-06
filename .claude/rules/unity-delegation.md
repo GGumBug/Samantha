@@ -150,7 +150,7 @@ UI 미표시·반투명·색상 이상 등 Unity 시각 버그는 **코드/asset
 
 여러 노드 타입/도메인이 **공통 허브 파일**(예: `NodeEntryService`, `PlayerData`, `PlayerRunStateData`, `RoguelikeMapController`)에 훅/필드/API를 추가해야 하는 경우 **반드시 순차 실행**. 병렬 위임하면 같은 파일에 분산 편집이 몰려 merge conflict 또는 중복 구현 발생.
 
-**식별 방법**: 여러 에이전트의 수정 파일 목록에 **같은 파일이 나타나면** 직렬화 후보. 특히 `*Service.cs`, `*Data.cs`, 공통 Enum 정의 파일.
+**식별 방법**: 여러 에이전트의 수정 파일 목록에 **같은 파일이 나타나면** 직렬화 후보. 특히 `*Service.cs`, `*Data.cs`, 공통 Enum 정의 파일. 순차의 경계는 앞 작업의 편집 종료가 아니라 **커밋**이다. 미커밋 파일(굽기 도구·프리팹)을 이어 고치면 두 작업이 한 diff에 섞인다.
 
 **예외**: Shop/Battle/Camp/Encounter 같이 **도메인이 분리된 파일**(예: `ShopManager`, `BattleManager`)은 안전하게 병렬 가능.
 
