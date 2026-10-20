@@ -20,6 +20,14 @@ set -uo pipefail
 SRC="C:/Unity_Projects/Double-Down"
 DST="C:/Unity_Projects/dd-batch"
 UNITY="/c/Program Files/Unity/Hub/Editor/6000.3.19f1/Editor/Unity.exe"
+# 파이썬은 PATH의 스토어 스텁(실행하면 "Python was not found")을 피해 실제로 도는 것을 고른다.
+PYTHON="${PYTHON:-}"
+if [ -z "$PYTHON" ]; then
+  for candidate in python3 python py "C:/Users/alsrl/AppData/Local/Python/pythoncore-3.14-64/python.exe"; do
+    if "$candidate" -c "pass" >/dev/null 2>&1; then PYTHON="$candidate"; break; fi
+  done
+fi
+[ -n "$PYTHON" ] || { echo "파이썬 없음: PYTHON 환경변수로 지정하라"; exit 1; }
 RESULTS="$DST/results-editmode.xml"
 LOG="$DST/batch.log"
 
@@ -74,7 +82,7 @@ if [ ! -f "$RESULTS" ]; then
   exit 1
 fi
 
-PYTHONIOENCODING=utf-8 python - "$RESULTS" <<'PY'
+PYTHONIOENCODING=utf-8 "$PYTHON" - "$RESULTS" <<'PY'
 import sys, xml.etree.ElementTree as ET
 # 콘솔 기본 코드페이지가 cp949 라 한글·em dash 가 UnicodeEncodeError 를 낸다 — 출력을 UTF-8 로 고정한다.
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
