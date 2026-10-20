@@ -518,6 +518,17 @@ MUTATIONS = [
     ('SA3', 'Assets/Scripts/Domain/Run/StampCatalog.cs', '                new StampDefinition(\n                    "stamp_chodan", CardTag.Chodan, CardCategory.Tti,\n                    new[] { CardTag.Hongdan, CardTag.Cheongdan, CardTag.BiTti }),\n', '', '초단 도장 행 없음', 'EditMode'),
     ('SA4', 'Assets/Scripts/Infrastructure/GameData/BgBalanceLoader.cs', 'int stampPrice = Require(values, "stamp_price");', 'int stampPrice = values.TryGetValue("stamp_price", out int sp) ? sp : 100;', 'stamp_price 누락을 조용히 넘김', 'EditMode'),
     ('SA5', 'Assets/Scripts/Domain/Balance/ShopBalance.cs', 'StampPrice = BalanceGuard.RequirePositive(stampPrice, nameof(stampPrice));', 'StampPrice = BalanceGuard.RequireNonNegative(stampPrice, nameof(stampPrice));', '도장 값 0 허용', 'EditMode'),
+    ('SB1', 'Assets/Scripts/Boot/MatchSessionFactory.cs', 'cardUpgrades = _stamps.ApplyTo(cardUpgrades);', ';', '도장이 덱 렌즈에 안 실림', 'PlayMode'),
+    ('SB2', 'Assets/Scripts/Boot/MatchSessionFactory.cs', '_stakeRuleEnabled, _balances.Shop.StartGold);\n            _upgrades = new RunUpgrades();\n            _cardUpgrades = new RunCardUpgrades();\n            _bonusCards = new RunBonusCards();\n            _stamps = new RunStamps();', '_stakeRuleEnabled, _balances.Shop.StartGold);\n            _upgrades = new RunUpgrades();\n            _cardUpgrades = new RunCardUpgrades();\n            _bonusCards = new RunBonusCards();', '새 런이 옛 도장을 이음', 'PlayMode'),
+    ('SB3', 'Assets/Scripts/Boot/MatchSessionFactory.cs', '_stamps.Stamp(new CardDefinitionId(definitionId), StampCatalog.Get(stampStableId));', 'try { _stamps.Stamp(new CardDefinitionId(definitionId), StampCatalog.Get(stampStableId)); } catch (System.ArgumentException) { }', 'DebugStamp가 거부를 삼킴', 'PlayMode'),
+    ('SC1', 'Assets/Scripts/Application/ShopSession.cs', 'if (second >= first)\n            {\n                second++;\n            }', 'if (false)\n            {\n                second++;\n            }', '둘째 제시 보정 없음(같은 도장 둘)', 'EditMode'),
+    ('SC2', 'Assets/Scripts/Application/ShopSession.cs', 'offers.Add(catalog[low]);\n            offers.Add(catalog[high]);', 'offers.Add(catalog[first]);\n            offers.Add(catalog[second]);', '제시 정렬 없음', 'EditMode'),
+    ('SC3', 'Assets/Scripts/Application/ShopSession.cs', '            _stampSoldOut = true;', '            ;', '도장 품절 표시 없음', 'EditMode'),
+    ('SC4', 'Assets/Scripts/Application/ShopSession.cs', '&& !IsStampSoldOut\n            && _run.Phase == RunPhase.AwaitingMatch', '&& !IsStampSoldOut', '도장 SKU 국면 조건 없음', 'EditMode'),
+    ('SC5', 'Assets/Scripts/Application/ShopSession.cs', 'if (IsSameStamp(_stamps.Slots[held].Stamp, stamp))', 'if (false)', '같은 도장 재구매 허용', 'EditMode'),
+    ('SC6', 'Assets/Scripts/Application/ShopSession.cs', 'return overwriteSlot >= 0 && overwriteSlot < RunStamps.SlotCount;', 'return overwriteSlot >= 0;', '덮을 칸 상한 검사 없음', 'EditMode'),
+    ('SC7', 'Assets/Scripts/Application/ShopSession.cs', 'if (!CanPlaceStamp(stampStableId, definitionId, overwriteSlot))', 'if (false)', 'BuyStamp가 배치 규칙을 건너뜀', 'EditMode'),
+    ('SC8', 'Assets/Scripts/Application/ShopSession.cs', '                    heldStamp.StableId);', '                    null);', 'HeldStampId가 늘 null', 'EditMode'),
 ]
 
 

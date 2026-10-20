@@ -63,11 +63,12 @@ while args:
 
 src_bytes = read(f"{SRC}/{REL}")
 dst_path = f"{DST}/{REL}"
-if read(dst_path) != src_bytes:
-    raise SystemExit("사본이 원본과 다르다. 먼저 동기화하라")
-restore_bytes = src_bytes
-if ref is not None:
-    # 옛 리비전의 스윕 파일로 바꿔 돈다. 끝나면 지금 원본 바이트로 되돌린다.
+restore_bytes = read(dst_path)
+if ref is None:
+    if restore_bytes != src_bytes:
+        raise SystemExit("사본이 원본과 다르다. 먼저 동기화하라")
+else:
+    # 옛 리비전의 스윕 파일로 바꿔 돈다. 작업 트리와 달라도 되고, 끝나면 사본의 원래 바이트로 되돌린다.
     src_bytes = subprocess.run(["git", "-C", SRC, "show", f"{ref}:{REL}"], capture_output=True, check=True).stdout
     print("ref", ref, "bytes", len(src_bytes))
 text = src_bytes.decode("utf-8")
