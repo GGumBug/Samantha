@@ -9,6 +9,7 @@
 #
 # 왜 사본에서 도는가: Editor 가 원본 프로젝트를 Temp/UnityLockfile 로 잠그므로 같은 폴더를
 # 배치 모드가 열 수 없다. 사본은 Library 캐시를 보존해 재임포트를 건너뛴다(첫 회만 느리다).
+# 사본을 %TEMP% 밖에 두는 이유: 임시 폴더 정리가 사본의 패키지 캐시를 두 번 지웠다(2026-09-30, 2026-10-08).
 #
 # 사용법:
 #   ./ddtest.sh                     Assets/Packages/ProjectSettings 증분 동기화 후 전량 실행
@@ -17,7 +18,7 @@
 set -uo pipefail
 
 SRC="C:/Unity_Projects/Double-Down"
-DST="C:/Users/alsrl/AppData/Local/Temp/claude/C--AI-Projects-Samantha/d514da04-ede3-4dc1-a445-44595fca6b59/scratchpad/dd-batch"
+DST="C:/Unity_Projects/dd-batch"
 UNITY="/c/Program Files/Unity/Hub/Editor/6000.3.19f1/Editor/Unity.exe"
 RESULTS="$DST/results-editmode.xml"
 LOG="$DST/batch.log"
