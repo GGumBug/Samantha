@@ -46,6 +46,15 @@
 | 투영 타입 | `StampOffer(StableId, ScoreLineKind TargetLine)`, `StampTarget(DefinitionId, ScoreLineKind? CurrentLine, string HeldStampId)`, `StampSlotView(Index, DefinitionId, StampId)` |
 | 화면(S5) | 상점 칸 "도장 찍기"에 제시 2종 버튼. 누르면 `StampPlacementView`: 설명 한 줄, 후보 격자(얼굴 + 현재 줄 글자), 칸 3(찼을 때만 덮을 칸 선택), 확인·취소. 확인에서만 `BuyStamp` |
 
+### 1-3. S6 판 표식·힌트의 모양 (조사로 확정, 2026-10-21)
+
+- `CardSnapshot`에 도장 축을 더하지 않는다. 생산 지점이 37곳(Scripts 12·Tests 25)이라 비용이 크고, 이미 카드마다 강화를 묻는 문 `CardUpgradeProbe`(`CardUpgradeValues`, 생산 지점 3곳)가 있다. 그 struct에 `ScoreLineKind? StampLine`을 싣는다.
+- S3가 동결한 "도장이 한 단으로 선다"(`ShopFactoryWiringTests.cs:785-787`)는 틀린 기대였다. `MatchSession.ProbeCardUpgrade`가 `entry.Upgrades.Count`를 그대로 내보내 도장이 금박 눈금으로 그려진다. S6a가 `TierCount`를 태그 항 제외로 고치고 기대를 바꾼다.
+- 족보 힌트 후보 표는 `ScoreLineMembers.Of(kind, PlayerDeck deck)`로 렌즈판을 만들고, `MatchSession.LineMembersUnderLens`를 판이 설 때 한 번 민다(`MainScene.cs:851` `ShowHandUpgrades` 계급). 화면은 문이 아니라 값을 받는다.
+- 광 도장은 광 줄 후보를 바꾸지 않는다(광 줄은 카테고리 기준, `ScoreLineMembers.cs:76`). 단 도장 셋만 후보가 움직인다.
+- 판 위 표식은 `CardView`에 `CardSlotBadge`(`CardView.cs:918`, 지연 생성 TMP 자식) 선례로 글자 배지를 하나 더 단다. `CardUpgradeMark`는 스프라이트 전용이라 손대지 않는다.
+- 분할: S6a Application(Jarvis) → S6b Presentation·Boot 배선(Ava). 시험은 카드마다 Sonny.
+
 ## 2. 카드
 
 순차다. 카드마다 구현자와 시험 작성자를 나눈다. 좌표는 2026-10-20 기준이다.
