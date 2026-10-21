@@ -43,6 +43,22 @@ done
 
 [ -x "$UNITY" ] || { echo "Unity 에디터 없음: $UNITY"; exit 1; }
 
+# 사본은 하나라 두 실행이 겹치면 동기화와 Unity 프로젝트 잠금이 서로 깨뜨린다. mkdir 원자 잠금으로 줄을 세운다.
+# 잠금은 사본 밖에 둔다(--full-sync의 rm -rf가 지우지 않게). 주인 셸이 죽었으면 회수한다.
+LOCK="${DST}.lock"
+WAITED=0
+until mkdir "$LOCK" 2>/dev/null; do
+  holder=$(cat "$LOCK/pid" 2>/dev/null)
+  if [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; then
+    echo "▸ 낡은 잠금 회수 (pid $holder)"; rm -rf "$LOCK"; continue
+  fi
+  [ "$WAITED" = 0 ] && echo "▸ 다른 배치 실행을 기다린다 (pid ${holder:-?})"
+  sleep 15; WAITED=$((WAITED + 15))
+  [ "$WAITED" -ge 5400 ] && { echo "▸ 대기 90분 초과 — 잠금 $LOCK 을 확인하라"; exit 1; }
+done
+echo $$ > "$LOCK/pid"
+trap 'rm -rf "$LOCK"' EXIT
+
 if [ "$FULL_SYNC" = "1" ]; then
   echo "▸ 전체 재생성 (Library 캐시 버림 — 첫 실행은 수 분 걸린다)"
   rm -rf "$DST"
