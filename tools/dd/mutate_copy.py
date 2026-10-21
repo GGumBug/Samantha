@@ -540,7 +540,7 @@ MUTATIONS = [
     ('SE2', 'Assets/Scripts/Application/MatchSession.cs', '                : StampLineProjection.TargetLineOf(resolvedTag);', '                : (ScoreLineKind?)null;', '프로브의 도장 줄이 늘 null', 'PlayMode'),
     ('SE3', 'Assets/Scripts/Application/ScoreLineMembers.cs', 'if (CountsToward(card, deck.Resolve(card).Tag, kind))', 'if (CountsToward(card, card.Tag, kind))', '후보 표가 렌즈를 무시한다', 'EditMode'),
     ('SE4', 'Assets/Scripts/Application/PresentationVocabulary.cs', '                && IsWeightAltered == other.IsWeightAltered\n                && StampLine == other.StampLine;', '                && IsWeightAltered == other.IsWeightAltered;', '같음 비교가 도장 줄을 무시한다', 'EditMode'),
-    ('SF1', 'Assets/Scripts/Presentation/Board/CardView.cs', '                else\n                {\n                    _stampBadge.Hide();\n                }', '                else\n                {\n                }', '도장이 빠져도 배지가 남는다', 'EditMode'),
+    ('SF1', 'Assets/Scripts/Presentation/Board/CardView.cs', '            else\n            {\n                _stampBadge.Hide();\n            }', '            else\n            {\n            }', '도장이 빠져도 배지가 남는다', 'EditMode'),
     ('SF2', 'Assets/Scripts/Presentation/Hud/JokboTracker.cs', '                _lineMembers != null && _lineMembers.TryGetValue(line.Kind, out IReadOnlyList<ushort> lensMembers)', '                false && _lineMembers.TryGetValue(line.Kind, out IReadOnlyList<ushort> lensMembers)', '힌트가 렌즈 표를 안 쓴다', 'EditMode'),
     ('SF3', 'Assets/Scripts/Presentation/Hud/JokboTracker.cs', '            _lineMembers = null;', '            // MUTATION', '판 사이에 렌즈 표가 남는다', 'EditMode'),
     ('SF4', 'Assets/Scripts/Presentation/Board/CardStampBadge.cs', 'bounds.max.x - bounds.size.x * RightInsetFactor,', 'bounds.min.x + bounds.size.x * RightInsetFactor,', '배지가 왼쪽 위로 간다', 'EditMode'),
@@ -549,6 +549,12 @@ MUTATIONS = [
     ('SF7', 'Assets/Scripts/Presentation/Board/CardView.cs', 'if (!IsFlipCovered && _upgradeValues.HasStamp)', 'if (_upgradeValues.HasStamp)', '뒤집기 가림 중에도 배지', 'EditMode'),
     ('SF8', 'Assets/Scripts/Presentation/Board/CardStampBadge.cs', '            _label = holder.AddComponent<TextMeshPro>();\n            if (_font != null)\n            {\n                _label.font = _font;\n            }', '            _label = holder.AddComponent<TextMeshPro>();', '새 배지 라벨이 폰트를 안 받는다', 'EditMode'),
     ('SF9', 'Assets/Scripts/Presentation/Board/CardStampBadge.cs', '            if (_label != null && font != null)\n            {\n                _label.font = font;\n            }', '            if (false)\n            {\n                _label.font = font;\n            }', '이미 선 배지가 폰트 교체를 안 받는다', 'EditMode'),
+    ('SG1', 'Assets/Scripts/Application/StampTheft.cs', 'return isMember && openBefore >= requiredCount && openBefore - 1 < requiredCount;', 'return isMember && openBefore - 1 < requiredCount;', '이미 닫힌 줄에도 뺏김', 'EditMode'),
+    ('SG2', 'Assets/Scripts/Application/PresentationStepConverter.cs', '                        stampTheftLedger?.Reset();', '                        ;', '라운드가 바뀌어도 장부가 이월', 'EditMode'),
+    ('SG3', 'Assets/Scripts/Application/PresentationStepConverter.cs', '                CardTag resolvedTag = playerDeck.Resolve(definition).Tag;', '                ledger.RecordOpponentCapture(definitionId);\n                CardTag resolvedTag = playerDeck.Resolve(definition).Tag;', '판정 전에 그 카드를 장부에 기록', 'EditMode'),
+    ('SG4', 'Assets/Scripts/Presentation/Board/CardStampBadge.cs', 'rect.localScale = Vector3.one * _pulseScale;', 'rect.localScale = Vector3.one;', '권위 렌더가 펄스를 지운다', 'EditMode'),
+    ('SG5', 'Assets/Scripts/Presentation/Board/CardStampBadge.cs', '            _pulseHandle.TryCancel();\n            _pulseScale = 1f;', '            _pulseHandle.TryCancel();', '숨겨도 펄스 배율이 남는다', 'EditMode'),
+    ('SG6', 'Assets/Scripts/Presentation/Board/FloatingTextMotion.cs', '                case StampStolenStep stolen:\n                    SpawnStampStolen(stolen);\n                    return UniTask.CompletedTask;', '                case StampStolenStep stolen:\n                    return UniTask.CompletedTask;', '뺏김 외침이 안 뜬다', 'EditMode'),
 ]
 
 
