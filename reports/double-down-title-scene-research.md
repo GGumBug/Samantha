@@ -108,7 +108,7 @@ Hades·Dead Cells는 검색에서 타이틀 설명을 확인하지 못해 표에
 
 ## 7. 결정해 주실 것
 
-1. 방향: 시안 A(하우스 테이블)로 갈지, C(다이제틱)를 지금 할지.
+1. 방향: **시안 A로 결정(2026-10-24).** 그림은 사용자가 Aseprite로 직접 찍는다. C는 보류. 레퍼런스는 §10이다.
 2. 로고: 시안 B ①·②·③ 중 하나. 글자 하나를 사물(칩·광·도장)로 바꿀지.
 3. 소리: 테마 곡을 어디서 구할지(직접·외주·라이선스). 이것이 없으면 화면만 고쳐도 "잘 만든" 느낌이 반만 난다.
 4. 느낌표: `DOUBLE DOWN!`의 `!`를 뗄지.
@@ -116,7 +116,7 @@ Hades·Dead Cells는 검색에서 타이틀 설명을 확인하지 못해 표에
 
 ## 8. 다음 단계
 
-결정이 오면 Ava가 배경 레이어를 그리고(팔레트 안, 1920×1080 또는 480×270 ×4), 씬은 라이브 에디터 명령으로 굽는다. 모션·피드백은 Ava 코드, 시험은 Sonny다.
+그림은 사용자가 §9 명세와 §10 보드를 보고 찍는다. Ava는 같은 치수의 단색 자리채움을 먼저 만들어 씬을 라이브 에디터 명령으로 굽고, 그림이 오면 같은 이름으로 덮는다. 모션·피드백은 Ava 코드, 시험은 Sonny다.
 소리는 자산이 먼저라 별도 트랙이다.
 
 ## 9. 이미지 자산 명세 (시안 A 기준, 2026-10-24)
@@ -165,6 +165,52 @@ Hades·Dead Cells는 검색에서 타이틀 설명을 확인하지 못해 표에
 - 자리를 먼저 보려면 Ava가 팔레트 색 단색 자리채움(같은 치수)을 코드로 만들어 씬에 꽂을 수 있다. 그림이 오면 같은 이름으로 덮는다.
 - 소리는 그림과 별도 트랙이다. 테마 1곡, 호버·확정 효과음 2개.
 
+## 10. 레퍼런스 보드 (시안 A, 2026-10-24)
+
+![레퍼런스 보드](assets/title-reference-board.png)
+
+원본 17장은 Double Down `Assets/Arts/Reference/Title/`에 있고, 파일별 출처와 조건은 그 폴더의 `README.md`가 든다.
+픽셀을 베끼지 않는다. 가져오는 것은 구도, 명도 단계, 소품 밀도 셋이다. 색은 팔레트 램프로 바꾼다.
+
+![팔레트 램프](assets/title-palette-ramps.png)
+
+램프 그림은 24색을 명도순으로 늘어놓고 펠트·나무·빛·연기·칩의 단계를 뽑은 것이다. 그릴 때 옆에 둔다.
+
+### 10-1. 공간·조명 (방 배경 `Title_Room`, 빛무리, 인물 실루엣)
+
+| 파일 | 볼 것 |
+|---|---|
+| `redstrings_ss_01` | 바 전경. 네온 간판 하나가 공간의 이름을 말하고, 벽은 비우고 소품 서넛만 밝다. 방 배경의 밀도 기준 |
+| `redstrings_ss_02` | 전경의 병·잔은 크고 밝고, 카운터 너머 인물은 실루엣이다. 전경 칩·부채와 후경 타짜(§9-3)의 두 단 깊이 |
+| `redstrings_ss_03` | 저녁 하늘의 디더링 띠와 역광 실루엣. 빛무리 가장자리를 디더링으로 푸는 방식 |
+| `va11halla_ss_01~03` | 패널마다 테두리가 있는 CRT풍 UI, 어두운 바 배경 위 초상. 런 설정 쪽지와 설정 화면(결정 5)의 패널 질감 |
+| `coffeetalk_ss_01` | 한쪽에서 오는 따뜻한 주황 조명이 인물군을 가른다. 전구 빛이 테이블 한쪽만 밝히는 구도 |
+| `coffeetalk_ss_02` | 선반 소품이 빼곡한 카운터. 소품 밀도의 상한이다. 우리는 이보다 비운다 |
+| `vertibirdo_tavern_pixel` | 돌벽·나무결의 디더링과 그림으로 찍은 간판 글자. 나무 테두리(`#45230d`) 질감과 로고의 참고 |
+
+### 10-2. 펠트·칩·CRT (테이블 `Title_Table`, 칩 더미, 로고 크기)
+
+| 파일 | 볼 것 |
+|---|---|
+| `balatro_main_menu_desktop` | 로고가 화면 40%를 차지하고 글자 하나가 카드(에이스)로 바뀐다(결정 2). 메뉴는 아래 가로 띠, 버튼마다 색이 다르다 |
+| `balatro_ss_01` | 단색 펠트 위 흰 카드라 대비가 크다. 우리 화투는 바탕이 어두워 펠트 `#183f39` 위에서 약할 수 있다. 부채 뒤 빛무리로 분리한다 |
+| `balatro_ss_02` | 배경 색만 보라로 바꿔도 판의 톤이 바뀐다. 배경 한 층이 장면의 기분을 정한다 |
+| `oga_pixel_poker_…_mockup` | 256×192에서 칩이 2~3px 디스크 묶음으로 읽힌다. `Title_ChipStack` 40×64은 넉넉하다. 빨간 나무 테두리도 같은 구도 |
+
+### 10-3. 연기 (`Title_Smoke`)
+
+| 파일 | 볼 것 |
+|---|---|
+| `oga_smoke_weissnix_ccbysa` | 32×32 10프레임. 한 줄기가 뭉쳤다 흩어지는 궤적이고 프레임 간 차이가 작아 느린 루프에 맞다. 160×120에서는 세로로 늘인 궤적으로 본다 |
+| `oga_fire_smoke_reactorcore_cc0_preview` | 회색 연기 행이 진한 덩어리에서 성긴 점으로 사라지는 순서를 보여 준다. 디더링이 빠지는 단계의 참고 |
+
+### 10-4. 로고·톤 (`Title_Logo`, 전체 색)
+
+| 파일 | 볼 것 |
+|---|---|
+| `balatro_logo_sketch` | 종이 연필 밑그림. 획이 울퉁불퉁하고 A 자리에 스페이드가 선다. 로고는 폰트가 아니라 그림이라는 §9-1 5번의 근거. 종이에 먼저 긋고 찍는다 |
+| `tazza_2006_poster` | 빨강·자주·크림 세 톤이 팔레트 `#9b1a0a`·`#550f0a`·`#efd8a1` 축과 같다. 옆얼굴과 글자가 한 색면에 겹친다. 타이틀 전체 톤의 기준 |
+
 ## 출처
 
 - [Balatro Wiki, Main menu](https://balatrowiki.org/w/Main_menu): 조커 등장, 에이스가 든 로고, 테마 음악, 버튼 구성
@@ -173,4 +219,5 @@ Hades·Dead Cells는 검색에서 타이틀 설명을 확인하지 못해 표에
 - [Washington Post, Best video game title screens](https://www.washingtonpost.com/video-games/interactive/2021/best-video-game-title-screens/): 첫인상, 슈퍼 마리오 3(검색 요약으로만 확인, 본문은 접근 제한)
 - [Steam 토론, Slay the Spire 타이틀](https://steamcommunity.com/app/646570/discussions/0/1692659135900855658/): 구름 애니메이션 언급
 - [TV Tropes, Inscryption](https://tvtropes.org/pmwiki/pmwiki.php/VideoGame/Inscryption): 메뉴 위장, 막별 색
+- 레퍼런스 파일별 출처·조건: Double Down `Assets/Arts/Reference/Title/README.md`
 - 저장소: `Assets/Scenes/TitleScene.unity`, `Assets/Scripts/Boot/Scenes/TitleScene.cs`, `Assets/Scripts/Presentation/Title/TitleView.cs`, `Assets/Arts/Reference/`
