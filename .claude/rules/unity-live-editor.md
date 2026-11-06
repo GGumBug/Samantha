@@ -40,7 +40,8 @@ unity command                             # 이 에디터가 노출하는 명령
 `Running: true`로 보였다. 두 명령을 나란히 보지 않았으면 "포트가 왜 안 뜨지"로 헤맸다.)
 
 에디터가 둘 이상 떠 있으면 CLI 문서는 `--project-path`로 대상을 고정하라고 권한다. 도달 가능성도 `status`가
-아니라 `unity command`로 확인하라고 적는다([integration-advanced.md](../skills/unity-cli/references/integration-advanced.md)).
+아니라 `unity command`로 확인하라고 적는다. 출처는 `unity:unity-cli` 플러그인 스킬의
+integration-advanced 참조 문서다.
 
 **끝내 파일을 직접 편집한다면 보고에 명시해라** — *"라이브 에디터 없음(사유), 파일 직접 편집"*.
 조용히 새는 것이 이 규칙이 막으려는 유일한 실패다.
