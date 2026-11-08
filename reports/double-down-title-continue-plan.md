@@ -183,4 +183,8 @@ Easy Save 3는 설치돼 있지만 쓰지 않는다. asmdef가 없어 `DoubleDow
 - 화투 48장(`Assets/Arts/Sprites/Hwatu/`)의 그림 자체 테두리 2px을 안쪽 색으로 메웠다(`1116403`).
   기본 테두리 안쪽에 그림의 선이 한 겹 더 보이던 이중 테두리가 판과 부채에서 사라진다.
   상점 도장 패널·팩·족보 힌트는 그림만 그려서 이제 외곽선 없이 보인다. 그 화면에도 테두리를 깔지는 사용자 결정이다.
+  사용자는 현재 덱 테두리를 입히기로 했다([double-down-ui-card-edge-plan.md](double-down-ui-card-edge-plan.md)).
+- 뒷면 카드 한 장을 다섯 장 패 더미로 바꿨다(`b7aa5ce`). 아래 카드를 4px씩 내리고 가로로 1px씩 엇갈렸다.
+  뒷면 테두리는 바깥 3px `#9B1A0A`, 안쪽 1px `#550F0A`라서 4px 간격이면 안쪽 1px이 카드 사이 경계선으로 드러난다.
+  3px 간격은 빨간 띠 한 덩어리로 보였다(라이브 에디터 시안 비교).
 - **도구 함정**: 에디터 플레이 중 eval로 `Application.runInBackground = true`를 넣으면 `ProjectSettings.asset`의 `runInBackground`가 1로 저장된다. 탐침 뒤 `PlayerSettings.runInBackground = false`로 되돌리고 `git status`로 확인한다. `.claude/rules/unity-live-editor.md`가 이 eval을 권하므로 같은 경고가 필요하다.
