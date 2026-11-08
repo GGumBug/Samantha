@@ -174,3 +174,9 @@ Easy Save 3는 설치돼 있지만 쓰지 않는다. asmdef가 없어 `DoubleDow
 | 클리어 뒤 자동 새 런 | 그 런이 저장되어 다음 실행의 계속하기가 1막 새 런을 연다(§5) |
 | 소리, 배경 모션 끄기 | 범위 밖(자산 0건, 설정 화면 없음) |
 | 개발용 저장 파일 | `%USERPROFILE%/AppData/LocalLow/DefaultCompany/Double Down/run.json`. 탐침이 남긴 새 런 하나가 있다 |
+
+### 이후 변경 (2026-11-08, 사용자 요청)
+
+- 부제 "화투 로그라이크 · 하우스에 앉는다"를 뺐다(Double Down `16b4066`). 굽기 도구가 부제를 세우지 않고, 남은 두 칸은 옛 간판처럼 굽기 때 지운다. §2-3의 부제 결정과 C6 메모의 그림자 설명은 그때의 기록이다.
+- 화투 부채 둘째 장을 3월 홍단에서 3월 광으로 바꿨다(`c44ae02`). 부채 다섯 장이 오광이 된다. 위의 완성 화면 이미지는 두 변경 뒤의 화면이다.
+- **도구 함정**: 에디터 플레이 중 eval로 `Application.runInBackground = true`를 넣으면 `ProjectSettings.asset`의 `runInBackground`가 1로 저장된다. 탐침 뒤 `PlayerSettings.runInBackground = false`로 되돌리고 `git status`로 확인한다. `.claude/rules/unity-live-editor.md`가 이 eval을 권하므로 같은 경고가 필요하다.
