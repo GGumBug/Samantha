@@ -179,4 +179,8 @@ Easy Save 3는 설치돼 있지만 쓰지 않는다. asmdef가 없어 `DoubleDow
 
 - 부제 "화투 로그라이크 · 하우스에 앉는다"를 뺐다(Double Down `16b4066`). 굽기 도구가 부제를 세우지 않고, 남은 두 칸은 옛 간판처럼 굽기 때 지운다. §2-3의 부제 결정과 C6 메모의 그림자 설명은 그때의 기록이다.
 - 화투 부채 둘째 장을 3월 홍단에서 3월 광으로 바꿨다(`c44ae02`). 부채 다섯 장이 오광이 된다. 위의 완성 화면 이미지는 두 변경 뒤의 화면이다.
+- 부채 앞면에 판 화면과 같은 층을 깔았다(`da9b542`). 굽기 도구의 `FanCard`가 배경, 그림, `BasicCardEdge` 순서로 세운다.
+- 화투 48장(`Assets/Arts/Sprites/Hwatu/`)의 그림 자체 테두리 2px을 안쪽 색으로 메웠다(`1116403`).
+  기본 테두리 안쪽에 그림의 선이 한 겹 더 보이던 이중 테두리가 판과 부채에서 사라진다.
+  상점 도장 패널·팩·족보 힌트는 그림만 그려서 이제 외곽선 없이 보인다. 그 화면에도 테두리를 깔지는 사용자 결정이다.
 - **도구 함정**: 에디터 플레이 중 eval로 `Application.runInBackground = true`를 넣으면 `ProjectSettings.asset`의 `runInBackground`가 1로 저장된다. 탐침 뒤 `PlayerSettings.runInBackground = false`로 되돌리고 `git status`로 확인한다. `.claude/rules/unity-live-editor.md`가 이 eval을 권하므로 같은 경고가 필요하다.
